@@ -1,6 +1,8 @@
 const express = require('express');
 const app = express();
 const db = require('./config/db');
+const bcrypt = require('bcrypt');
+const saltRounds = 10; //Define a força do hash
 const cors = require('cors');
 
 // Habilita CORS para todas as requisições
@@ -27,18 +29,26 @@ app.get('/usuarios', (req, res) => {
 });
 
 // Criar novo usuário
-app.post('/usuarios', (req, res) => {
+app.post('/usuarios', async (req, res) => {
   const { nome, email, senha } = req.body;
-  const query = 'INSERT INTO usuarios (nome, email, senha) VALUES (?, ?, ?)';
 
-  db.run(query, [nome, email, senha], function (err) {
-    if (err) {
-      console.error('Erro ao inserir usuário:', err);
-      res.status(500).send('Erro interno no servidor');
-    } else {
-      res.status(201).json({ id: this.lastID, nome, email }); // Retorna o ID gerado
-    }
-  });
+  try {
+      // Gerar hash da senha antes de salvar no banco
+      const hashSenha = await bcrypt.hash(senha, saltRounds);
+
+      db.run('INSERT INTO usuarios (nome, email, senha) VALUES (?, ?, ?)', [nome, email, hashSenha], function (err) {
+          if (err) {
+              console.error('Erro ao inserir usuário:', err);
+              res.status(500).send('Erro interno');
+          } else {
+              res.status(201).json({ id: this.lastID, nome, email });
+          }
+      });
+
+  } catch (error) {
+      console.error('Erro ao criar hash da senha:', error);
+      res.status(500).send('Erro ao processar senha');
+  }
 });
 
 // Buscar um usuário por ID
@@ -57,21 +67,31 @@ app.get('/usuarios/:id', (req, res) => {
 });
 
 // Atualizar um usuário
-app.put('/usuarios/:id', (req, res) => {
+app.put('/usuarios/:id', async (req, res) => {
   const usuarioID = req.params.id;
   const { nome, email, senha } = req.body;
-  const query = 'UPDATE usuarios SET nome = ?, email = ?, senha = ? WHERE id = ?';
 
-  db.run(query, [nome, email, senha, usuarioID], function (err) {
-    if (err) {
-      console.error('Erro ao atualizar usuário:', err);
-      res.status(500).send('Erro interno no servidor');
-    } else if (this.changes === 0) {
-      res.status(404).send('Usuário não encontrado');
-    } else {
-      res.send('Usuário atualizado com sucesso');
-    }
-  });
+  try {
+      let senhaFinal = senha;
+      if (senha) {
+          senhaFinal = await bcrypt.hash(senha, saltRounds); // Hashear a nova senha
+      }
+
+      db.run('UPDATE usuarios SET nome = ?, email = ?, senha = ? WHERE id = ?', [nome, email, senhaFinal, usuarioID], function (err) {
+          if (err) {
+              console.error('Erro ao atualizar usuário:', err);
+              res.status(500).send('Erro interno');
+          } else if (this.changes === 0) {
+              res.status(404).send('Usuário não encontrado');
+          } else {
+              res.send('Usuário atualizado com sucesso!');
+          }
+      });
+
+  } catch (error) {
+      console.error('Erro ao criar hash da senha:', error);
+      res.status(500).send('Erro ao processar senha');
+  }
 });
 
 // Excluir um usuário

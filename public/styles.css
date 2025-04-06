@@ -37,9 +37,8 @@ form button:hover {
 
 /* Adiciona a nova "janelinha" para centralizar os usuários */
 #container {
- 
     padding: 20px;
-    max-width: 900px; /* Largura máxima */
+    max-width: 1200px; /* Largura máxima */
     width: 100%; /* Faz o container se ajustar */
     text-align: center;
 }
@@ -51,13 +50,7 @@ form button:hover {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Sombras suaves */
 }
 
-/* Centraliza e estiliza a lista de usuários */
-#usuarioLista {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-top: 20px;
-}
+
 
 /* Caixa de cada usuário */
 .user-item {
@@ -81,4 +74,51 @@ form button:hover {
 .user-actions{
     display: flex;
     gap: 10px;
+}
+
+.edit-button, .delete-button{
+    padding: 5px 10px;
+    border: none;
+    cursor: pointer;
+}
+
+.edit-button {
+    background-color: #ffc107;
+    color: black;
+}
+.edit-button:hover {
+    background-color: #d17f1a;
+    color: black;
+}
+
+.delete-button {
+    background-color: #dc3545;
+    color: white;
+}
+.delete-button:hover {
+    background-color: #96016e;
+    color: white;
+}
+
+/*tabela*/
+table{
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+#usuarioSenha{
+    word-break: break-word; /* Quebra o texto longo */
+    white-space: normal; /* Permite quebras de linha */
+    max-width: 400px; /* Define um tamanho máximo */
+    overflow-wrap: break-word; /* Garante que o texto se ajuste */
+}
+th {
+    background-color: #F0F0F0;
 }

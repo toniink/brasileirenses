@@ -9,16 +9,19 @@ async function getUsers(){
     userList.innerHTML = '';
 
     users.forEach((user) => {
-        const userItem = document.createElement('div');
-        userItem.className = 'user-item';
-        userItem.innerHTML = `
-        <span>Nome: ${user.nome} | Email: ${user.email}</span>
-        <div class ="user-actions">
-        <button onclick="editUser('${user.id}')">Editar</button>
-        <button onclick="deleteUser('${user.id}')">Excluir</button>
-        </div>
-        `;
-        userList.appendChild(userItem);
+        const userRow = document.createElement('tr');
+        userRow.innerHTML = `
+        <td>${user.id}</td>
+        <td>${user.nome}</td>
+        <td>${user.email}</td>
+        <td id="usuarioSenha">${user.senha}</td>
+        <td>${user.data_criacao}</td>
+        <td class="user-actions">
+            <button class="edit-button" onclick="editUser('${user.id}')">Editar</button>
+            <button class="delete-button" onclick="deleteUser('${user.id}')">Excluir</button>
+        </td>
+         `;
+        userList.appendChild(userRow);
     });
 }
 
