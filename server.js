@@ -1,6 +1,12 @@
 const express = require('express');
 const app = express();
+
 const db = require('./config/db');
+const cors = require('cors');
+
+// Habilita CORS para todas as requisições
+app.use(cors());
+
 
 // Configurar o middleware para ler JSON
 app.use(express.json());
@@ -66,6 +72,21 @@ app.get('/usuarios', (req, res) => {
         res.status(500).send('Erro interno no servidor');
       } else {
         res.send('Usuário atualizado com sucesso!');
+      }
+    });
+  });
+
+  app.get('/usuarios/:id', (req, res) => {
+    const usuarioID = req.params.id;
+  
+    // Executa a consulta com db.query
+    db.query('SELECT * FROM usuarios WHERE id = ?', [usuarioID], (err, results) => {
+      if (err) {
+        res.status(500).send('Erro no servidor');
+      } else if (results.length === 0) {
+        res.status(404).send('Usuário não encontrado');
+      } else {
+        res.json(results[0]); // Retorna o primeiro resultado (usuário) como JSON
       }
     });
   });

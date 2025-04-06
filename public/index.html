@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/public/styles.css">
+    <title>Gerenciamento de Usuarios</title>
+</head>
+<body>
+    <div id="container">
+        <!-- Caixa do formulário -->
+        <div id="form-container">
+            <h1>Gerenciamento de Usuarios</h1>
+            <form id="usuarioForm">
+                <input type="hidden" id="usuarioID" />
+                <input type="text" id="nome" placeholder="Nome" required />
+                <input type="email" id="email" placeholder="Email" required />
+                <input type="password" id="senha" placeholder="Senha" required />
+                <button type="submit">Salvar</button>
+            </form>
+        </div>
+
+        <!-- Caixa para lista de usuários -->
+        <div id="lista-container">
+            <h2>Lista de Usuarios</h2>
+            <div id="usuarioLista"></div>
+        </div>
+    </div>
+
+    <script src="/public/scripts.js"></script>
+</body>
+</html>
