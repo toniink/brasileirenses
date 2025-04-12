@@ -129,4 +129,5 @@ db.run(`CREATE TABLE IF NOT EXISTS denuncias (
     FOREIGN KEY (id_usuario) REFERENCES Usuarios (idUsuarios)
 );`);
 
+
 module.exports = db;
