@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/public/styles.css">
+    <title>Consulta de Cursos</title>
+</head>
+<body>
+    <div id="container">
+        <button id="voltarButton">Voltar ao Menu Principal</button>
+        
+        <!-- Caixa do formulário -->
+        <div id="form-container">
+            <h1>Gerenciamento de Cursos</h1>
+            <form id="cursoFormulario">
+                <input type="hidden" id="cursoID" />
+                <input type="text" id="nome_curso" placeholder="Nome do Curso" required />
+                <textarea id="descricao" placeholder="Descrição do Curso" required></textarea>
+                <input type="text" id="duracao" placeholder="Duração (ex.: 40 horas)" required />
+                <input type="url" id="url" placeholder="Link do Curso" />
+                <select id="formato" required>
+                    <option value="">Selecione o formato</option>
+                    <option value="texto">Texto</option>
+                    <option value="video">Vídeo</option>
+                    <option value="interativo">Interativo</option>
+                </select>
+                <select id="nivel_dificuldade" required>
+                    <option value="">Selecione o nível de dificuldade</option>
+                    <option value="iniciante">Iniciante</option>
+                    <option value="intermediario">Intermediário</option>
+                    <option value="avancado">Avançado</option>
+                </select>
+                <select id="categoria" required>
+                    <option value="">Selecione uma categoria</option>
+                    <!-- Categorias carregadas dinamicamente -->
+                </select>
+                <select id="site" required>
+                    <option value="">Selecione um site</option>
+                    <!-- Sites carregadas dinamicamente -->
+                </select>
+                <button type="submit">Salvar</button>
+            </form>
+        </div>
+
+        <!-- Caixa para lista de cursos -->
+        <div id="lista-container">
+            <h2>Lista de Cursos</h2>
+            <table id="cursoTabela">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nome</th>
+                        <th>Descrição</th>
+                        <th>Duração</th>
+                        <th>URL</th>
+                        <th>Formato</th>
+                        <th>Nível</th>
+                        <th>Categoria</th>
+                        <th>Site</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="cursoLista">
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="/public//scripts/inserirCursos.js"></script>
+</body>
+</html>

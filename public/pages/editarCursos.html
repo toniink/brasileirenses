@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/public/styles.css">
+    <title>Editar Curso</title>
+</head>
+<body>
+    <div id="container">
+      
+        
+        <h1>Editar Curso</h1>
+        <form id="formEditarCurso">
+            <label for="id_curso">ID:</label>
+            <input type="text" id="id_curso" disabled />
+
+            <label for="nome_curso">Nome do Curso:</label>
+            <input type="text" id="nome_curso" placeholder="Digite o nome do curso" required />
+
+            <label for="descricao">Descrição:</label>
+            <textarea id="descricao" placeholder="Digite a descrição do curso" required></textarea>
+
+            <label for="duracao">Duração:</label>
+            <input type="text" id="duracao" placeholder="Ex.: 40 horas" required />
+
+            <label for="url">Link do Curso:</label>
+            <input type="url" id="url" placeholder="Digite a URL do curso" />
+
+            <label for="formato">Formato:</label>
+            <select id="formato" required>
+                <option value="texto">Texto</option>
+                <option value="video">Vídeo</option>
+                <option value="interativo">Interativo</option>
+            </select>
+
+            <label for="nivel_dificuldade">Nível de Dificuldade:</label>
+            <select id="nivel_dificuldade" required>
+                <option value="iniciante">Iniciante</option>
+                <option value="intermediario">Intermediário</option>
+                <option value="avancado">Avançado</option>
+            </select>
+
+            <label for="categoria">Categoria:</label>
+            <select id="categoria" required>
+                <option value="">Selecione uma categoria</option>
+                <!-- Categorias carregadas dinamicamente -->
+            </select>
+
+            <label for="site">Site:</label>
+            <select id="site" required>
+                <option value="">Selecione um site</option>
+                <!-- Sites carregados dinamicamente -->
+            </select>
+
+            <button type="submit">Salvar</button>
+            <button type="button" id="botaoCancelar">Cancelar</button>
+        </form>
+    </div>
+
+    <script src="/public/scripts/editarCursos.js"></script>
+</body>
+</html>

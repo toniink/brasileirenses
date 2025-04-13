@@ -122,3 +122,18 @@ th, td {
 th {
     background-color: #F0F0F0;
 }
+
+#voltarButton {
+    padding: 10px 20px;
+    background-color: #28a745; /* Verde para destacar */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    margin: 10px 0;
+}
+
+#voltarButton:hover {
+    background-color: #218838; /* Cor mais escura ao passar o mouse */
+}

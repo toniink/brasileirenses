@@ -61,16 +61,17 @@ async function deleteUser(usuarioID) {
   
   // Função para carregar dados no formulário para edição
   function editUser(usuarioID) {
-    fetch(`${apiURL}/${usuarioID}`)
-      .then((response) => response.json())
-      .then((user) => {
-        document.getElementById('usuarioID').value = user.id;
-        document.getElementById('nome').value = user.nome;
-        document.getElementById('email').value = user.email;
-        document.getElementById('senha').value = user.senha;
-      });
-  }
+    window.location.href=(`editUser.html?id=${usuarioID}`);
+}
+
   
+
+//botao voltar menu principal
+document.getElementById('voltarButton').addEventListener('click', () => {
+    window.location.href = '../index.html'; // Ajuste o caminho se necessário
+});
+
   // Inicializa as funções
   document.getElementById('usuarioForm').addEventListener('submit', saveUser);
 getUsers();
+

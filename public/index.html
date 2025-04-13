@@ -4,43 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/public/styles.css">
-    <title>Gerenciamento de Usuarios</title>
+    <title>Menu Principal</title>
 </head>
 <body>
-    <div id="container">
-        <!-- Caixa do formulário -->
-        <div id="form-container">
-            <h1>Gerenciamento de Usuarios</h1>
-            <form id="usuarioForm">
-                <input type="hidden" id="usuarioID" />
-                <input type="text" id="nome" placeholder="Nome" required />
-                <input type="email" id="email" placeholder="Email" required />
-                <input type="password" id="senha" placeholder="Senha" required />
-                <button type="submit">Salvar</button>
-            </form>
-        </div>
-
-        <!-- Caixa para lista de usuários -->
-        <div id="lista-container">
-            <h2>Lista de Usuarios</h2>
-            <table id="usuarioTabela">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Nome</th>
-                        <th>Email</th>
-                        <th>Senha</th>
-                        <th>Data de Criação</th>
-                        <th>Ações</th>
-                    </tr>
-                </thead>
-                <tbody id="usuarioLista">
-
-                </tbody>
-            </table>
-        </div>
+   
+    <div id="menu-container">
+        
+        <h1>Menu de Gerência</h1>
+        <button onclick="window.location.href = 'pages/consultarUsuarios.html';">Usuários</button>
+        <button onclick="window.location.href = 'pages/consultaCursos.html';">Cursos</button>
+        <button onclick="window.location.href = 'pages/consultaSites.html';">Sites</button>
+        <!-- Adicione outras opções aqui, se necessário -->
     </div>
-
-    <script src="/public/scripts.js"></script>
 </body>
 </html>

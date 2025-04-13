@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/public/styles.css">
+    <title>Editar Site</title>
+</head>
+<body>
+    <div id="container">
+        
+        <h1>Editar <NomeTabela></h1>
+        <form id="formEditarSites">
+            <label for="sitesID">ID:</label>
+            <input type="text" id="sitesID" disabled />
+
+            <label for="nome_site">Nome do Site:</label>
+            <input type="text" id="nome_site" placeholder="Digite o nome do site" required />
+
+            <label for="url_site">:</label>
+            <input type="text" id="url_site" placeholder="Digite a URL do site" required />
+
+            <label for="descricao_site">Descrição do Site:</label>
+            <input type="text" id="descricao_site" placeholder="Digite a descrição do site." required />
+
+            <label for="categoria">Categoria:</label>
+            <select id="categoria" required>
+                <option value="">Selecione uma categoria</option>
+                <!-- Categorias carregadas dinamicamente -->
+            </select>
+
+            <button type="submit">Salvar</button>
+            <button type="button" id="botaoCancelar">Cancelar</button>
+        </form>
+    </div>
+
+    <script src="/public/scripts/editarSites.js"></script>
+</body>
+</html>

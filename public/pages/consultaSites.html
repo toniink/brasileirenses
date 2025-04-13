@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/public/styles.css">
+    <title>Consulta de Sites</title>
+</head>
+<body>
+    <div id="container">
+        <button id="voltarButton">Voltar ao Menu Principal</button>
+        
+        <!-- Caixa do formulário -->
+        <div id="form-container">
+            <h1>Gerenciamento de Sites</h1>
+
+            <form id="sitesFormulario">
+                <input type="hidden" id="sitesID" />
+                <input type="text" id="nome_sites" placeholder="Nome do Site" required />
+                <textarea id="descricao" placeholder="Descrição do Site" required></textarea>
+                <input type="url" id="url" placeholder="Link do Site" />
+                <select id="categoria" required>
+                    <option value="">Selecione uma categoria</option>
+                    <!-- Categorias carregadas dinamicamente -->
+                </select>
+                
+                <button type="submit">Salvar</button>
+            </form>
+        </div>
+
+        <!-- Caixa para lista de cursos -->
+        <div id="lista-container">
+            <h2>Lista de Sites</h2>
+            <table id="sitesTabela">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nome</th>
+                        <th>Descrição</th>
+                        <th>URL</th>
+                        <th>Categoria</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="sitesLista">
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="/public/scripts/inserirSites.js"></script>
+</body>
+</html>
