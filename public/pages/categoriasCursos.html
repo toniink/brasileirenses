@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/public/styles.css">
+    <title>Gerenciar Categorias de Cursos</title>
+</head>
+<body>
+    <div id="container">
+        <h1>Gerenciar Categorias do Curso</h1>
+
+        <!-- Curso atual -->
+        <div id="cursoInfo">
+            <label for="id_curso">Curso:</label>
+            <input type="text" id="id_curso" disabled /> <!-- Mostra o ID -->
+            <p id="nome_curso">Nome do Curso: <span></span></p> <!-- Mostra o nome -->
+        </div>
+
+        <!-- Adicionar categorias -->
+        <form id="formAdicionarCategoria">
+            <label for="categoria">Adicionar Categoria:</label>
+            <select id="categoria" required>
+                <option value="">Selecione uma categoria</option>
+                <!-- Categorias carregadas dinamicamente -->
+            </select>
+            <button type="submit">Adicionar</button>
+        </form>
+
+        <!-- Listar categorias associadas -->
+        <h2>Categorias Associadas:</h2>
+        <table id="categoriasLista">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nome</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Categorias serão carregadas dinamicamente -->
+            </tbody>
+        </table>
+
+        <!-- Botão para voltar -->
+        <button id="botaoVoltar">Voltar à Edição de Cursos</button>
+    </div>
+
+    <script src="/public/scripts/categoriasCursos.js"></script>
+</body>
+</html>

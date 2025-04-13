@@ -23,6 +23,13 @@ app.use('/cursos', rotasCursos);
 const sitesRoutes = require('./routes/sitesRoutes');
 app.use('/sites', sitesRoutes);
 
+//rotas para categorias
+const categoriasRoutes = require('./routes/categoriasRoutes');
+app.use('/categorias', categoriasRoutes);
+
+//categorias secundarias
+const categoriasCursosRoutes = require('./routes/categoriasCursosRoutes');
+app.use('/categoriasCursos', categoriasCursosRoutes);
 
 // Inicializar o servidor
 app.listen(3000, () => {

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/public/styles.css">
+    <title>Consulta de Categorias</title>
+</head>
+<body>
+    <div id="container">
+        <button id="voltarButton">Voltar ao Menu Principal</button>
+        
+        <h1>Gerenciamento de Categorias</h1>
+
+        <!-- Formulário para inserir categorias -->
+        <form id="categoriasFormulario">
+            <input type="hidden" id="categoriasID" />
+            <input type="text" id="nome_categoria" placeholder="Nome da Categoria" required />
+            <textarea id="descricao_categoria" placeholder="Descrição da Categoria" required></textarea>
+            <button type="submit">Salvar</button>
+        </form>
+
+        <!-- Tabela para listar categorias -->
+        <div id="lista-container">
+            <h2>Lista de Categorias</h2>
+            <table id="categoriasTabela">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nome</th>
+                        <th>Descrição</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="categoriasLista">
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="/public/scripts/inserirCategorias.js"></script>
+</body>
+</html>

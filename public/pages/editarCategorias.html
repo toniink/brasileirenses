@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/public/styles.css">
+    <title>Editar Categoria</title>
+</head>
+<body>
+    <div id="container">
+        <h1>Editar Categoria</h1>
+
+        <form id="formEditarCategorias">
+            <label for="categoriasID">ID:</label>
+            <input type="text" id="categoriasID" disabled />
+
+            <label for="nome_categoria">Nome da Categoria:</label>
+            <input type="text" id="nome_categoria" placeholder="Digite o nome da categoria" required />
+
+            <label for="descricao_categoria">Descrição da Categoria:</label>
+            <textarea id="descricao_categoria" placeholder="Digite a descrição da categoria" required></textarea>
+
+            <button type="submit">Salvar</button>
+            <button type="button" id="botaoCancelar">Cancelar</button>
+        </form>
+    </div>
+
+    <script src="/public/scripts/editarCategorias.js"></script>
+</body>
+</html>
