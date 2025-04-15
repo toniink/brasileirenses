@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/public/styles.css">
+    <title>Gerenciamento de Feedbacks</title>
+</head>
+<body>
+    <div id="container">
+        <button id="voltarButton">Voltar ao Menu Principal</button>
+        
+        <!-- Caixa do formulário -->
+        <div id="form-container">
+            <h1>Gerenciamento de Feedbacks</h1>
+            <form id="feedbackForm">
+                <input type="hidden" id="feedbackID" />
+                <input type="number" id="id_usuario" placeholder="ID do Usuário" required />
+                <select id="tipo_feedback" required>
+                    <option value="">Selecione o Tipo de Feedback</option>
+                    <option value="Bug">Bug</option>
+                    <option value="Sugestão">Sugestão</option>
+                    <option value="Outro">Outro</option>
+                </select>
+                <textarea id="mensagem" placeholder="Mensagem"></textarea>
+                <button type="submit">Salvar Feedback</button>
+            </form>
+        </div>
+
+        <!-- Caixa para lista de feedbacks -->
+        <div id="lista-container">
+            <h2>Lista de Feedbacks</h2>
+            <table id="feedbackTabela">
+                <thead>
+                    <tr>
+                        <th>ID Feedback</th>
+                        <th>ID Usuário</th>
+                        <th>Tipo</th>
+                        <th>Mensagem</th>
+                        <th>Data</th>
+                    </tr>
+                </thead>
+                <tbody id="feedbackLista">
+                    <!-- Feedbacks serão carregados dinamicamente -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="/public/scripts/inserirFeedback.js"></script>
+</body>
+</html>

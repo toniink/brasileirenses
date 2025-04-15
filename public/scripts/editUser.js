@@ -41,7 +41,7 @@ async function saveChanges(event) {
 
 // Cancelar e voltar para a tela principal
 function cancelEdit() {
-    window.location.href = 'consultarUsuarios.html';
+    window.location.href = 'consultaUsuarios.html';
 }
 
 // Inicializar funções

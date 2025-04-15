@@ -31,6 +31,10 @@ app.use('/categorias', categoriasRoutes);
 const categoriasCursosRoutes = require('./routes/categoriasCursosRoutes');
 app.use('/categoriasCursos', categoriasCursosRoutes);
 
+//feedbacks
+const feedbackRoutes = require('./routes/feedbackRoutes');
+app.use('/feedback', feedbackRoutes); // Rota para feedbacks
+
 // Inicializar o servidor
 app.listen(3000, () => {
   console.log('Servidor rodando na porta 3000!');
