@@ -18,6 +18,14 @@ db.run(`CREATE TABLE IF NOT EXISTS usuarios (
     data_cadastro DATE DEFAULT CURRENT_DATE
 );`);
 
+db.run(`CREATE TABLE IF NOT EXISTS admin (
+    id_admin INTEGER PRIMARY KEY AUTOINCREMENT,
+    nome TEXT NOT NULL,
+    email TEXT UNIQUE NOT NULL,
+    senha TEXT NOT NULL,
+    data_criacao DATE DEFAULT CURRENT_DATE
+);`);
+
 db.run(`CREATE TABLE IF NOT EXISTS feedback (
     id_feedback INTEGER PRIMARY KEY AUTOINCREMENT,
     id_usuario INTEGER NOT NULL,
@@ -128,6 +136,5 @@ db.run(`CREATE TABLE IF NOT EXISTS denuncias (
     FOREIGN KEY (id_comentario) REFERENCES AvaliacoesComentarios (id_comentario),
     FOREIGN KEY (id_usuario) REFERENCES Usuarios (idUsuarios)
 );`);
-
 
 module.exports = db;
