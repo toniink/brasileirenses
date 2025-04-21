@@ -1,0 +1,60 @@
+<!DOCTYPE html> 
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/public/styles.css">
+  <title>Gerenciamento de Softwares</title>
+</head>
+<body>
+  <div id="container">
+    <button id="voltarButton">Voltar ao Menu Principal</button>
+
+    <!-- Formulário -->
+    <div id="form-container">
+      <h1>Gerenciamento de Softwares</h1>
+      <form id="softwareForm">
+        <input type="hidden" id="softwareID" />
+        <input type="text" id="nome" placeholder="Nome do Software" required />
+        <input type="text" id="url" placeholder="URL do Software" />
+        <input type="text" id="desenvolvedor" placeholder="Desenvolvedor" />
+
+        <!-- Select de Categorias -->
+        <label for="categoriaSelect">Categoria:</label>
+        <select id="categoriaSelect" required>
+          <option value="">Selecione uma categoria</option>
+        </select>
+
+        <!-- Select de Sites -->
+        <label for="siteSelect">Site:</label>
+        <select id="siteSelect" required>
+          <option value="">Selecione um site</option>
+        </select>
+
+        <button type="submit">Salvar</button>
+      </form>
+    </div>
+
+    <!-- Lista -->
+    <div id="lista-container">
+      <h2>Lista de Softwares</h2>
+      <table id="softwareTabela">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nome</th>
+            <th>URL</th>
+            <th>Desenvolvedor</th>
+            <th>Categoria</th>
+            <th>Site</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody id="softwareLista"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script src="/public/scripts/inserirSoftwares.js"></script>
+</body>
+</html>
