@@ -44,3 +44,5 @@ app.use('/admin', adminRoutes); // Rota para login de admins
 app.listen(3000, () => {
   console.log('Servidor rodando na porta 3000!');
 });
+
+//teste
