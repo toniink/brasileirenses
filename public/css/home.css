@@ -1,0 +1,322 @@
+body{
+  background-color: white;
+}
+/* Barra de Navegação */
+.nav-links {
+  background-color: #0a2a66; /* Azul escuro */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 40px;
+  position: fixed;
+  width: 100%;
+  top: 0;
+  left: 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.Logo {
+  font-size: 20px;
+  font-weight: bold;
+  color: white;
+  text-decoration: none;
+}
+
+.nav-links ul {
+  list-style: none;
+  display: flex;
+  gap: 30px;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-links ul li a {
+  text-decoration: none;
+  color: white;
+  font-size: 16px;
+  transition: color 0.3s;
+}
+
+.nav-links ul li a:hover {
+  color: #bcd4ff; /* Azul claro ao passar o mouse */
+}
+
+/* Banner */
+.banner {
+  padding: 60px 20px;
+  background-color: #ffffff;
+}
+
+.conteudo-flex {
+  display: flex;
+  align-items: center; /* Alinha verticalmente */
+  justify-content: space-between; /* Espaço entre texto e carrossel */
+  gap: 20px; /* Espaço entre os dois elementos */
+  flex-wrap: wrap; /* Garante que os elementos se ajustem em telas menores */
+}
+
+.texto {
+  flex:0.5; /* O texto ocupa metade do espaço */
+  max-width: 45%; /* Limita a largura */
+  margin-left: 50px
+}
+
+.texto h1 {
+  font-size: 32px;
+  margin-bottom: 20px;
+  color: #0a2a66;
+}
+
+.texto p {
+  font-size: 18px;
+  color: #444;
+  margin-bottom: 25px;
+}
+
+.botao {
+  display: inline-block;
+  padding: 12px 25px;
+  background-color: #0a2a66;
+  color: white;
+  border-radius: 5px;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+/*IMAGE*/
+img {
+  flex: 1; /* Ajusta o tamanho da imagem */
+  max-width: 380px; /* Limita a largura da imagem */
+  height: auto; /* Mantém a proporção */
+  border-radius: 10px; /* Adiciona bordas arredondadas, se desejado */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Adiciona sombra à imagem */
+ margin-right: 80px;
+}
+
+/*Section Segurança*/
+.container {
+  display: flex;
+  background-color: #e6e4ff;
+  justify-content: space-between; /* Espaço entre texto e imagem */
+  align-items: center;
+  padding: 20px;
+  max-width: 1800px;
+  margin: auto;
+ height: 500px;
+}
+
+.text-section {
+  max-width: 50%; /* Limita a largura do texto */
+  padding-right: 20px; /* Espaço entre texto e imagem */
+}
+
+.text-section h1 {
+  font-size: 2.5em;
+  color: #0a2a66; /* Azul escuro */
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.text-section p {
+  font-size: 1.2em;
+  color: #333; /* Texto em cinza escuro */
+  line-height: 1.6;
+  text-align:justify;
+  padding-left: 50px;
+}
+
+.image-section img {
+  max-width: 370px; /* Largura máxima da imagem */
+  height: auto; /* Mantém a proporção da imagem */
+  border-radius: 8px; /* Bordas arredondadas */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Sombra suave */
+  margin-right: 110px;
+}
+
+/*section cursos*/
+.cursos {
+  text-align: center;
+  padding: 50px 20px;
+  background-color: #f9f9f9; /* Fundo claro para destaque */
+}
+
+.cursos h1 {
+  font-size: 2.5em;
+  color: #0a2a66; /* Azul escuro para o título */
+  margin-bottom: 30px;
+}
+
+.container-cursos {
+  display: flex;
+  justify-content: space-around; /* Espaço igual entre os cursos */
+  flex-wrap: wrap; /* Empilha os itens em telas menores */
+  gap: 20px; /* Espaçamento entre os cursos */
+}
+
+.curso {
+  background: #ffffff; /* Fundo branco para o card */
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Sombra suave */
+  padding: 20px;
+  width: 300px; /* Largura fixa dos cards */
+  text-align: center;
+  
+}
+
+.curso img {
+  max-width: 220px; /* Tamanho máximo da imagem */
+  height: auto;
+  margin-bottom: 15px;
+  margin-right: auto;
+  
+}
+
+.curso h2 {
+  font-size: 1.5em;
+  color: #0a2a66;
+  margin: 10px 0;
+}
+
+.curso p {
+  font-size: 1em;
+  color: #555; /* Cinza suave para texto */
+  line-height: 1.5;
+}
+/*Section Crie sua conta*/
+.container-conta {
+  display: flex;
+  align-items: center; /* Centraliza verticalmente */
+  flex-wrap: wrap; /* Permite que os itens empilhem em telas menores */
+  background-color: #fdfdfd;
+  justify-content: space-between; /* Espaço entre texto e imagem */
+  align-items: center;
+  padding: 20px;
+  max-width: 1800px;
+  margin: auto;
+ height: 500px;
+}
+.text-conta {
+  max-width: 50%; /* Limita a largura do texto */
+  padding-right: 20px; /* Espaço entre texto e imagem */
+}
+
+.text-conta h1 {
+  font-size: 2.5em;
+  color: #0a2a66; /* Azul escuro */
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.text-conta p {
+  font-size: 1.2em;
+  color: #333; /* Texto em cinza escuro */
+  line-height: 1.6;
+  text-align:justify;
+  padding-left: 50px;
+}
+
+p{
+  font-size: 1.2em;
+  color: #333; /* Texto em cinza escuro */
+  line-height: 1.6;
+  text-align:justify;
+}
+
+.image-conta img {
+  max-width: 370px; /* Largura máxima da imagem */
+  height: auto; /* Mantém a proporção da imagem */
+  border-radius: 8px; /* Bordas arredondadas */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Sombra suave */
+  margin-right: 110px;
+}
+.button {
+  margin-top: 20px;
+    margin: 20px auto; /* Centraliza horizontalmente com 'auto' */
+    padding: 15px 30px; /* Tamanho do botão */
+    background-color: #0a2a66; /* Azul escuro */
+    color: white;
+    border-radius: 5px; /* Bordas arredondadas */
+    text-decoration: none; /* Remove sublinhado do link */
+    font-size: 1em; /* Tamanho do texto do botão */
+    transition: background-color 0.3s ease; /* Efeito ao passar o mouse */
+}
+.button a {
+  text-align: center;
+}
+
+.button:hover {
+  background-color: #003a99; /* Cor mais escura ao passar o mouse */
+}
+
+/*Rodapé da página*/
+footer {
+  background-color: #0a2a66; /* Azul escuro */
+  color: white;
+  padding: 20px;
+}
+
+.footer-container {
+  display: flex;
+  justify-content: space-between; /* Espaça as colunas igualmente */
+  flex-wrap: wrap; /* Empilha colunas em telas menores */
+}
+
+.footer-column {
+  flex: 1;
+  margin: 0 10px;
+  min-width: 200px; /* Largura mínima de cada coluna */
+}
+
+.footer-column h3 {
+  margin-bottom: 10px;
+
+}
+.footer-column p{
+  color: white;
+}
+
+.footer-column a {
+  color: white;
+}
+
+.contact-icons {
+  display: flex;
+  margin-top: 10px;
+}
+
+.icon {
+  width: 40px;
+  height: 40px;
+  background-color: #ccc; /* Cinza para ícones */
+  margin-right: 10px;
+  border-radius: 5px; /* Ícones com cantos arredondados */
+}
+
+.footer-column ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.footer-column ul li {
+  margin-bottom: 5px;
+}
+
+.footer-column ul li a {
+  color: white;
+  text-decoration: none; /* Remove sublinhado dos links */
+}
+
+.footer-column ul li a:hover {
+  text-decoration: underline; /* Sublinhado ao passar o mouse */
+}
+
+.footer-bottom {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 14px;
+}
+.footer-bottom p{
+text-align: center;
+color: white;
+}
