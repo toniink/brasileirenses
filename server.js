@@ -40,17 +40,15 @@ app.use('/feedback', feedbackRoutes); // Rota para feedbacks
 const adminRoutes = require('./routes/adminRoutes');
 app.use('/admin', adminRoutes); // Rota para login de admins
 
+//softwares
+const rotasSoftwares = require('./routes/softwaresRoutes');
+
+app.use('/softwares', rotasSoftwares);
+
+
 // Inicializar o servidor
 app.listen(3000, () => {
   console.log('Servidor rodando na porta 3000!');
-
-//softwares
-const softwareRoutes = require('./routes/softwareRoutes');
-app.use('/api', softwareRoutes);
-
-app.get('/softwares', (req, res) => {
-  res.sendFile(path.join(__dirname, 'views', 'softwares.html'));
-});
 
 
 });
