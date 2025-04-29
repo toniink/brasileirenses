@@ -1,6 +1,6 @@
 const db = require('../config/db');
 
-// Listar todos os softwares
+// Listar todos os softwares e trazer a categoria associada
 exports.buscarTodosSoftwares = (req, res) => {
     db.all(
         `SELECT 
@@ -8,11 +8,9 @@ exports.buscarTodosSoftwares = (req, res) => {
             softwares.nome,
             softwares.url,
             softwares.desenvolvedor,
-            categorias.nome AS nome_categoria,
-            sites.nome AS nome_site
+            categorias.nome AS nome_categoria
         FROM softwares
-        LEFT JOIN categorias ON softwares.id_categoria = categorias.id_categorias
-        LEFT JOIN sites ON softwares.id_site = sites.id_site`,
+        LEFT JOIN categorias ON softwares.id_categoria = categorias.id_categorias`,
         [],
         (err, resultados) => {
             if (err) {
@@ -27,11 +25,11 @@ exports.buscarTodosSoftwares = (req, res) => {
 
 // Criar novo software
 exports.criarSoftware = (req, res) => {
-    const { nome, url, desenvolvedor, id_categoria, id_site } = req.body;
+    const { nome, url, desenvolvedor, id_categoria } = req.body;
 
     db.run(
-        'INSERT INTO softwares (nome, url, desenvolvedor, id_categoria, id_site) VALUES (?, ?, ?, ?, ?)',
-        [nome, url, desenvolvedor, id_categoria, id_site],
+        'INSERT INTO softwares (nome, url, desenvolvedor, id_categoria) VALUES (?, ?, ?, ?)',
+        [nome, url, desenvolvedor, id_categoria],
         function (err) {
             if (err) {
                 console.error('Erro ao criar software:', err);
@@ -43,7 +41,7 @@ exports.criarSoftware = (req, res) => {
     );
 };
 
-// Buscar software por ID
+// Buscar software por ID e trazer a categoria associada
 exports.buscarSoftwarePorId = (req, res) => {
     const softwareID = req.params.id;
 
@@ -53,11 +51,9 @@ exports.buscarSoftwarePorId = (req, res) => {
             softwares.nome,
             softwares.url,
             softwares.desenvolvedor,
-            categorias.nome AS nome_categoria,
-            sites.nome AS nome_site
+            categorias.nome AS nome_categoria
         FROM softwares
         LEFT JOIN categorias ON softwares.id_categoria = categorias.id_categorias
-        LEFT JOIN sites ON softwares.id_site = sites.id_site
         WHERE softwares.id_softwares = ?`,
         [softwareID],
         (err, linha) => {
@@ -76,11 +72,11 @@ exports.buscarSoftwarePorId = (req, res) => {
 // Atualizar software
 exports.atualizarSoftware = (req, res) => {
     const softwareID = req.params.id;
-    const { nome, url, desenvolvedor, id_categoria, id_site } = req.body;
+    const { nome, url, desenvolvedor, id_categoria } = req.body;
 
     db.run(
-        'UPDATE softwares SET nome = ?, url = ?, desenvolvedor = ?, id_categoria = ?, id_site = ? WHERE id_softwares = ?',
-        [nome, url, desenvolvedor, id_categoria, id_site, softwareID],
+        'UPDATE softwares SET nome = ?, url = ?, desenvolvedor = ?, id_categoria = ? WHERE id_softwares = ?',
+        [nome, url, desenvolvedor, id_categoria, softwareID],
         function (err) {
             if (err) {
                 console.error('Erro ao atualizar software:', err);

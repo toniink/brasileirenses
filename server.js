@@ -42,8 +42,27 @@ app.use('/admin', adminRoutes); // Rota para login de admins
 
 //softwares
 const rotasSoftwares = require('./routes/softwaresRoutes');
-
 app.use('/softwares', rotasSoftwares);
+
+//tutoriais
+const rotasTutoriais = require('./routes/tutoriaisRoutes');
+app.use('/tutoriais', rotasTutoriais);
+
+//avaliacoesComentarios
+const rotasAvaliacoes = require('./routes/avaliacoesComentariosRoutes');
+app.use('/avaliacoesComentarios', rotasAvaliacoes);
+
+//denuncias
+const rotasDenuncias = require('./routes/denunciasRoutes');
+app.use('/denuncias', rotasDenuncias);
+
+//playlistUsuarios
+const rotasPlaylists = require('./routes/playlistUsuariosRoutes');
+app.use('/playlistUsuarios', rotasPlaylists);
+
+//playlistCursos - tabela intermediaria
+const rotasPlaylistCursos = require('./routes/playlistCursosRoutes');
+app.use('/playlistCursos', rotasPlaylistCursos);
 
 
 // Inicializar o servidor
