@@ -1,3 +1,8 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding:0;
+}
 body{
   background-color: white;
 }
@@ -5,13 +10,11 @@ body{
 .nav-links {
   background-color: #0a2a66; /* Azul escuro */
   display: flex;
-  justify-content: space-between;
+  justify-content: space-around;
   align-items: center;
   padding: 15px 40px;
   position: fixed;
   width: 100%;
-  top: 0;
-  left: 0;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   font-family: Arial, Helvetica, sans-serif;
 }
@@ -21,6 +24,18 @@ body{
   font-weight: bold;
   color: white;
   text-decoration: none;
+}
+
+.nav-links a{
+  font-size: 16px;
+  color: white;
+  text-decoration: none;
+  transition: color 0.3s;
+  
+
+}
+.nav-links a:hover{
+  color: #bcd4ff; /* Azul claro ao passar o mouse */
 }
 
 .nav-links ul {
@@ -72,16 +87,6 @@ body{
   font-size: 18px;
   color: #444;
   margin-bottom: 25px;
-}
-
-.botao {
-  display: inline-block;
-  padding: 12px 25px;
-  background-color: #0a2a66;
-  color: white;
-  border-radius: 5px;
-  text-decoration: none;
-  font-weight: bold;
 }
 
 /*IMAGE*/
@@ -187,33 +192,34 @@ img {
 .container-conta {
   display: flex;
   align-items: center; /* Centraliza verticalmente */
-  flex-wrap: wrap; /* Permite que os itens empilhem em telas menores */
-  background-color: #fdfdfd;
-  justify-content: space-between; /* Espaço entre texto e imagem */
-  align-items: center;
+  flex-wrap: nowrap; /* Permite empilhar elementos em telas menores */
+  justify-content: space-around; /* Centraliza os elementos horizontalmente */
   padding: 20px;
   max-width: 1800px;
   margin: auto;
- height: 500px;
+  height: 500px;
+  gap: 20px; /* Adiciona espaço entre as divs de texto e imagem */
 }
-.text-conta {
-  max-width: 50%; /* Limita a largura do texto */
-  padding-right: 20px; /* Espaço entre texto e imagem */
+.crie-sua-conta {
+  display: flex;
+  flex-direction: column; /* Limita a largura do texto */
+  
 }
 
-.text-conta h1 {
+.crie-sua-conta h1 {
   font-size: 2.5em;
   color: #0a2a66; /* Azul escuro */
   margin-bottom: 10px;
   text-align: center;
 }
 
-.text-conta p {
+.crie-sua-conta p {
   font-size: 1.2em;
   color: #333; /* Texto em cinza escuro */
   line-height: 1.6;
   text-align:justify;
   padding-left: 50px;
+  width: 550px;
 }
 
 p{
@@ -223,12 +229,9 @@ p{
   text-align:justify;
 }
 
-.image-conta img {
-  max-width: 370px; /* Largura máxima da imagem */
-  height: auto; /* Mantém a proporção da imagem */
-  border-radius: 8px; /* Bordas arredondadas */
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Sombra suave */
-  margin-right: 110px;
+
+.image-conta p {
+  width: 200px;
 }
 .button {
   margin-top: 20px;
@@ -288,9 +291,9 @@ footer {
 .icon {
   width: 40px;
   height: 40px;
-  background-color: #ccc; /* Cinza para ícones */
   margin-right: 10px;
   border-radius: 5px; /* Ícones com cantos arredondados */
+  cursor: pointer;
 }
 
 .footer-column ul {

@@ -1,0 +1,45 @@
+
+body{
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: white;
+}
+.login{
+    background-color:white;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%); /*Centraliza totalmente a div*/
+    padding: 80px ;
+    border-radius: 15px;
+    color: #0a2a66;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Propriedade de sombra */
+}
+
+div.link {
+    text-align: center; /* Centraliza o texto do link */
+    color: #0a2a66; /* Mantém a cor do link no estilo existente */
+    text-decoration: underline; /* Sublinhado no texto */
+    cursor: pointer;
+  }
+input{
+    padding: 15px;
+    border: none;
+    outline: none;
+    font-size: 15px;
+    border: 1px solid #0a2a66; /* Borda com espessura de 2px e cor preta */
+}
+button{
+    background-color:#0a2a66 ;
+    border: none;
+    padding: 15px;
+    width: 100%;
+    border-radius: 10px;
+    color: white;
+    font-size: 15px;
+    cursor: pointer;
+}
+button:hover{
+    background-color: #2d4164;
+}
+
+  

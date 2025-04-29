@@ -1,0 +1,76 @@
+/* Estilo geral */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f3f3f3; /* Cor de fundo suave */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; /* Altura total da tela */
+  }
+  
+  /* Centralizar título */
+  h1 {
+    text-align: center;
+    color: #0a2a66;
+    margin-bottom: 20px; /* Espaço abaixo do título */
+    margin-right: 30px;
+  }
+  
+  /* Formulário dentro de uma caixa */
+  form {
+    width: 100%;
+    max-width: 400px;
+    background-color: #ffffff; /* Fundo branco */
+    padding: 80px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombras suaves */
+  }
+  
+  /* Espaço entre os elementos do formulário */
+  label {
+    display: block;
+    margin-top: 10px;
+    font-weight: bold;
+    color: #0a2a66;
+  }
+  
+  /* Estilo dos campos de entrada e seleção */
+  input, select {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border: 1px solid #0c2f70;
+    border-radius: 5px;
+  }
+  
+  /* Caixa de texto com tamanho fixo */
+  textarea {
+    width: 100%; /* Largura total do formulário */
+    height: 150px; /* Altura fixa */
+    padding: 10px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    resize: none; /* Impedir que o usuário redimensione */
+    margin-bottom: 15px; /* Espaço extra abaixo da área de texto */
+  }
+  
+  /* Botão */
+  button {
+    background-color:#0a2a66 ;
+    border: none;
+    padding: 15px;
+    width: 100%;
+    border-radius: 10px;
+    color: white;
+    font-size: 15px;
+    cursor: pointer;
+    
+  }
+  
+  button:hover {
+    background-color: #0f3f99;
+  }
+  
