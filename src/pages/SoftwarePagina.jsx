@@ -1,0 +1,129 @@
+/* eslint-disable no-console */
+
+import React, { useState, useEffect } from 'react';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import { useNavigate } from 'react-router-dom'; // Adicionar hook para navegação
+
+const SoftwarePagina = () => {
+    const [softwares, setSoftwares] = useState([]); // Estado para armazenar os softwares
+    const navigate = useNavigate(); // Hook para navegação entre páginas
+
+    useEffect(() => {
+        // Consumir a API para buscar os softwares
+        fetch('http://localhost:3000/softwares') // URL do endpoint de softwares
+            .then(response => response.json())
+            .then(data => setSoftwares(data)) // Atualiza o estado com os softwares
+            .catch(error => console.error('Erro ao buscar softwares:', error));
+    }, []); // Executa apenas na primeira renderização
+
+    const handleSoftwareClick = (id) => {
+        // Navegar para a página do software específico com base no ID
+        navigate(`/softwares/${id}`); // Exemplo de rota dinâmica
+    };
+
+    return (
+        <div className="container-fluid">
+            {/* Cabeçalho */}
+            <header className="bg-light py-3">
+                <div className="container d-flex justify-content-between align-items-center">
+                    <nav className="d-flex gap-3">
+                        <button className="btn btn-link">HOME</button>
+                        <button className="btn btn-link">SOFTWARES</button>
+                        <button className="btn btn-link">PROGRAMAS</button>
+                        <button className="btn btn-link">CATEGORIAS</button>
+                        <button className="btn btn-link">CONTATO</button>
+                    </nav>
+                    <button className="btn btn-primary">Fazer Login</button>
+                </div>
+            </header>
+
+            {/* Layout Principal */}
+            <div className="row mt-4">
+                {/* Coluna Lateral: Filtro */}
+                <div className="col-md-3">
+                    <div className="bg-secondary text-white p-3 rounded">
+                        <h5>Filtro</h5>
+                        <p>(Placeholder para filtros)</p>
+                    </div>
+                </div>
+
+                {/* Conteúdo Principal: Softwares */}
+                <div className="col-md-9">
+                    <h2 className="mb-4">Softwares</h2>
+                    <div className="row">
+                        {/* Renderizar os softwares dinamicamente */}
+                        {softwares.map(software => (
+                            <div
+                                className="col-md-4 mb-4"
+                                key={software.id_softwares}
+                                style={{ cursor: 'pointer' }} // Adiciona estilo para indicar clique
+                                onClick={() => handleSoftwareClick(software.id_softwares)}>
+                                <div className="card h-100">
+                                    <div className="bg-secondary" style={{ height: '150px' }} />
+                                    <div className="card-body">
+                                        <h5 className="card-title">{software.nome}</h5> {/* Nome do software */}
+                                        <p className="card-text">{software.desenvolvedor}</p> {/* Desenvolvedor */}
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                    <button className="btn btn-primary">Ver mais softwares</button>
+                </div>
+            </div>
+
+            {/* Footer */}
+            <footer className="bg-primary text-light py-4 mt-4">
+                <div className="container">
+                    <div className="row">
+                        {/* Coluna Contato */}
+                        <div className="col-md-3 text-center">
+                            <h5>Contato</h5>
+                            <p>
+                                Fale conosco preenchendo nosso formulário!<br />
+                                <button className="btn btn-link text-light text-decoration-underline">Clique aqui</button>
+                            </p>
+                        </div>
+
+                        {/* Coluna Redes Sociais */}
+                        <div className="col-md-3 text-center">
+                            <h5>Redes Sociais</h5>
+                            <div className="d-flex justify-content-center gap-2">
+                                <div className="bg-secondary rounded-circle" style={{ width: '40px', height: '40px' }} />
+                                <div className="bg-secondary rounded-circle" style={{ width: '40px', height: '40px' }} />
+                                <div className="bg-secondary rounded-circle" style={{ width: '40px', height: '40px' }} />
+                            </div>
+                            <p className="mt-2">Siga-nos nas redes sociais!</p>
+                        </div>
+
+                        {/* Coluna Opinião */}
+                        <div className="col-md-3 text-center">
+                            <h5>Dê sua Opinião</h5>
+                            <p>
+                                Envie sua opinião para nós preenchendo o formulário.<br />
+                                <button className="btn btn-link text-light text-decoration-underline">Envie aqui</button>
+                            </p>
+                        </div>
+
+                        {/* Coluna Menu Rápido */}
+                        <div className="col-md-3 text-center">
+                            <h5>Menu Rápido</h5>
+                            <ul className="list-unstyled">
+                                <li><button className="btn btn-link text-light text-decoration-underline">Página Principal</button></li>
+                                <li><button className="btn btn-link text-light text-decoration-underline">Softwares</button></li>
+                                <li><button className="btn btn-link text-light text-decoration-underline">Programas</button></li>
+                                <li><button className="btn btn-link text-light text-decoration-underline">Categorias</button></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div className="text-center mt-3">
+                        <p>&copy; 2025 - Desenvolvido por Brasilierenses</p>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    );
+};
+
+export default SoftwarePagina;
