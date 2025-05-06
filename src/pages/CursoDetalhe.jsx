@@ -1,18 +1,44 @@
 /* eslint-disable no-console */
 
 import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom'; // Captura o ID da URL
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const CursoDetalhes = () => {
-    const [curso, setCurso] = useState({});
+    const { id } = useParams(); // Captura o ID do curso
+    const [curso, setCurso] = useState(null); // Inicializa como null
 
     useEffect(() => {
-        // Substitua pelo ID real do curso
-        fetch('http://localhost:3000/cursos/1') // Exemplo de endpoint para um curso específico
-            .then(response => response.json())
-            .then(data => setCurso(data)) // Dados do curso
-            .catch(error => console.error('Erro ao buscar dados do curso:', error));
-    }, []);
+        const fetchCurso = async () => {
+            try {
+                console.log(`Buscando curso com ID: ${id}`);
+                const response = await fetch(`http://localhost:3000/cursos/${id}`);
+                if (!response.ok) {
+                    throw new Error(`Erro ao buscar curso ID ${id}`);
+                }
+                const data = await response.json();
+
+                if (!data || Object.keys(data).length === 0) {
+                    throw new Error(`Curso não encontrado para ID ${id}`);
+                }
+
+                setCurso(data);
+            } catch (error) {
+                console.error(error.message);
+            }
+        };
+
+        fetchCurso();
+    }, [id]);
+
+    if (!curso) {
+        return (
+            <div className="container text-center mt-5">
+                <h1>Carregando curso...</h1>
+                <p>Aguarde enquanto recuperamos os detalhes.</p>
+            </div>
+        );
+    }
 
     return (
         <div className="container-fluid">
@@ -30,31 +56,25 @@ const CursoDetalhes = () => {
                 </div>
             </header>
 
-            {/* Layout Principal */}
             <div className="row mt-4">
-                {/* Seção Lateral */}
                 <div className="col-md-3">
                     <div className="bg-secondary text-white p-3 rounded">
-                        <h5>{curso.nome_curso || 'Curso Exemplo'}</h5> {/* Nome do curso */}
-                        <p>Duração: {curso.duracao || 'N/A'}</p> {/* Duração */}
-                        <p>Tipo: {curso.tipo || 'N/A'}</p> {/* Tipo */}
-                        <div className="bg-dark" style={{ height: '150px', marginTop: '15px' }} /> {/* Placeholder imagem */}
+                        <h5>{curso.nome_curso || 'Curso não encontrado'}</h5>
+                        <p>Duração: {curso.duracao || 'N/A'}</p>
+                        <p>Tipo: {curso.tipo || 'N/A'}</p>
+                        <div className="bg-dark" style={{ height: '150px', marginTop: '15px' }} />
                     </div>
                 </div>
 
-                {/* Conteúdo Principal */}
                 <div className="col-md-9">
-                    {/* Visão Geral */}
                     <h4>Visão Geral</h4>
                     <p>{curso.visao_geral || 'Texto de visão geral sobre o curso.'}</p>
                     <hr className="border-secondary" />
 
-                    {/* Área Abrangida */}
                     <h4>Área que o Curso Abrange</h4>
                     <p>{curso.area_abrangida || 'Descrição sobre a área que o curso abrange.'}</p>
                     <hr className="border-secondary" />
 
-                    {/* Áreas de Atuação */}
                     <h4>Áreas de Atuação</h4>
                     <div className="row">
                         <div className="col-md-6">
@@ -65,22 +85,12 @@ const CursoDetalhes = () => {
                             <h5>Área 2</h5>
                             <p>Descrição da segunda área de atuação.</p>
                         </div>
-                        <div className="col-md-6">
-                            <h5>Área 3</h5>
-                            <p>Descrição da terceira área de atuação.</p>
-                        </div>
-                        <div className="col-md-6">
-                            <h5>Área 4</h5>
-                            <p>Descrição da quarta área de atuação.</p>
-                        </div>
                     </div>
                     <hr className="border-secondary" />
 
-                    {/* Descrição das Áreas */}
                     <h5>Descrição das Áreas de Atuação</h5>
                     <p>{curso.descricao_areas || 'Texto explicativo sobre as áreas de atuação abordadas pelo curso.'}</p>
 
-                    {/* Botão para Tutorial */}
                     <button className="btn btn-primary mt-4">Ir para Tutorial de Instalação</button>
                 </div>
             </div>

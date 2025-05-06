@@ -6,6 +6,7 @@ import CursoDetalhe from './pages/CursoDetalhe'; // importa a pagina de detalhes
 import SoftwarePagina from './pages/SoftwarePagina';
 import SoftwareDetalhes from './pages/SoftwareDetalhes';
 import TutorialGenerico from './pages/TutorialGenerico';
+import GerenciarTutorial from './pages/GerenciarTutorial';
 
 const App = () => (
     <Router>
@@ -22,6 +23,7 @@ const App = () => (
             <Route path="/softwares/:id" element={<SoftwareDetalhes />} />
             {/* Rota para Cursos */}
             <Route path="/tutorial/:software" element={<TutorialGenerico />} />
+            <Route path="/gerenciar-tutorial" element={<GerenciarTutorial />} />
         </Routes>
     </Router>
 );
