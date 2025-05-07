@@ -9,37 +9,83 @@
 <body>
     <nav class="nav-links">
         <ul>
-          <li><a href="Home.html" class="Logo">Home</a></li>
-          <li><a href="Cursos.html">Cursos</a></li>
-          <li><a href="softwares.html">Softwares</a></li>
-          <li><a href="playlist.html">Playlists</a></li>
-          <li><a href="Tutoriais.html">Tutoriais</a></li>
-          <li></li>
+            <li><a href="Home.html" class="logo">Home</a></li>
+            <li><a href="Cursos.html">Cursos</a></li>
+            <li><a href="softwares.html">Software</a></li>
+            <li><a href="playlist.html">Playlists</a></li>
+            <li><a href="Tutoriais.html">Tutoriais</a></li>
         </ul>
-        <a href="login.html">Login</a>
-      </nav>
-      
-      <section class="cursos">
-        <h2>Cursos</h2>
-        <div class="cursos-grid">
-            <!-- Curso 1 -->
-            <div class="curso">
-                <div class="curso-imagem"></div>
-                <h3>Nome Curso</h3>
-                <p>Descrição do curso...</p>
+        <a href="login.html" class="btn-login">Login</a>
+    </nav>
+
+    <main>
+        <aside class="filtro">
+            <h2>Filtro</h2>
+            <p>Filtre por categoria ou tipo de programa.</p>
+        </aside>
+
+        <section class="programas">
+            <h2>Programas</h2>
+            <div class="grid">
+                <div class="programa">
+                   <img src="/public/img/word.png" alt="Logo do Word" width="80px">
+                    <h3>Word</h3>
+                    <p>O Microsoft Word é um editor de texto usado para criar e formatar documentos de forma profissional e eficiente. 🚀</p>
+                    <button class="btn-saber">Saber mais</button>
+                </div>
+                <div class="programa">
+                    <img src="/public/img/excel.png" alt="Logo do Excel" width="80px">
+                    <h3>Excel</h3>
+                    <p>Descrição breve do programa.</p>
+                    <button class="btn-saber">Saber mais</button>
+                </div>
             </div>
-            <!-- Curso 2 -->
-            <div class="curso">
-                <div class="curso-imagem"></div>
-                <h3>Nome Curso</h3>
-                <p>Descrição do curso...</p>
+            <button class="btn-ver-mais">Ver mais programas</button>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-container">
+          <!-- Coluna Contato -->
+          <div class="footer-column">
+            <h3>Contato</h3>
+            <div class="contact-icons">
+              <div class="icon"><a href=""><img src="/public/img/instagram.webp" width="50px"></a></div>
+              <div class="icon"><img src="/public/img/gmail.webp" width="55px"></div>
+              <div class="icon"><img src="/public/img/linkedin.png" width="50px"></div>
+              <div class="icon"><a href="https://github.com/toniink"><img src="/public/img/github.png" width="50px"></a></div>
             </div>
-            <!-- Repita conforme necessário -->
+          </div>
+          <!-- Coluna Dê sua opinião -->
+          <div class="footer-column">
+            <h3>Dê sua opinião</h3>
+            <p>Envie sua opinião para nós, preencha o formulário é rapidinho! <a href="/public/site/formulário.html">Clique aqui</a></p>
+          </div>
+          <!-- Coluna Ajuda -->
+          <div class="footer-column">
+            <h3>Ajuda</h3>
+            <ul>
+              <li><a href="#">Perguntas Frequentes</a></li>
+              <li>Mande um e-mail para: suportbrasiliense@gmail.com</li>
+            </ul>
+          </div>
+          <!-- Coluna Menu Rápido -->
+          <div class="footer-column">
+            <h3>Menu Rápido</h3>
+            <ul>
+              <li><a href="/public/site/Home.html">Página Principal</a></li>
+              <li><a href="/public/site/Cursos.html">Cursos</a></li>
+              <li><a href="/public/site/softwares.html">Software</a></li>
+              <li><a href="/public/site/Tutoriais.html">Tutoriais</a></li>
+            </ul>
+          </div>
         </div>
-        <button class="btn-ver-mais">Ver mais cursos</button>
-    </section>
-    
-      
-      <script src="/public/scripts/menu.js"></script>
+        <!-- Rodapé inferior -->
+        <div class="footer-bottom">
+          <p>Brasileirenses © 2025</p>
+        </div>
+      </footer>    
+
+    <script src="/public/scripts/menu.js"></script>
 </body>
 </html>
