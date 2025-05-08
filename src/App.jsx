@@ -22,7 +22,7 @@ const App = () => (
             {/* Rota para Cursos */}
             <Route path="/softwares/:id" element={<SoftwareDetalhes />} />
             {/* Rota para Cursos */}
-            <Route path="/tutorial/:software" element={<TutorialGenerico />} />
+            <Route path="/tutorial/:id" element={<TutorialGenerico />} />
             <Route path="/gerenciar-tutorial" element={<GerenciarTutorial />} />
         </Routes>
     </Router>

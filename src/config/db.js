@@ -128,6 +128,52 @@ db.run(`CREATE TABLE IF NOT EXISTS tutoriais (
     FOREIGN KEY (id_software) REFERENCES Softwares (id_softwares)
 );`);
 
+db.run(`CREATE TABLE IF NOT EXISTS secoes_tutorial (
+    id_secao INTEGER PRIMARY KEY AUTOINCREMENT,
+    id_tutorial INTEGER NOT NULL,
+    tipo TEXT CHECK(tipo IN ('paragrafo', 'titulo', 'lista', 'imagem')),
+    ordem INTEGER NOT NULL,
+    FOREIGN KEY (id_tutorial) REFERENCES tutoriais(id_tutorial) ON DELETE CASCADE
+);`);
+
+db.run(`CREATE TABLE IF NOT EXISTS conteudo_paragrafo (
+    id_paragrafo INTEGER PRIMARY KEY AUTOINCREMENT,
+    id_secao INTEGER NOT NULL,
+    texto TEXT NOT NULL,
+    FOREIGN KEY (id_secao) REFERENCES secoes_tutorial(id_secao) ON DELETE CASCADE
+);`);
+
+db.run(`CREATE TABLE IF NOT EXISTS conteudo_titulo (
+    id_titulo INTEGER PRIMARY KEY AUTOINCREMENT,
+    id_secao INTEGER NOT NULL,
+    texto TEXT NOT NULL,
+    FOREIGN KEY (id_secao) REFERENCES secoes_tutorial(id_secao) ON DELETE CASCADE
+);`);
+
+db.run(`CREATE TABLE IF NOT EXISTS conteudo_lista (
+    id_item INTEGER PRIMARY KEY AUTOINCREMENT,
+    id_secao INTEGER NOT NULL,
+    item TEXT NOT NULL,
+    FOREIGN KEY (id_secao) REFERENCES secoes_tutorial(id_secao) ON DELETE CASCADE
+);`);
+
+db.run(`CREATE TABLE IF NOT EXISTS conteudo_imagem (
+    id_imagem INTEGER PRIMARY KEY AUTOINCREMENT,
+    id_secao INTEGER NOT NULL,
+    url TEXT NOT NULL,
+    descricao TEXT,
+    FOREIGN KEY (id_secao) REFERENCES secoes_tutorial(id_secao) ON DELETE CASCADE
+);
+`);
+
+db.run (`CREATE TABLE IF NOT EXISTS tutorial_software (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id_software INTEGER NOT NULL,
+    id_tutorial INTEGER NOT NULL,
+    FOREIGN KEY (id_software) REFERENCES softwares(id_softwares),
+    FOREIGN KEY (id_tutorial) REFERENCES tutoriais(id_tutorial)
+);`);
+
 db.run(`CREATE TABLE IF NOT EXISTS denuncias (
     id_denuncia INTEGER PRIMARY KEY AUTOINCREMENT,
     id_comentario INTEGER NOT NULL,

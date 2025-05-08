@@ -1,73 +1,118 @@
-import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import tutorials from '../data/tutoriais.json'; // Importa o JSON de tutoriais
+import React, { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
+import "bootstrap/dist/css/bootstrap.min.css";
 
 const TutorialGenerico = () => {
-    const { id } = useParams(); // Captura o ID do software na URL
+    const { id } = useParams();
     const [tutorialData, setTutorialData] = useState(null);
+    const [secoes, setSecoes] = useState([]);
+    const [conteudos, setConteudos] = useState({});
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         if (!id || isNaN(id)) {
-            console.error("Erro crítico: ID do software não foi passado corretamente.");
+            console.error("Erro crítico: ID do tutorial não foi passado corretamente.");
+            setLoading(false);
             return;
         }
 
-        console.log(`Buscando tutorial no JSON para software ID: ${id}`);
-
-        // 🚀 Busca diretamente o tutorial correto pelo ID
-        const tutorial = tutorials.softwares.find(t => t.id === Number(id));
-
-        if (!tutorial) {
-            console.error(`Erro: Nenhum tutorial encontrado para software ID ${id}`);
-        }
-
-        setTutorialData(tutorial || null);
+        fetch(`http://localhost:3000/tutoriais/${id}`)
+            .then((res) => res.json())
+            .then((data) => setTutorialData(data))
+            .catch((error) => console.error("Erro ao buscar tutorial:", error))
+            .finally(() => setLoading(false));
     }, [id]);
+
+    useEffect(() => {
+        if (!id || tutorialData === null) return;
+
+        fetch(`http://localhost:3000/secoes/${id}`)
+            .then((res) => res.json())
+            .then((data) => {
+                setSecoes(data);
+                buscarConteudosDasSecoes(data);
+            })
+            .catch((error) => console.error("Erro ao buscar seções do tutorial:", error));
+    }, [id, tutorialData]);
+
+    const buscarConteudosDasSecoes = (secoes) => {
+        secoes.forEach((secao) => {
+            fetch(`http://localhost:3000/conteudo/${secao.id_secao}`)
+                .then((res) => res.json())
+                .then((data) => {
+                    setConteudos((prevState) => ({
+                        ...prevState,
+                        [secao.id_secao]: data,
+                    }));
+                })
+                .catch((error) => console.error(`Erro ao buscar conteúdo da seção ${secao.id_secao}:`, error));
+        });
+    };
+
+    if (loading) {
+        return (
+            <div className="container text-center mt-5">
+                <h1 className="text-primary">Carregando...</h1>
+                <p className="text-muted">Aguarde enquanto recuperamos os detalhes do tutorial.</p>
+            </div>
+        );
+    }
 
     if (!tutorialData) {
         return (
             <div className="container text-center mt-5">
-                <h1>Erro: Tutorial não encontrado</h1>
-                <p>O tutorial que você está tentando acessar não existe ou foi removido.</p>
+                <h1 className="text-danger">Erro: Tutorial não encontrado</h1>
+                <p className="text-muted">O tutorial que você está tentando acessar não existe ou foi removido.</p>
             </div>
         );
     }
 
     return (
         <div className="container-fluid">
-            <header className="bg-light py-3">
-                <div className="container d-flex justify-content-between align-items-center">
-                    <h2>{tutorialData.titulo}</h2>
-                </div>
+            <header className="bg-primary text-white py-4 text-center shadow">
+                <h2>{tutorialData.titulo}</h2>
             </header>
 
-            <div className="bg-light py-4">
-                <div className="container">
-                    {tutorialData.descricao.map((texto, index) => (
-                        <p key={index}>{texto}</p>
-                    ))}
-                </div>
+            <section className="container bg-light rounded shadow my-4 p-4">
+                <p className="lead text-secondary">{tutorialData.descricao}</p>
+            </section>
+
+            <div className="container">
+                {secoes.length > 0 ? (
+                    secoes.map((secao, index) => (
+                        <div key={index} className="mb-4 p-4 border rounded shadow">
+                            <h3 className="text-primary">{secao.tipo === "titulo" ? "Título" : secao.tipo === "paragrafo" ? "Parágrafo" : secao.tipo === "lista" ? "Lista" : "Imagem"}</h3>
+
+                            {conteudos[secao.id_secao] &&
+                                conteudos[secao.id_secao].map((conteudo, i) => (
+                                    <div key={i}>
+                                        {secao.tipo === "titulo" && <h3 className="text-dark">{conteudo.texto}</h3>}
+                                        {secao.tipo === "paragrafo" && <p className="text-secondary">{conteudo.texto}</p>}
+                                        {secao.tipo === "lista" && (
+                                            <ul className="list-group">
+                                                {conteudo.texto.split(",").map((item, i) => (
+                                                    <li key={i} className="list-group-item">{item.trim()}</li>
+                                                ))}
+                                            </ul>
+                                        )}
+                                        {secao.tipo === "imagem" && (
+                                            <div className="text-center my-3">
+                                                <img src={conteudo.url} alt={conteudo.descricao} className="img-fluid rounded shadow" style={{ maxWidth: "80%" }} />
+                                            </div>
+                                        )}
+                                    </div>
+                                ))}
+                        </div>
+                    ))
+                ) : (
+                    <p className="text-center text-muted mt-3">Nenhum conteúdo disponível para este tutorial.</p>
+                )}
             </div>
 
-            {tutorialData.passos && (
-                <div className="container">
-                    <h3>Passos para Instalação</h3>
-                    {tutorialData.passos.map((passo, index) => (
-                        <div key={index}>
-                            <h4>{passo.titulo}</h4>
-                            {passo.texto.map((linha, subIndex) => (
-                                <p key={subIndex}>{linha}</p>
-                            ))}
-                        </div>
-                    ))}
-                </div>
-            )}
-
-            {tutorialData.site && (
-                <div className="container text-center mt-3">
-                    <a href={tutorialData.site} target="_blank" rel="noopener noreferrer" className="btn btn-primary">
-                        Ir para o site do software
+            {tutorialData.imagem_url && (
+                <div className="container text-center mt-4">
+                    <a href={tutorialData.imagem_url} target="_blank" rel="noopener noreferrer" className="btn btn-lg btn-primary shadow">
+                        Ir para o site oficial
                     </a>
                 </div>
             )}

@@ -1,6 +1,6 @@
 const db = require('../config/db');
 
-// Listar todos os tutoriais e trazer o nome do software associado
+// Listar todos os tutoriais e seus softwares associados
 exports.buscarTodosTutoriais = (req, res) => {
     db.all(
         `SELECT 
@@ -23,7 +23,7 @@ exports.buscarTodosTutoriais = (req, res) => {
     );
 };
 
-// Criar novo tutorial
+// Criar um novo tutorial e vincular a um software
 exports.criarTutorial = (req, res) => {
     const { id_software, titulo, descricao, imagem_url } = req.body;
 
@@ -41,7 +41,7 @@ exports.criarTutorial = (req, res) => {
     );
 };
 
-// Buscar tutorial por ID e trazer o nome do software associado
+// Buscar um tutorial por ID
 exports.buscarTutorialPorId = (req, res) => {
     const tutorialID = req.params.id;
 
@@ -69,14 +69,14 @@ exports.buscarTutorialPorId = (req, res) => {
     );
 };
 
-// Atualizar tutorial
+// Atualizar um tutorial existente
 exports.atualizarTutorial = (req, res) => {
     const tutorialID = req.params.id;
-    const { id_software, titulo, descricao, imagem_url } = req.body;
+    const { titulo, descricao, imagem_url, id_software } = req.body;
 
     db.run(
-        'UPDATE tutoriais SET id_software = ?, titulo = ?, descricao = ?, imagem_url = ? WHERE id_tutorial = ?',
-        [id_software, titulo, descricao, imagem_url, tutorialID],
+        'UPDATE tutoriais SET titulo = ?, descricao = ?, imagem_url = ?, id_software = ? WHERE id_tutorial = ?',
+        [titulo, descricao, imagem_url, id_software, tutorialID],
         function (err) {
             if (err) {
                 console.error('Erro ao atualizar tutorial:', err);
@@ -90,7 +90,7 @@ exports.atualizarTutorial = (req, res) => {
     );
 };
 
-// Deletar tutorial
+// Excluir tutorial
 exports.excluirTutorial = (req, res) => {
     const tutorialID = req.params.id;
 
@@ -105,3 +105,48 @@ exports.excluirTutorial = (req, res) => {
         }
     });
 };
+
+// Associar tutorial a um software
+exports.associarTutorialSoftware = (req, res) => {
+    const { id_software, id_tutorial } = req.body;
+
+    if (!id_software || !id_tutorial) {
+        return res.status(400).json({ erro: "Erro: ID do software e ID do tutorial são obrigatórios!" });
+    }
+
+    db.run(
+        "INSERT INTO tutorial_software (id_software, id_tutorial) VALUES (?, ?)",
+        [id_software, id_tutorial],
+        function (err) {
+            if (err) {
+                console.error("Erro ao associar tutorial e software:", err);
+                res.status(500).json({ erro: "Erro ao salvar no banco" });
+            } else {
+                res.status(201).json({ mensagem: "Tutorial vinculado ao software com sucesso!" });
+            }
+        }
+    );
+};
+
+// Buscar tutorial vinculado ao software
+exports.buscarTutorialPorSoftware = (req, res) => {
+    const softwareID = req.params.id;
+
+    db.get(
+        `SELECT tutoriais.id_tutorial, tutoriais.titulo FROM tutorial_software 
+        INNER JOIN tutoriais ON tutorial_software.id_tutorial = tutoriais.id_tutorial
+        WHERE tutorial_software.id_software = ?`,
+        [softwareID],
+        (err, linha) => {
+            if (err) {
+                console.error("Erro ao buscar tutorial associado:", err);
+                res.status(500).json({ erro: "Erro no servidor" });
+            } else if (!linha) {
+                res.status(404).json({ erro: "Nenhum tutorial encontrado para este software" });
+            } else {
+                res.json(linha);
+            }
+        }
+    );
+};
+

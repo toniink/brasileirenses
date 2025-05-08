@@ -45,8 +45,8 @@ const rotasSoftwares = require('./src/routes/softwaresRoutes');
 app.use('/softwares', rotasSoftwares);
 
 //tutoriais
-const rotasTutoriais = require('./src/routes/tutoriaisRoutes');
-app.use('/tutoriais', rotasTutoriais);
+const tutoriaisRoutes = require('./src/routes/tutoriaisRoutes');
+app.use('/tutoriais', tutoriaisRoutes);
 
 //avaliacoesComentarios
 const rotasAvaliacoes = require('./src/routes/avaliacoesComentariosRoutes');
@@ -63,6 +63,13 @@ app.use('/playlistUsuarios', rotasPlaylists);
 //playlistCursos - tabela intermediaria
 const rotasPlaylistCursos = require('./src/routes/playlistCursosRoutes');
 app.use('/playlistCursos', rotasPlaylistCursos);
+
+const secoesRoutes = require('./src/routes/secoesRoutes');
+app.use('/secoes', secoesRoutes);
+
+const conteudoRoutes = require('./src/routes/conteudoRoutes');
+app.use('/conteudo', conteudoRoutes);
+
 
 
 // Inicializar o servidor
