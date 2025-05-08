@@ -6,7 +6,7 @@ const GerenciarTutorial = () => {
     const [softwares, setSoftwares] = useState([]);
     const [tutoriais, setTutoriais] = useState([]);
     const [tituloTutorial, setTituloTutorial] = useState("");
-    const [descricaoTutorial, setDescricaoTutorial] = useState("");
+    const [descricaoTutorial] = useState("");
     const [idSoftwareSelecionado, setIdSoftwareSelecionado] = useState("");
     const [idTutorialSelecionado, setIdTutorialSelecionado] = useState("");
 
