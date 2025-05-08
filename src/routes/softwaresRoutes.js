@@ -1,20 +1,20 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const softwaresController = require('../controllers/softwaresController');
+const softwaresController = require("../controllers/softwaresController");
 
-// Rota para listar todos os softwares com a categoria associada
-router.get('/', softwaresController.buscarTodosSoftwares);
+// 📌 Rotas para gerenciar softwares
+router.get("/", softwaresController.buscarTodosSoftwares); // ✅ Agora acessível via "/softwares"
+router.post("/", softwaresController.criarSoftware);
+router.get("/:id", softwaresController.buscarSoftwarePorId); // ✅ Corrigido para "/softwares/:id"
+router.put("/:id", softwaresController.atualizarSoftware);
+router.delete("/:id", softwaresController.excluirSoftware);
 
-// Rota para criar novo software
-router.post('/', softwaresController.criarSoftware);
 
-// Rota para buscar software por ID e trazer a categoria associada
-router.get('/:id', softwaresController.buscarSoftwarePorId);
-
-// Rota para atualizar software
-router.put('/:id', softwaresController.atualizarSoftware);
-
-// Rota para deletar software
-router.delete('/:id', softwaresController.excluirSoftware);
+// //  Rotas para gerenciar seções de software
+// router.get("/softwares/:id_software/secoesSoftware", softwaresController.getSoftwareSections);
+// router.post("/softwares/secoesSoftware", softwaresController.createSoftwareSection);
+// 📌 Rotas para gerenciar conteúdo de software
+router.get("/secoesSoftware/:id/conteudo", softwaresController.buscarConteudoPorSecaoSoftware);
+router.post("/secoesSoftware/conteudo", softwaresController.criarConteudoSoftware);
 
 module.exports = router;

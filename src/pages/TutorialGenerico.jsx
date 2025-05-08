@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 const TutorialGenerico = () => {
@@ -70,6 +70,23 @@ const TutorialGenerico = () => {
     return (
         <div className="container-fluid">
             <header className="bg-primary text-white py-4 text-center shadow">
+                {/* Cabeçalho */}
+        <header className="bg-light py-3">
+            <div className="container">
+                <div className="d-flex justify-content-between align-items-center">
+                    {/* Navegação no Header */}
+                    <nav className="d-flex gap-3">
+                        <Link to="/" className="btn btn-link">HOME</Link>
+                        <Link to="/cursos" className="btn btn-link">CURSOS</Link>
+                        <Link to="/softwares" className="btn btn-link">PROGRAMAS</Link>
+                        <button className="btn btn-link">CATEGORIAS</button>
+                        <button className="btn btn-link">CONTATO</button>
+                    </nav>
+                    {/* Botão de Login */}
+                    <button className="btn btn-primary">Fazer Login</button>
+                </div>
+            </div>
+        </header>
                 <h2>{tutorialData.titulo}</h2>
             </header>
 

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { useNavigate } from 'react-router-dom'; // Adicionar hook para navegação
+import { useNavigate, Link } from 'react-router-dom'; // Adicionar hook para navegação
 
 const CursoPagina = () => {
     const [cursos, setCursos] = useState([]); // Estado para armazenar os cursos
@@ -26,10 +26,10 @@ const CursoPagina = () => {
             {/* Cabeçalho */}
             <header className="bg-light py-3">
                 <div className="container d-flex justify-content-between align-items-center">
-                    <nav className="d-flex gap-3">
-                        <button className="btn btn-link">HOME</button>
-                        <button className="btn btn-link">CURSOS</button>
-                        <button className="btn btn-link">PROGRAMAS</button>
+                     <nav className="d-flex gap-3">
+                        <Link to="/" className="btn btn-link">HOME</Link>
+                        <Link to="/cursos" className="btn btn-link">CURSOS</Link>
+                        <Link to="/softwares" className="btn btn-link">PROGRAMAS</Link>
                         <button className="btn btn-link">CATEGORIAS</button>
                         <button className="btn btn-link">CONTATO</button>
                     </nav>

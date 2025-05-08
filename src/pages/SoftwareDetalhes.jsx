@@ -73,7 +73,7 @@ const SoftwareDetalhes = () => {
                     <div className="bg-secondary text-white p-3 rounded">
                         <h5>{software.nome || 'Software não encontrado'}</h5>
                         <p>Desenvolvedor: {software.desenvolvedor || 'N/A'}</p>
-                        <button className="btn btn-primary w-100 mt-3" onClick={() => window.open(software.site || '#', '_blank')}>
+                        <button className="btn btn-primary w-100 mt-3" onClick={() => window.open(software.url || '#', '_blank')}>
                             Ir para Download
                         </button>
                     </div>
@@ -93,7 +93,7 @@ const SoftwareDetalhes = () => {
                             Ir para Tutorial de Instalação
                         </button>
 
-                        <button className="btn btn-secondary" onClick={() => window.open(software.site || '#', '_blank')}>
+                        <button className="btn btn-secondary" onClick={() => window.open(software.url || '#', '_blank')}>
                             Ir para Download
                         </button>
                     </div>

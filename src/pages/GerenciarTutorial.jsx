@@ -91,7 +91,7 @@ const GerenciarTutorial = () => {
 
         // 🔹 Salvar as seções vinculadas ao tutorial
         for (const secao of conteudo) {
-            const secaoResponse = await fetch("http://localhost:3000/secoes", {
+            const secaoResponse = await fetch("http://localhost:3000/secoesTutorial", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
@@ -136,6 +136,8 @@ const GerenciarTutorial = () => {
                             <Link to="/" className="btn btn-link">HOME</Link>
                             <Link to="/cursos" className="btn btn-link">CURSOS</Link>
                             <Link to="/softwares" className="btn btn-link">PROGRAMAS</Link>
+                            <button className="btn btn-link">CATEGORIAS</button>
+                            <button className="btn btn-link">CONTATO</button>
                         </nav>
                         <button className="btn btn-primary">Fazer Login</button>
                     </div>

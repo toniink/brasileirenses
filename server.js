@@ -65,7 +65,7 @@ const rotasPlaylistCursos = require('./src/routes/playlistCursosRoutes');
 app.use('/playlistCursos', rotasPlaylistCursos);
 
 const secoesRoutes = require('./src/routes/secoesRoutes');
-app.use('/secoes', secoesRoutes);
+app.use('/secoesTutorial', secoesRoutes);
 
 const conteudoRoutes = require('./src/routes/conteudoRoutes');
 app.use('/conteudo', conteudoRoutes);

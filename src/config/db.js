@@ -96,6 +96,44 @@ db.run(`CREATE TABLE IF NOT EXISTS softwares (
     FOREIGN KEY (id_site) REFERENCES Sites (id_site)
 );`);
 
+db.run(`CREATE TABLE IF NOT EXISTS software_secoes (
+    id_secao INTEGER PRIMARY KEY AUTOINCREMENT,
+    id_software INTEGER NOT NULL,
+    tipo TEXT CHECK(tipo IN ('titulo', 'area_atuacao', 'paragrafo', 'lista')),
+    ordem INTEGER NOT NULL,
+    FOREIGN KEY (id_software) REFERENCES softwares(id_software) ON DELETE CASCADE
+);`);
+
+db.run(`CREATE TABLE IF NOT EXISTS software_conteudo_titulo (
+    id_titulo INTEGER PRIMARY KEY AUTOINCREMENT,
+    id_secao INTEGER NOT NULL,
+    texto TEXT NOT NULL,
+    FOREIGN KEY (id_secao) REFERENCES software_secoes(id_secao) ON DELETE CASCADE
+);`);
+
+db.run (`CREATE TABLE IF NOT EXISTS software_conteudo_area_atuacao (
+    id_area INTEGER PRIMARY KEY AUTOINCREMENT,
+    id_secao INTEGER NOT NULL,
+    titulo TEXT NOT NULL,
+    descricao TEXT NOT NULL,
+    FOREIGN KEY (id_secao) REFERENCES software_secoes(id_secao) ON DELETE CASCADE
+);`);
+
+db.run(`CREATE TABLE IF NOT EXISTS software_conteudo_paragrafo (
+    id_paragrafo INTEGER PRIMARY KEY AUTOINCREMENT,
+    id_secao INTEGER NOT NULL,
+    texto TEXT NOT NULL,
+    FOREIGN KEY (id_secao) REFERENCES software_secoes(id_secao) ON DELETE CASCADE
+);`);
+
+db.run (`CREATE TABLE IF NOT EXISTS software_conteudo_lista (
+    id_item INTEGER PRIMARY KEY AUTOINCREMENT,
+    id_secao INTEGER NOT NULL,
+    item TEXT NOT NULL,
+    FOREIGN KEY (id_secao) REFERENCES software_secoes(id_secao) ON DELETE CASCADE
+);`);
+
+
 db.run(`CREATE TABLE IF NOT EXISTS sites (
     id_site INTEGER PRIMARY KEY AUTOINCREMENT,
     id_categoria INTEGER,
