@@ -68,7 +68,7 @@ const secoesRoutes = require('./src/routes/secoesRoutes');
 app.use('/secoesTutorial', secoesRoutes);
 
 const conteudoRoutes = require('./src/routes/conteudoRoutes');
-app.use('/conteudo', conteudoRoutes);
+app.use('/conteudoSoftware', conteudoRoutes);
 
 
 

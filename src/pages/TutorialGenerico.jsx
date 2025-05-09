@@ -26,7 +26,7 @@ const TutorialGenerico = () => {
     useEffect(() => {
         if (!id || tutorialData === null) return;
 
-        fetch(`http://localhost:3000/secoes/${id}`)
+        fetch(`http://localhost:3000/secoesTutorial/${id}`)
             .then((res) => res.json())
             .then((data) => {
                 setSecoes(data);

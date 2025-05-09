@@ -1,20 +1,18 @@
-const express = require("express");
-const router = express.Router();
-const softwaresController = require("../controllers/softwaresController");
+// src/routes/softwaresRoutes.js
+const express = require('express');
+const router = express.Router(); // ✅ Use express.Router() em vez de require('router')
+const softwaresController = require('../controllers/softwaresController');
 
-// 📌 Rotas para gerenciar softwares
-router.get("/", softwaresController.buscarTodosSoftwares); // ✅ Agora acessível via "/softwares"
-router.post("/", softwaresController.criarSoftware);
-router.get("/:id", softwaresController.buscarSoftwarePorId); // ✅ Corrigido para "/softwares/:id"
-router.put("/:id", softwaresController.atualizarSoftware);
-router.delete("/:id", softwaresController.excluirSoftware);
+// Rotas CRUD básicas
+router.get('/', softwaresController.buscarTodosSoftwares);
+router.post('/', softwaresController.criarSoftware);
+router.get('/:id', softwaresController.buscarSoftwarePorId);
+router.put('/:id', softwaresController.atualizarSoftware);
+router.delete('/:id', softwaresController.excluirSoftware);
 
-
-// //  Rotas para gerenciar seções de software
-// router.get("/softwares/:id_software/secoesSoftware", softwaresController.getSoftwareSections);
-// router.post("/softwares/secoesSoftware", softwaresController.createSoftwareSection);
-// 📌 Rotas para gerenciar conteúdo de software
-router.get("/secoesSoftware/:id/conteudo", softwaresController.buscarConteudoPorSecaoSoftware);
-router.post("/secoesSoftware/conteudo", softwaresController.criarConteudoSoftware);
+// Rotas para o CMS
+router.get('/:id/conteudoCompleto', softwaresController.buscarConteudoPorSoftware);
+router.post('/secoes', softwaresController.criarSecaoSoftware);
+router.post('/conteudo', softwaresController.adicionarConteudo);
 
 module.exports = router;
