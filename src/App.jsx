@@ -8,6 +8,7 @@ import SoftwareDetalhes from './pages/SoftwareDetalhes';
 import TutorialGenerico from './pages/TutorialGenerico';
 import GerenciarTutorial from './pages/GerenciarTutorial';
 import GerenciarSoftware from './pages/GerenciarConteudoSoftware';
+import GerenciarConteudoCurso from './pages/GerenciarConteudoCursos';
 
 const App = () => (
     <Router>
@@ -26,7 +27,8 @@ const App = () => (
             <Route path="/tutorial/:id" element={<TutorialGenerico />} />
 
             <Route path="/gerenciar-tutorial" element={<GerenciarTutorial />} />
-            <Route path="/gerenciar-software" element={<GerenciarSoftware/>} />       
+            <Route path="/gerenciar-software" element={<GerenciarSoftware/>} />
+            <Route path="/gerenciar-curso" element={<GerenciarConteudoCurso/>} />     
         </Routes>
     </Router>
 );

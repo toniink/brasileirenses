@@ -2,52 +2,51 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 
-const GerenciarConteudoSoftware = () => {
-    const [softwares, setSoftwares] = useState([]);
-    const [idSoftwareSelecionado, setIdSoftwareSelecionado] = useState("");
+const GerenciarConteudoCurso = () => {
+    const [cursos, setCursos] = useState([]);
+    const [idCursoSelecionado, setIdCursoSelecionado] = useState("");
     const [secoes, setSecoes] = useState([]);
     const [carregando, setCarregando] = useState(false);
     const [erro, setErro] = useState(null);
 
-    // 🚀 Buscar softwares disponíveis
+    // 🚀 Buscar cursos disponíveis
     useEffect(() => {
         setCarregando(true);
-        fetch("http://localhost:3000/softwares")
+        fetch("http://localhost:3000/cursos")
             .then((res) => {
-                if (!res.ok) throw new Error("Erro ao buscar softwares");
+                if (!res.ok) throw new Error("Erro ao buscar cursos");
                 return res.json();
             })
             .then((data) => {
                 if (Array.isArray(data)) {
-                    setSoftwares(data);
+                    setCursos(data);
                 } else {
-                    setSoftwares([]);
+                    setCursos([]);
                     console.warn("Dados recebidos não são um array:", data);
                 }
             })
             .catch((error) => {
-                console.error("Erro ao buscar softwares:", error);
+                console.error("Erro ao buscar cursos:", error);
                 setErro(error.message);
             })
             .finally(() => setCarregando(false));
     }, []);
 
-    // 🚀 Carregar seções quando selecionar um software
+    // 🚀 Carregar seções quando selecionar um curso
     useEffect(() => {
-        if (idSoftwareSelecionado) {
+        if (idCursoSelecionado) {
             setCarregando(true);
             setErro(null);
             
-            fetch(`http://localhost:3000/softwares/${idSoftwareSelecionado}/content`)
+            fetch(`http://localhost:3000/cursos/${idCursoSelecionado}/content`)
                 .then((res) => {
                     if (!res.ok) throw new Error("Erro ao buscar conteúdo");
                     return res.json();
                 })
                 .then((data) => {
-                    // Garante que data seja um array antes de usar map
                     const dadosArray = Array.isArray(data) ? data : [];
                     const secoesFormatadas = dadosArray.map(secao => ({
-                        id_secao: secao.id_secao,
+                        id_secao_curso: secao.id_secao_curso,
                         tipo: secao.tipo,
                         ordem: secao.ordem,
                         conteudos: Array.isArray(secao.conteudos) ? secao.conteudos : [],
@@ -58,13 +57,13 @@ const GerenciarConteudoSoftware = () => {
                 .catch((error) => {
                     console.error("Erro ao buscar conteúdo:", error);
                     setErro(error.message);
-                    setSecoes([]); // Garante array vazio em caso de erro
+                    setSecoes([]);
                 })
                 .finally(() => setCarregando(false));
         } else {
-            setSecoes([]); // Limpa seções quando nenhum software está selecionado
+            setSecoes([]);
         }
-    }, [idSoftwareSelecionado]);
+    }, [idCursoSelecionado]);
 
     // 🚀 Adicionar uma nova seção (apenas no estado local)
     const adicionarSecao = (tipo) => {
@@ -74,10 +73,11 @@ const GerenciarConteudoSoftware = () => {
             conteudos: [{
                 texto: "",
                 ...(tipo === 'area_atuacao' ? { titulo: "", descricao: "" } : {}),
-                ...(tipo === 'lista' ? { item: "" } : {})
+                ...(tipo === 'lista' ? { item: "" } : {}),
+                ...(tipo === 'passo_a_passo' ? { numero: secoes.length + 1, instrucao: "", imagem: "" } : {})
             }],
             editando: true,
-            id_secao: null // Marca como nova seção
+            id_secao_curso: null
         };
         setSecoes([...secoes, novaSecao]);
     };
@@ -95,8 +95,8 @@ const GerenciarConteudoSoftware = () => {
 
     // 🚀 Salvar todas as alterações no backend
     const salvarAlteracoes = async () => {
-        if (!idSoftwareSelecionado) {
-            setErro("Selecione um software primeiro!");
+        if (!idCursoSelecionado) {
+            setErro("Selecione um curso primeiro!");
             return;
         }
 
@@ -104,18 +104,16 @@ const GerenciarConteudoSoftware = () => {
             setCarregando(true);
             setErro(null);
 
-            // Processa cada seção modificada
             for (const secao of secoes.filter(s => s.editando)) {
                 try {
-                    if (secao.id_secao) {
+                    if (secao.id_secao_curso) {
                         // Seção existente - atualizar conteúdo
                         for (const conteudo of secao.conteudos) {
-                            const response = await fetch(`http://localhost:3000/softwares/conteudo`, {
+                            const response = await fetch(`http://localhost:3000/cursos/conteudo/${secao.tipo}`, {
                                 method: "POST",
                                 headers: { "Content-Type": "application/json" },
                                 body: JSON.stringify({
-                                    id_secao: secao.id_secao,
-                                    tipo: secao.tipo,
+                                    id_secao_curso: secao.id_secao_curso,
                                     ...conteudo
                                 })
                             });
@@ -126,12 +124,13 @@ const GerenciarConteudoSoftware = () => {
                         }
                     } else {
                         // Nova seção - criar primeiro a seção
-                        const secaoResponse = await fetch(`http://localhost:3000/softwares/${idSoftwareSelecionado}/sections`, {
+                        const secaoResponse = await fetch(`http://localhost:3000/cursos/${idCursoSelecionado}/sections`, {
                             method: "POST",
                             headers: { "Content-Type": "application/json" },
                             body: JSON.stringify({
                                 tipo: secao.tipo,
-                                ordem: secao.ordem
+                                ordem: secao.ordem,
+                                ...(secao.tipo === 'titulo' && secao.conteudos[0]?.texto ? { titulo: secao.conteudos[0].texto } : {})
                             })
                         });
                         
@@ -141,38 +140,38 @@ const GerenciarConteudoSoftware = () => {
 
                         const novaSecao = await secaoResponse.json();
                         
-                        // Depois criar os conteúdos
-                        for (const conteudo of secao.conteudos) {
-                            const contentResponse = await fetch(`http://localhost:3000/softwares/conteudo`, {
-                                method: "POST",
-                                headers: { "Content-Type": "application/json" },
-                                body: JSON.stringify({
-                                    id_secao: novaSecao.id_secao,
-                                    tipo: secao.tipo,
-                                    ...conteudo
-                                })
-                            });
+                        // Depois criar os conteúdos (exceto título que já foi criado)
+                        if (secao.tipo !== 'titulo') {
+                            for (const conteudo of secao.conteudos) {
+                                const contentResponse = await fetch(`http://localhost:3000/cursos/conteudo/${secao.tipo}`, {
+                                    method: "POST",
+                                    headers: { "Content-Type": "application/json" },
+                                    body: JSON.stringify({
+                                        id_secao_curso: novaSecao.id_secao_curso,
+                                        ...conteudo
+                                    })
+                                });
 
-                            if (!contentResponse.ok) {
-                                throw new Error(`Erro ao salvar conteúdo: ${contentResponse.status}`);
+                                if (!contentResponse.ok) {
+                                    throw new Error(`Erro ao salvar conteúdo: ${contentResponse.status}`);
+                                }
                             }
                         }
                     }
                 } catch (error) {
                     console.error(`Erro ao processar seção:`, error);
-                    throw error; // Propaga o erro para ser capturado no catch externo
+                    throw error;
                 }
             }
 
             // Recarrega as seções após salvar
-            const response = await fetch(`http://localhost:3000/softwares/${idSoftwareSelecionado}/content`);
+            const response = await fetch(`http://localhost:3000/cursos/${idCursoSelecionado}/content`);
             if (!response.ok) {
                 throw new Error(`Erro ao recarregar conteúdo: ${response.status}`);
             }
 
             const data = await response.json();
-            const dadosArray = Array.isArray(data) ? data : [];
-            setSecoes(dadosArray.map(s => ({ ...s, editando: false })));
+            setSecoes((Array.isArray(data) ? data : []).map(s => ({ ...s, editando: false })));
             
             alert("Alterações salvas com sucesso!");
         } catch (error) {
@@ -185,7 +184,6 @@ const GerenciarConteudoSoftware = () => {
 
     // 🚀 Renderizar inputs de edição para cada tipo de seção
     const renderizarEditorSecao = (secao, indexSecao) => {
-        // Garante que conteudos seja um array
         const conteudos = Array.isArray(secao.conteudos) ? secao.conteudos : [];
         
         return conteudos.map((conteudo, indexConteudo) => {
@@ -234,6 +232,38 @@ const GerenciarConteudoSoftware = () => {
                             />
                         </div>
                     );
+                case "passo_a_passo":
+                    return (
+                        <div key={indexConteudo} className="mb-3">
+                            <h4>Passo {conteudo.numero || indexConteudo + 1}:</h4>
+                            <div className="mb-2">
+                                <label className="form-label">Número do Passo</label>
+                                <input
+                                    type="number"
+                                    className="form-control"
+                                    value={conteudo.numero || indexConteudo + 1}
+                                    onChange={(e) => atualizarConteudo(indexSecao, indexConteudo, 'numero', parseInt(e.target.value))}
+                                />
+                            </div>
+                            <div className="mb-2">
+                                <label className="form-label">Instrução</label>
+                                <textarea
+                                    className="form-control"
+                                    value={conteudo.instrucao || ""}
+                                    onChange={(e) => atualizarConteudo(indexSecao, indexConteudo, 'instrucao', e.target.value)}
+                                />
+                            </div>
+                            <div>
+                                <label className="form-label">URL da Imagem (opcional)</label>
+                                <input
+                                    type="text"
+                                    className="form-control"
+                                    value={conteudo.imagem || ""}
+                                    onChange={(e) => atualizarConteudo(indexSecao, indexConteudo, 'imagem', e.target.value)}
+                                />
+                            </div>
+                        </div>
+                    );
                 default:
                     return null;
             }
@@ -248,7 +278,7 @@ const GerenciarConteudoSoftware = () => {
                     <div className="d-flex justify-content-between align-items-center">
                         <nav className="d-flex gap-3">
                             <Link to="/" className="btn btn-link">HOME</Link>
-                            <Link to="/softwares" className="btn btn-link">SOFTWARES</Link>
+                            <Link to="/cursos" className="btn btn-link">CURSOS</Link>
                             <Link to="/categorias" className="btn btn-link">CATEGORIAS</Link>
                             <button className="btn btn-link">CONTATO</button>
                         </nav>
@@ -259,7 +289,7 @@ const GerenciarConteudoSoftware = () => {
 
             {/* Conteúdo Principal */}
             <main className="container flex-grow-1 py-4">
-                <h2 className="mb-4">Gerenciamento de Conteúdo</h2>
+                <h2 className="mb-4">Gerenciamento de Conteúdo do Curso</h2>
                 
                 {/* Mensagens de Erro */}
                 {erro && (
@@ -268,20 +298,20 @@ const GerenciarConteudoSoftware = () => {
                     </div>
                 )}
 
-                {/* Seleção do Software */}
+                {/* Seleção do Curso */}
                 <div className="card mb-4">
                     <div className="card-body">
-                        <h5 className="card-title">Selecione o Software</h5>
+                        <h5 className="card-title">Selecione o Curso</h5>
                         <select 
                             className="form-select"
-                            value={idSoftwareSelecionado} 
-                            onChange={(e) => setIdSoftwareSelecionado(e.target.value)}
+                            value={idCursoSelecionado} 
+                            onChange={(e) => setIdCursoSelecionado(e.target.value)}
                             disabled={carregando}
                         >
-                            <option value="">Selecione um software</option>
-                            {softwares.map((software) => (
-                                <option key={software.id_softwares} value={software.id_softwares}>
-                                    {software.nome}
+                            <option value="">Selecione um curso</option>
+                            {cursos.map((curso) => (
+                                <option key={curso.id_cursos} value={curso.id_cursos}>
+                                    {curso.nome_curso}
                                 </option>
                             ))}
                         </select>
@@ -296,30 +326,37 @@ const GerenciarConteudoSoftware = () => {
                             <button 
                                 className="btn btn-primary"
                                 onClick={() => adicionarSecao("titulo")}
-                                disabled={!idSoftwareSelecionado || carregando}
+                                disabled={!idCursoSelecionado || carregando}
                             >
                                 Adicionar Título
                             </button>
                             <button 
                                 className="btn btn-secondary"
                                 onClick={() => adicionarSecao("paragrafo")}
-                                disabled={!idSoftwareSelecionado || carregando}
+                                disabled={!idCursoSelecionado || carregando}
                             >
                                 Adicionar Parágrafo
                             </button>
                             <button 
                                 className="btn btn-warning"
                                 onClick={() => adicionarSecao("lista")}
-                                disabled={!idSoftwareSelecionado || carregando}
+                                disabled={!idCursoSelecionado || carregando}
                             >
                                 Adicionar Lista
                             </button>
                             <button 
                                 className="btn btn-info"
                                 onClick={() => adicionarSecao("area_atuacao")}
-                                disabled={!idSoftwareSelecionado || carregando}
+                                disabled={!idCursoSelecionado || carregando}
                             >
                                 Adicionar Área
+                            </button>
+                            <button 
+                                className="btn btn-success"
+                                onClick={() => adicionarSecao("passo_a_passo")}
+                                disabled={!idCursoSelecionado || carregando}
+                            >
+                                Adicionar Passo a Passo
                             </button>
                         </div>
                     </div>
@@ -338,21 +375,21 @@ const GerenciarConteudoSoftware = () => {
                             </div>
                         ) : secoes.length === 0 ? (
                             <div className="alert alert-info">
-                                {idSoftwareSelecionado 
+                                {idCursoSelecionado 
                                     ? "Nenhuma seção encontrada. Adicione uma seção."
-                                    : "Selecione um software para visualizar ou adicionar seções."}
+                                    : "Selecione um curso para visualizar ou adicionar seções."}
                             </div>
                         ) : (
                             <div className="list-group">
                                 {secoes.map((secao, index) => (
                                     <div 
-                                        key={`${secao.id_secao || 'new'}-${index}`}
+                                        key={`${secao.id_secao_curso || 'new'}-${index}`}
                                         className={`list-group-item ${secao.editando ? 'border-primary' : ''}`}
                                     >
                                         <div className="d-flex justify-content-between align-items-center mb-2">
                                             <h6 className="mb-0 text-capitalize">
                                                 {secao.tipo} - Ordem: {secao.ordem}
-                                                {secao.id_secao && <small className="text-muted ms-2">(ID: {secao.id_secao})</small>}
+                                                {secao.id_secao_curso && <small className="text-muted ms-2">(ID: {secao.id_secao_curso})</small>}
                                             </h6>
                                             {secao.editando && (
                                                 <span className="badge bg-primary">Modificado</span>
@@ -371,7 +408,7 @@ const GerenciarConteudoSoftware = () => {
                     <button 
                         className="btn btn-success px-4 py-2"
                         onClick={salvarAlteracoes}
-                        disabled={!idSoftwareSelecionado || carregando || !secoes.some(s => s.editando)}
+                        disabled={!idCursoSelecionado || carregando || !secoes.some(s => s.editando)}
                     >
                         {carregando ? (
                             <>
@@ -395,4 +432,4 @@ const GerenciarConteudoSoftware = () => {
     );
 };
 
-export default GerenciarConteudoSoftware;
+export default GerenciarConteudoCurso;

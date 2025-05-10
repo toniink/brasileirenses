@@ -41,8 +41,8 @@ const adminRoutes = require('./src/routes/adminRoutes');
 app.use('/admin', adminRoutes); // Rota para login de admins
 
 //softwares
-const rotasSoftwares = require('./src/routes/softwaresRoutes');
-app.use('/softwares', rotasSoftwares);
+const softwareRoutes = require('./src/routes/softwaresRoutes');
+app.use('/softwares', softwareRoutes);
 
 //tutoriais
 const tutoriaisRoutes = require('./src/routes/tutoriaisRoutes');

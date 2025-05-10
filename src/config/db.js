@@ -77,6 +77,53 @@ db.run(`CREATE TABLE IF NOT EXISTS cursos (
     FOREIGN KEY (id_site) REFERENCES Sites (id_site)
 );`);
 
+db.run(`CREATE TABLE IF NOT EXISTS curso_secoes (
+    id_secao_curso INTEGER PRIMARY KEY AUTOINCREMENT,
+    id_curso INTEGER NOT NULL,
+    tipo TEXT CHECK(tipo IN ('titulo', 'area_atuacao', 'paragrafo', 'lista', 'passo_a_passo')),
+    ordem INTEGER NOT NULL,
+    FOREIGN KEY (id_curso) REFERENCES cursos(id_cursos) ON DELETE CASCADE
+);`);
+
+db.run(`CREATE TABLE IF NOT EXISTS curso_conteudo_titulo (
+    id_titulo_curso INTEGER PRIMARY KEY AUTOINCREMENT,
+    id_secao_curso INTEGER NOT NULL,
+    texto TEXT NOT NULL,
+    FOREIGN KEY (id_secao_curso) REFERENCES curso_secoes(id_secao_curso) ON DELETE CASCADE
+);`);
+
+db.run(`CREATE TABLE IF NOT EXISTS curso_conteudo_area_atuacao (
+    id_area_curso INTEGER PRIMARY KEY AUTOINCREMENT,
+    id_secao_curso INTEGER NOT NULL,
+    titulo TEXT NOT NULL,
+    descricao TEXT NOT NULL,
+    FOREIGN KEY (id_secao_curso) REFERENCES curso_secoes(id_secao_curso) ON DELETE CASCADE
+);`);
+
+db.run(`CREATE TABLE IF NOT EXISTS curso_conteudo_paragrafo (
+    id_paragrafo_curso INTEGER PRIMARY KEY AUTOINCREMENT,
+    id_secao_curso INTEGER NOT NULL,
+    texto TEXT NOT NULL,
+    FOREIGN KEY (id_secao_curso) REFERENCES curso_secoes(id_secao_curso) ON DELETE CASCADE
+);`);
+
+db.run(`CREATE TABLE IF NOT EXISTS curso_conteudo_lista (
+    id_item_curso INTEGER PRIMARY KEY AUTOINCREMENT,
+    id_secao_curso INTEGER NOT NULL,
+    item TEXT NOT NULL,
+    FOREIGN KEY (id_secao_curso) REFERENCES curso_secoes(id_secao_curso) ON DELETE CASCADE
+);`);
+
+db.run(`CREATE TABLE IF NOT EXISTS curso_conteudo_passo (
+    id_passo_curso INTEGER PRIMARY KEY AUTOINCREMENT,
+    id_secao_curso INTEGER NOT NULL,
+    numero INTEGER NOT NULL,
+    instrucao TEXT NOT NULL,
+    imagem TEXT,
+    FOREIGN KEY (id_secao_curso) REFERENCES curso_secoes(id_secao_curso) ON DELETE CASCADE
+);`);
+
+
 db.run(`CREATE TABLE IF NOT EXISTS categoriasCursos (
     id_curso INTEGER NOT NULL,
     id_categoria INTEGER NOT NULL,

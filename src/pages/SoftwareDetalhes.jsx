@@ -5,31 +5,49 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 const SoftwareDetalhes = () => {
     const { id } = useParams();
     const [software, setSoftware] = useState(null);
-    const [conteudo, setConteudo] = useState([]);
-    const [carregando, setCarregando] = useState(true);
+    const [sections, setSections] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                // Busca dados do software e conteúdo
-                const [softwareRes, conteudoRes] = await Promise.all([
+                setLoading(true);
+                setError(null);
+                
+                // Busca dados do software e seções de conteúdo
+                const [softwareRes, sectionsRes] = await Promise.all([
                     fetch(`http://localhost:3000/softwares/${id}`),
-                    fetch(`http://localhost:3000/softwares/${id}/conteudoCompleto`)
+                    fetch(`http://localhost:3000/softwares/${id}/content`)
                 ]);
 
-                if (!softwareRes.ok || !conteudoRes.ok) {
-                    throw new Error('Erro ao carregar dados');
+                // Verifica se o software existe
+                if (!softwareRes.ok) {
+                    throw new Error(softwareRes.status === 404 
+                        ? 'Software não encontrado' 
+                        : 'Erro ao carregar dados do software');
                 }
 
                 const softwareData = await softwareRes.json();
-                const conteudoData = await conteudoRes.json();
-
                 setSoftware(softwareData);
-                setConteudo(conteudoData);
-            } catch (error) {
-                console.error("Erro:", error);
+
+                // Verifica se há conteúdo
+                if (!sectionsRes.ok) {
+                    console.warn('Nenhum conteúdo encontrado para este software');
+                    setSections([]);
+                } else {
+                    const sectionsData = await sectionsRes.json();
+                    // Garante que sectionsData seja um array
+                    setSections(Array.isArray(sectionsData) ? sectionsData : []);
+                }
+
+            } catch (err) {
+                console.error("Erro ao carregar dados:", err);
+                setError(err.message);
+                setSoftware(null);
+                setSections([]);
             } finally {
-                setCarregando(false);
+                setLoading(false);
             }
         };
 
@@ -37,27 +55,57 @@ const SoftwareDetalhes = () => {
     }, [id]);
 
     // Função para renderizar o conteúdo dinâmico
-    const renderConteudo = () => {
-        return conteudo.map((secao, index) => {
-            switch (secao.tipo) {
+    const renderContent = () => {
+        // Garante que sections seja um array antes de mapear
+        if (!Array.isArray(sections)) {
+            return (
+                <div className="alert alert-warning">
+                    Nenhum conteúdo disponível para este software.
+                </div>
+            );
+        }
+
+        if (sections.length === 0) {
+            return (
+                <div className="alert alert-info">
+                    Este software ainda não possui conteúdo cadastrado.
+                </div>
+            );
+        }
+
+        return sections.map((section, index) => {
+            // Garante que conteudos seja um array
+            const conteudos = Array.isArray(section.conteudos) ? section.conteudos : [];
+            
+            switch (section.tipo) {
                 case 'titulo':
-                    return <h4 key={index} className="mt-4">{secao.conteudos[0]?.texto}</h4>;
+                    return (
+                        <h4 key={`${section.id_secao}-${index}`} className="mt-4">
+                            {conteudos[0]?.texto || 'Título não disponível'}
+                        </h4>
+                    );
                 case 'paragrafo':
-                    return <p key={index}>{secao.conteudos[0]?.texto}</p>;
+                    return (
+                        <p key={`${section.id_secao}-${index}`}>
+                            {conteudos[0]?.texto || 'Conteúdo não disponível'}
+                        </p>
+                    );
                 case 'lista':
                     return (
-                        <ul key={index} className="list-group">
-                            {secao.conteudos.map((item, i) => (
-                                <li key={i} className="list-group-item">{item.texto}</li>
+                        <ul key={`${section.id_secao}-${index}`} className="list-group">
+                            {conteudos.map((item, i) => (
+                                <li key={`${item.id}-${i}`} className="list-group-item">
+                                    {item.texto || 'Item sem texto'}
+                                </li>
                             ))}
                         </ul>
                     );
                 case 'area_atuacao':
                     return (
-                        <div key={index} className="card mt-3">
+                        <div key={`${section.id_secao}-${index}`} className="card mt-3">
                             <div className="card-body">
-                                <h5 className="card-title">{secao.conteudos[0]?.titulo}</h5>
-                                <p className="card-text">{secao.conteudos[0]?.descricao}</p>
+                                <h5 className="card-title">{conteudos[0]?.titulo || 'Área de atuação'}</h5>
+                                <p className="card-text">{conteudos[0]?.descricao || 'Descrição não disponível'}</p>
                             </div>
                         </div>
                     );
@@ -67,7 +115,7 @@ const SoftwareDetalhes = () => {
         });
     };
 
-    if (carregando) {
+    if (loading) {
         return (
             <div className="container text-center mt-5">
                 <div className="spinner-border text-primary" role="status">
@@ -78,10 +126,24 @@ const SoftwareDetalhes = () => {
         );
     }
 
-    if (!software) {
+    if (error) {
         return (
             <div className="container text-center mt-5">
                 <div className="alert alert-danger">
+                    <h4>Erro ao carregar dados</h4>
+                    <p>{error}</p>
+                    <Link to="/softwares" className="btn btn-primary">
+                        Voltar para lista de softwares
+                    </Link>
+                </div>
+            </div>
+        );
+    }
+
+    if (!software) {
+        return (
+            <div className="container text-center mt-5">
+                <div className="alert alert-warning">
                     <h4>Software não encontrado</h4>
                     <p>O software solicitado não está disponível.</p>
                     <Link to="/softwares" className="btn btn-primary">
@@ -127,7 +189,7 @@ const SoftwareDetalhes = () => {
 
                 <div className="col-md-9">
                     {/* Conteúdo dinâmico do banco de dados */}
-                    {renderConteudo()}
+                    {renderContent()}
 
                     <hr className="border-secondary" />
 
@@ -146,7 +208,7 @@ const SoftwareDetalhes = () => {
                 </div>
             </div>
 
-            {/* Footer - Mantido igual ao exemplo */}
+            {/* Footer */}
             <footer className="bg-primary text-light py-4 mt-4">
                 <div className="container">
                     <div className="row">

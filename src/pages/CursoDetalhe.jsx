@@ -1,41 +1,136 @@
 /* eslint-disable no-console */
-
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom'; // Captura o ID da URL
+import { useParams, Link } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const CursoDetalhes = () => {
-    const { id } = useParams(); // Captura o ID do curso
-    const [curso, setCurso] = useState(null); // Inicializa como null
+    const { id } = useParams();
+    const [curso, setCurso] = useState(null);
+    const [conteudos, setConteudos] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
     useEffect(() => {
-        const fetchCurso = async () => {
+        const fetchData = async () => {
             try {
-                console.log(`Buscando curso com ID: ${id}`);
-                const response = await fetch(`http://localhost:3000/cursos/${id}`);
-                if (!response.ok) {
+                // Busca dados do curso
+                const cursoResponse = await fetch(`http://localhost:3000/cursos/${id}`);
+                if (!cursoResponse.ok) {
                     throw new Error(`Erro ao buscar curso ID ${id}`);
                 }
-                const data = await response.json();
+                const cursoData = await cursoResponse.json();
 
-                if (!data || Object.keys(data).length === 0) {
-                    throw new Error(`Curso não encontrado para ID ${id}`);
+                // Busca conteúdos do curso
+                const conteudosResponse = await fetch(`http://localhost:3000/cursos/${id}/content`);
+                if (!conteudosResponse.ok) {
+                    throw new Error(`Erro ao buscar conteúdos do curso ID ${id}`);
                 }
+                const conteudosData = await conteudosResponse.json();
 
-                setCurso(data);
+                setCurso(cursoData);
+                setConteudos(conteudosData);
+                setLoading(false);
             } catch (error) {
-                console.error(error.message);
+                console.error('Erro ao carregar dados:', error);
+                setError(error.message);
+                setLoading(false);
             }
         };
 
-        fetchCurso();
+        fetchData();
     }, [id]);
+
+    // Função para renderizar o conteúdo dinamicamente
+    const renderContent = (secao) => {
+        switch (secao.tipo) {
+            case 'titulo':
+                return (
+                    <h4 className="mt-4">
+                        {secao.conteudos[0]?.texto || 'Título da Seção'}
+                    </h4>
+                );
+            case 'paragrafo':
+                return (
+                    <p className="mt-3">
+                        {secao.conteudos[0]?.texto || 'Texto do parágrafo...'}
+                    </p>
+                );
+            case 'lista':
+                return (
+                    <ul className="mt-3">
+                        {secao.conteudos.map((item, index) => (
+                            <li key={index}>{item.texto || `Item ${index + 1}`}</li>
+                        ))}
+                    </ul>
+                );
+            case 'area_atuacao':
+                return (
+                    <div className="row mt-3">
+                        {secao.conteudos.map((area, index) => (
+                            <div key={index} className="col-md-6 mb-3">
+                                <h5>{area.titulo || `Área ${index + 1}`}</h5>
+                                <p>{area.descricao || 'Descrição da área de atuação...'}</p>
+                            </div>
+                        ))}
+                    </div>
+                );
+            case 'passo_a_passo':
+                return (
+                    <div className="mt-3">
+                        {secao.conteudos.map((passo, index) => (
+                            <div key={index} className="mb-3">
+                                <h6>Passo {passo.numero || index + 1}</h6>
+                                <p>{passo.instrucao || 'Instrução do passo...'}</p>
+                                {passo.imagem && (
+                                    <img 
+                                        src={passo.imagem} 
+                                        alt={`Passo ${passo.numero}`} 
+                                        className="img-fluid mb-2"
+                                    />
+                                )}
+                            </div>
+                        ))}
+                    </div>
+                );
+            default:
+                return null;
+        }
+    };
+
+    if (loading) {
+        return (
+            <div className="container text-center mt-5">
+                <div className="spinner-border text-primary" role="status">
+                    <span className="visually-hidden">Carregando...</span>
+                </div>
+                <h1 className="mt-3">Carregando curso...</h1>
+                <p>Aguarde enquanto recuperamos os detalhes.</p>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="container text-center mt-5">
+                <div className="alert alert-danger">
+                    <h1>Erro ao carregar o curso</h1>
+                    <p>{error}</p>
+                    <Link to="/cursos" className="btn btn-primary">
+                        Voltar para lista de cursos
+                    </Link>
+                </div>
+            </div>
+        );
+    }
 
     if (!curso) {
         return (
             <div className="container text-center mt-5">
-                <h1>Carregando curso...</h1>
-                <p>Aguarde enquanto recuperamos os detalhes.</p>
+                <h1>Curso não encontrado</h1>
+                <p>O curso solicitado não foi encontrado em nosso sistema.</p>
+                <Link to="/cursos" className="btn btn-primary">
+                    Voltar para lista de cursos
+                </Link>
             </div>
         );
     }
@@ -46,12 +141,12 @@ const CursoDetalhes = () => {
             <header className="bg-light py-3">
                 <div className="container d-flex justify-content-between align-items-center">
                     <nav className="d-flex gap-3">
-                            <Link to="/" className="btn btn-link">HOME</Link>
-                            <Link to="/cursos" className="btn btn-link">CURSOS</Link>
-                            <Link to="/softwares" className="btn btn-link">PROGRAMAS</Link>
-                            <button className="btn btn-link">CATEGORIAS</button>
-                            <button className="btn btn-link">CONTATO</button>
-                        </nav>
+                        <Link to="/" className="btn btn-link">HOME</Link>
+                        <Link to="/cursos" className="btn btn-link">CURSOS</Link>
+                        <Link to="/softwares" className="btn btn-link">PROGRAMAS</Link>
+                        <button className="btn btn-link">CATEGORIAS</button>
+                        <button className="btn btn-link">CONTATO</button>
+                    </nav>
                     <button className="btn btn-primary">Fazer Login</button>
                 </div>
             </header>
@@ -61,37 +156,39 @@ const CursoDetalhes = () => {
                     <div className="bg-secondary text-white p-3 rounded">
                         <h5>{curso.nome_curso || 'Curso não encontrado'}</h5>
                         <p>Duração: {curso.duracao || 'N/A'}</p>
-                        <p>Tipo: {curso.tipo || 'N/A'}</p>
+                        <p>Nível: {curso.nivel_dificuldade || 'N/A'}</p>
+                        <p>Formato: {curso.formato || 'N/A'}</p>
                         <div className="bg-dark" style={{ height: '150px', marginTop: '15px' }} />
                     </div>
                 </div>
 
                 <div className="col-md-9">
-                    <h4>Visão Geral</h4>
-                    <p>{curso.visao_geral || 'Texto de visão geral sobre o curso.'}</p>
-                    <hr className="border-secondary" />
+                    {/* Visão Geral - Primeira seção */}
+                    <section>
+                        <h4>Visão Geral</h4>
+                        <p>{curso.descricao || 'Texto de visão geral sobre o curso.'}</p>
+                        <hr className="border-secondary" />
+                    </section>
 
-                    <h4>Área que o Curso Abrange</h4>
-                    <p>{curso.area_abrangida || 'Descrição sobre a área que o curso abrange.'}</p>
-                    <hr className="border-secondary" />
+                    {/* Conteúdo dinâmico das seções */}
+                    {conteudos.map((secao, index) => (
+                        <section key={index}>
+                            {renderContent(secao)}
+                            {index < conteudos.length - 1 && <hr className="border-secondary" />}
+                        </section>
+                    ))}
 
-                    <h4>Áreas de Atuação</h4>
-                    <div className="row">
-                        <div className="col-md-6">
-                            <h5>Área 1</h5>
-                            <p>Descrição da primeira área de atuação.</p>
-                        </div>
-                        <div className="col-md-6">
-                            <h5>Área 2</h5>
-                            <p>Descrição da segunda área de atuação.</p>
-                        </div>
-                    </div>
-                    <hr className="border-secondary" />
-
-                    <h5>Descrição das Áreas de Atuação</h5>
-                    <p>{curso.descricao_areas || 'Texto explicativo sobre as áreas de atuação abordadas pelo curso.'}</p>
-
-                    <button className="btn btn-primary mt-4">Ir para Tutorial de Instalação</button>
+                    {/* Botão de tutorial (se houver URL) */}
+                    {curso.url && (
+                        <a 
+                            href={curso.url} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="btn btn-primary mt-4"
+                        >
+                            Ir para Tutorial
+                        </a>
+                    )}
                 </div>
             </div>
 
