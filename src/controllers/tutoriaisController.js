@@ -1,4 +1,5 @@
 const db = require('../config/db');
+const TutoriaisContentService = require('../services/tutoriaisContentService');
 
 // Listar todos os tutoriais e seus softwares associados
 exports.buscarTodosTutoriais = (req, res) => {
@@ -106,6 +107,122 @@ exports.excluirTutorial = (req, res) => {
     });
 };
 
+// Métodos do CMS - Usando o TutoriaisContentService
+exports.getContentByTutorial = async (req, res) => {
+    try {
+        const tutorialId = parseInt(req.params.id);
+        const content = await TutoriaisContentService.getFullContent(tutorialId);
+        res.json(content);
+    } catch (error) {
+        console.error("Erro ao buscar conteúdo:", error);
+        res.status(500).json({ 
+            error: "Erro ao buscar conteúdo",
+            details: error.message
+        });
+    }
+};
+
+exports.createSection = async (req, res) => {
+    try {
+        const tutorialId = parseInt(req.params.id);
+        const { tipo, ordem, titulo } = req.body;
+        const section = await TutoriaisContentService.createSection(tutorialId, tipo, ordem, titulo);
+        res.status(201).json(section);
+    } catch (error) {
+        console.error("Erro ao criar seção:", error);
+        res.status(500).json({ 
+            error: "Erro ao criar seção",
+            details: error.message
+        });
+    }
+};
+
+exports.addContent = async (req, res) => {
+    try {
+        const { id_secao } = req.params;
+        const { tipo, ...conteudo } = req.body;
+        
+        // Verifica se a seção existe
+        const secao = await new Promise((resolve, reject) => {
+            db.get("SELECT id_secao, tipo FROM secoes_tutorial WHERE id_secao = ?", 
+                  [id_secao], (err, row) => {
+                if (err) reject(err);
+                else resolve(row);
+            });
+        });
+
+        if (!secao) {
+            return res.status(404).json({ error: "Seção não encontrada" });
+        }
+
+        // Insere o conteúdo
+        const result = await TutoriaisContentService.addContent(id_secao, secao.tipo, conteudo);
+        res.status(201).json(result);
+    } catch (error) {
+        console.error("Erro ao adicionar conteúdo:", error);
+        res.status(500).json({ 
+            error: "Erro ao adicionar conteúdo",
+            details: error.message
+        });
+    }
+};
+
+exports.getSections = async (req, res) => {
+    try {
+        const tutorialId = parseInt(req.params.id);
+        const sections = await TutoriaisContentService.getSections(tutorialId);
+        res.json(sections);
+    } catch (error) {
+        console.error("Erro ao buscar seções:", error);
+        res.status(500).json({ 
+            error: "Erro ao buscar seções",
+            details: error.message
+        });
+    }
+};
+
+exports.deleteContent = async (req, res) => {
+    try {
+        const { tipo, id } = req.params;
+        await TutoriaisContentService.deleteContent(tipo, id);
+        res.json({ message: "Conteúdo excluído com sucesso" });
+    } catch (error) {
+        console.error("Erro ao excluir conteúdo:", error);
+        res.status(500).json({ 
+            error: "Erro ao excluir conteúdo",
+            details: error.message
+        });
+    }
+};
+
+exports.deleteSection = async (req, res) => {
+    try {
+        const { id } = req.params;
+        await TutoriaisContentService.deleteSection(id);
+        res.json({ message: "Seção excluída com sucesso" });
+    } catch (error) {
+        console.error("Erro ao excluir seção:", error);
+        res.status(500).json({ 
+            error: "Erro ao excluir seção",
+            details: error.message
+        });
+    }
+};
+
+exports.getSectionContent = async (req, res) => {
+    try {
+        const { id_secao } = req.params;
+        const content = await TutoriaisContentService.getSectionContent(id_secao);
+        res.json(content);
+    } catch (error) {
+        console.error("Erro ao buscar conteúdo da seção:", error);
+        res.status(500).json({ 
+            error: "Erro ao buscar conteúdo da seção",
+            details: error.message
+        });
+    }
+};
+
 // Associar tutorial a um software
 exports.associarTutorialSoftware = (req, res) => {
     const { id_software, id_tutorial } = req.body;
@@ -149,4 +266,3 @@ exports.buscarTutorialPorSoftware = (req, res) => {
         }
     );
 };
-

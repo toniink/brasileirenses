@@ -20,9 +20,9 @@ const GerenciarCurso = lazy(() => import('./pages/gerenciamento/conteudo/Gerenci
 const ConteudoGerenciamento = lazy(() => import('./pages/gerenciamento/ConteudoGerenciamento'));
 import ListaConteudos from './pages/gerenciamento/conteudo/ListaConteudos';
 const EditarConteudo = lazy(() => import('./pages/gerenciamento/EditarConteudo'))
-
-
-
+const EditarSoftware = lazy(() => import('./pages/gerenciamento/entidades/EditarSoftwares'))
+const EditarConteudoSoftware = lazy(() => import('./pages/gerenciamento/conteudo/EditarConteudoSoftware'))
+const EditarConteudoTutorial = lazy(() => import('./pages/gerenciamento/conteudo/EditarConteudoTutorial'))
 
 const App = () => (
     <Router>
@@ -44,12 +44,15 @@ const App = () => (
                 <Route path="/gerenciamento" element={<DashboardGerenciamento />} />
                 <Route path="/gerenciamento/conteudo/cursos" element={<ListaConteudos tipo="cursos" />} />
                 <Route path="/gerenciamento/conteudo/softwares" element={<ListaConteudos tipo="softwares" />} />
+                <Route path="/gerenciamento/conteudo/tutoriais" element={<ListaConteudos tipo="tutoriais" />} />
                 <Route path="/gerenciamento/conteudo" element={<ConteudoGerenciamento />} />
                 <Route path="/gerenciamento/conteudo/cursos/novo" element={<GerenciarCurso />} />
                 <Route path="gerenciamento/conteudo/softwares/novo" element={<GerenciarSoftware />} />
-                <Route path="/gerenciamento/conteudo/tutoriais" element={<GerenciarTutorial />} />
+                <Route path="/gerenciamento/conteudo/tutoriais/novo" element={<GerenciarTutorial />} />
                 <Route path="/gerenciamento/conteudo/:tipo/editar/:id" element={<EditarConteudo />} />
-
+                <Route path="gerenciamento/softwares/editar/:id" element={<EditarSoftware />} />
+                <Route path="gerenciamento/conteudo/softwares/editar-conteudo/:id" element={<EditarConteudoSoftware />} />
+                <Route path="gerenciamento/conteudo/tutoriais/editar-conteudo/:id" element={<EditarConteudoTutorial />} />
 
 
             </Routes>

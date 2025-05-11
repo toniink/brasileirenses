@@ -2,24 +2,22 @@ const express = require('express');
 const router = express.Router();
 const tutoriaisController = require('../controllers/tutoriaisController');
 
-// Rota para listar todos os tutoriais
+// Rotas básicas
 router.get('/', tutoriaisController.buscarTodosTutoriais);
-
-// Rota para criar novo tutorial
 router.post('/', tutoriaisController.criarTutorial);
-
-// Rota para buscar tutorial por ID
 router.get('/:id', tutoriaisController.buscarTutorialPorId);
-
-// Rota para atualizar tutorial
 router.put('/:id', tutoriaisController.atualizarTutorial);
-
-// Rota para deletar tutorial
 router.delete('/:id', tutoriaisController.excluirTutorial);
 
-//associar tutorial a software
-router.post('/associar', tutoriaisController.associarTutorialSoftware);
+// Rotas de conteúdo
+router.get('/:id/conteudo', tutoriaisController.getContentByTutorial);
+router.get('/:id/secoes', tutoriaisController.getSections);
+router.post('/:id/secoes', tutoriaisController.createSection);
+router.delete('/:id/secoes/:id_secao', tutoriaisController.deleteSection);
 
-router.get('/software/:id', tutoriaisController.buscarTutorialPorSoftware);
+// Rotas específicas de conteúdo
+router.get('/:id/secoes/:id_secao/conteudo', tutoriaisController.getSectionContent);
+router.post('/:id/secoes/:id_secao/conteudo', tutoriaisController.addContent);
+router.delete('/:id/conteudo/:tipo/:id', tutoriaisController.deleteContent);
 
 module.exports = router;
