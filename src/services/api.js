@@ -1,5 +1,5 @@
 // Versão simplificada usando fetch nativo
-export const fetchCursos = {
+const fetchCursos = {
   listar: async () => {
     const response = await fetch('http://localhost:3000/api/cursos');
     return await response.json();
@@ -10,3 +10,4 @@ export const fetchCursos = {
   },
   // Adicione outros métodos conforme suas rotas
 };
+export default api;

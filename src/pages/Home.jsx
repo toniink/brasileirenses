@@ -41,6 +41,11 @@ const HomePage = () => (
                 <div className="col-md-6 text-end">
                     {/* Placeholder cinza para a imagem */}
                     <div className="bg-secondary rounded" style={{ width: '150px', height: '150px' }} />
+                    <img
+                        src="https://example.com/minha-imagem.jpg"
+                        alt="Descrição da imagem"
+                        style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '8px' }}
+                    />
                 </div>
             </section>
 
@@ -54,8 +59,13 @@ const HomePage = () => (
                     </p>
                 </div>
                 <div className="col-md-6 text-end">
-                    {/* Placeholder circular para o ícone */}
-                    <div className="bg-secondary rounded-circle" style={{ width: '100px', height: '100px' }} />
+                    <div style={{ width: '100px', height: '100px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                        <img
+                            src="https://static.vecteezy.com/system/resources/previews/010/145/488/large_2x/download-icon-sign-symbol-design-free-png.png"
+                            alt="Ícone de segurança"
+                            style={{ width: '60%', height: '60%' }}
+                        />
+                    </div>
                 </div>
             </section>
 
@@ -65,7 +75,14 @@ const HomePage = () => (
                 <div className="row">
                     {/* Curso Python */}
                     <div className="col-md-4 text-center mb-4">
-                        <div className="bg-secondary rounded" style={{ width: '150px', height: '150px', margin: '0 auto' }} />
+                        {/* Imagem adicionada */}
+                        <div style={{ width: '150px', height: '150px', margin: '0 auto' }}>
+                            <img
+                                src="https://upload.wikimedia.org/wikipedia/commons/c/c3/Python-logo-notext.svg"
+                                alt="Logo do Python"
+                                style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                            />
+                        </div>
                         <h3>Python</h3>
                         <p>
                             Aprenda o básico de lógica de programação com uma das linguagens mais venenosas atualmente.
@@ -73,20 +90,36 @@ const HomePage = () => (
                     </div>
                     {/* Curso Finanças */}
                     <div className="col-md-4 text-center mb-4">
-                        <div className="bg-secondary rounded" style={{ width: '150px', height: '150px', margin: '0 auto' }} />
+                        {/* Imagem adicionada */}
+                        <div style={{ width: '150px', height: '150px', margin: '0 auto' }}>
+                            <img
+                                src="https://images.icon-icons.com/1149/PNG/512/1486504348-business-coins-finance-banking-bank-marketing_81341.png"
+                                alt="Imagem representando finanças"
+                                style={{ width: '100%', height: '100%', objectFit: 'contain', borderRadius: '8px' }}
+                            />
+                        </div>
                         <h3>Finanças</h3>
                         <p>
                             Estude sobre economia de forma a aprender a gerenciar seu dinheiro de forma eficiente.
                         </p>
                     </div>
+
                     {/* Curso JavaScript */}
                     <div className="col-md-4 text-center mb-4">
-                        <div className="bg-secondary rounded" style={{ width: '150px', height: '150px', margin: '0 auto' }} />
+                        {/* Adicionando uma imagem */}
+                        <div style={{ width: '150px', height: '150px', margin: '0 auto' }}>
+                            <img
+                                src="https://upload.wikimedia.org/wikipedia/commons/6/6a/JavaScript-logo.png"
+                                alt="Logo do JavaScript"
+                                style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                            />
+                        </div>
                         <h3>JavaScript</h3>
                         <p>
                             Veja como construir um site utilizando uma das linguagens mais versáteis para web.
                         </p>
                     </div>
+
                 </div>
             </section>
 
