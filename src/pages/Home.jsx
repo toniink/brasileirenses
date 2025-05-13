@@ -25,29 +25,26 @@ const HomePage = () => (
         {/* Conteúdo Principal */}
         <main className="container mt-4">
             {/* Seção Boas-vindas */}
-            <section className="row align-items-center mb-5">
-                <div className="col-md-6 text-start">
-                    <h1>Seja bem-vindo ao seu espaço digital de aprendizado!</h1>
-                    <p>
-                        Aqui, transformamos conhecimento em algo acessível e intuitivo, ajudando você a trilhar seu caminho com confiança.
-                        Descubra como simplificar o complexo e abraçar as tecnologias de forma descomplicada e prática.
-                    </p>
-                    {/* Botão com redirecionamento usando Link */}
-                    <Link to="/cursos" className="btn btn-primary mb-3">IR AOS CURSOS</Link>
+        <section className="row align-items-center mb-5">
+  <div className="col-md-6 col-sm-12 text-start">
+    <h1>Seja bem-vindo ao seu espaço digital de aprendizado!</h1>
+    <p>
+      Aqui, transformamos conhecimento em algo acessível e intuitivo, ajudando você a trilhar seu caminho com confiança.
+      Descubra como simplificar o complexo e abraçar as tecnologias de forma descomplicada e prática.
+    </p>
+    <Link to="/cursos" className="btn btn-primary mb-3">IR AOS CURSOS</Link>
+    <br />
+    <button className="btn btn-link text-primary">Tem dúvidas? Veja nosso suporte</button>
+  </div>
+  <div className="col-md-6 col-sm-12 text-end">
+    <img
+      src="https://icemexico.online/wp-content/uploads/2020/09/6461-2048x1280.jpg"
+      alt="imagem principal"
+      style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '8px', display: 'block' }}
+    />
+  </div>
+</section>
 
-                    <br />
-                    <button className="btn btn-link text-primary">Tem dúvidas? Veja nosso suporte</button>
-                </div>
-                <div className="col-md-6 text-end">
-                    {/* Placeholder cinza para a imagem */}
-                    <div className="bg-secondary rounded" style={{ width: '150px', height: '150px' }} />
-                    <img
-                        src="https://example.com/minha-imagem.jpg"
-                        alt="Descrição da imagem"
-                        style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '8px' }}
-                    />
-                </div>
-            </section>
 
             {/* Seção Acessível e Seguro */}
             <section className="row align-items-center bg-light p-4 rounded">
@@ -124,21 +121,37 @@ const HomePage = () => (
             </section>
 
             {/* Seção Crie Sua Conta */}
-            <section className="container mt-5 bg-light p-4 rounded">
-                <div className="row align-items-center">
-                    <div className="col-md-6 text-start">
-                        <h2>Crie Sua Conta</h2>
-                        <p>
-                            Registre-se gratuitamente para avaliar cursos, deixar comentários e criar playlists personalizadas.
-                            Organize seu aprendizado com facilidade e planeje trilhas de conhecimento exclusivas!
-                        </p>
-                    </div>
-                    <div className="col-md-6 text-end">
-                        {/* Placeholder circular para a imagem */}
-                        <div className="bg-secondary rounded-circle" style={{ width: '150px', height: '150px' }} />
-                    </div>
-                </div>
-            </section>
+          <section className="container mt-5 bg-light p-4 rounded">
+  <div className="row align-items-center">
+    <div className="col-md-6 text-start">
+      <h2>Crie Sua Conta</h2>
+      <p>
+        Registre-se gratuitamente para avaliar cursos, deixar comentários e criar playlists personalizadas.
+        Organize seu aprendizado com facilidade e planeje trilhas de conhecimento exclusivas!
+      </p>
+    </div>
+    <div className="col-md-6 text-end">
+      {/* Placeholder circular para a imagem */}
+      <div 
+        style={{ 
+          width: '150px', 
+          height: '150px', 
+          borderRadius: '50%', 
+          overflow: 'hidden', 
+          display: 'flex', 
+          justifyContent: 'center', 
+          alignItems: 'center' 
+        }}
+      >
+        <img
+          src="https://static.vecteezy.com/system/resources/previews/005/163/906/non_2x/create-new-account-concept-illustration-flat-design-eps10-modern-graphic-element-for-landing-page-empty-state-ui-infographic-icon-vector.jpg"
+          alt="Imagem circular"
+          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+        />
+      </div>
+    </div>
+  </div>
+</section>
 
             {/* Seção Descubra Algo Novo */}
             <section className="container mt-5 text-center">
