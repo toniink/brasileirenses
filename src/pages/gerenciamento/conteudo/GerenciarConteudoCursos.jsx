@@ -1,286 +1,239 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 const GerenciarConteudoCurso = () => {
+    const navigate = useNavigate();
     const [cursos, setCursos] = useState([]);
-    const [idCursoSelecionado, setIdCursoSelecionado] = useState("");
+    const [formData, setFormData] = useState({
+        id_curso: "",
+        titulo: "",
+        descricao: ""
+    });
     const [secoes, setSecoes] = useState([]);
-    const [carregando, setCarregando] = useState(false);
-    const [erro, setErro] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+    const [success, setSuccess] = useState(null);
 
-    // 🚀 Buscar cursos disponíveis
+    // Buscar cursos disponíveis
     useEffect(() => {
-        setCarregando(true);
-        fetch("http://localhost:3000/cursos")
-            .then((res) => {
-                if (!res.ok) throw new Error("Erro ao buscar cursos");
-                return res.json();
-            })
-            .then((data) => {
-                if (Array.isArray(data)) {
-                    setCursos(data);
-                } else {
-                    setCursos([]);
-                    console.warn("Dados recebidos não são um array:", data);
-                }
-            })
-            .catch((error) => {
-                console.error("Erro ao buscar cursos:", error);
-                setErro(error.message);
-            })
-            .finally(() => setCarregando(false));
+        const fetchCursos = async () => {
+            try {
+                setLoading(true);
+                const response = await fetch("http://localhost:3000/cursos");
+                if (!response.ok) throw new Error("Erro ao buscar cursos");
+                const data = await response.json();
+                setCursos(Array.isArray(data) ? data : []);
+            } catch (err) {
+                console.error("Erro ao buscar cursos:", err);
+                setError(err.message);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchCursos();
     }, []);
 
-    // 🚀 Carregar seções quando selecionar um curso
+    // Carregar conteúdo quando um curso é selecionado
     useEffect(() => {
-        if (idCursoSelecionado) {
-            setCarregando(true);
-            setErro(null);
-            
-            fetch(`http://localhost:3000/cursos/${idCursoSelecionado}/content`)
-                .then((res) => {
-                    if (!res.ok) throw new Error("Erro ao buscar conteúdo");
-                    return res.json();
-                })
-                .then((data) => {
-                    const dadosArray = Array.isArray(data) ? data : [];
-                    const secoesFormatadas = dadosArray.map(secao => ({
-                        id_secao_curso: secao.id_secao_curso,
-                        tipo: secao.tipo,
-                        ordem: secao.ordem,
-                        conteudos: Array.isArray(secao.conteudos) ? secao.conteudos : [],
-                        editando: false
-                    }));
-                    setSecoes(secoesFormatadas);
-                })
-                .catch((error) => {
-                    console.error("Erro ao buscar conteúdo:", error);
-                    setErro(error.message);
-                    setSecoes([]);
-                })
-                .finally(() => setCarregando(false));
-        } else {
-            setSecoes([]);
-        }
-    }, [idCursoSelecionado]);
+        const fetchConteudoCurso = async () => {
+            if (!formData.id_curso) {
+                setSecoes([]);
+                return;
+            }
 
-    // 🚀 Adicionar uma nova seção (apenas no estado local)
+            try {
+                setLoading(true);
+                setError(null);
+                
+                const response = await fetch(`http://localhost:3000/cursos/${formData.id_curso}/content`);
+                if (!response.ok) throw new Error("Erro ao buscar conteúdo");
+                
+                const data = await response.json();
+                const dadosArray = Array.isArray(data) ? data : [];
+                
+                setSecoes(dadosArray.map(secao => ({
+                    ...secao,
+                    conteudos: Array.isArray(secao.conteudos) ? secao.conteudos : [],
+                    editando: false
+                })));
+            } catch (err) {
+                console.error("Erro ao buscar conteúdo:", err);
+                setError(err.message);
+                setSecoes([]);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchConteudoCurso();
+    }, [formData.id_curso]);
+
+    // Manipuladores de formulário
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({ ...prev, [name]: value }));
+    };
+
+    // Adicionar nova seção
     const adicionarSecao = (tipo) => {
-        const novaSecao = { 
-            tipo, 
-            ordem: secoes.length + 1, 
-            conteudos: [{
-                texto: "",
-                ...(tipo === 'area_atuacao' ? { titulo: "", descricao: "" } : {}),
-                ...(tipo === 'lista' ? { item: "" } : {}),
-                ...(tipo === 'passo_a_passo' ? { numero: secoes.length + 1, instrucao: "", imagem: "" } : {})
-            }],
+        const novaSecao = {
+            tipo,
+            ordem: secoes.length + 1,
+            conteudos: [criarConteudoInicial(tipo)],
             editando: true,
             id_secao_curso: null
         };
         setSecoes([...secoes, novaSecao]);
     };
 
-    // 🚀 Atualizar conteúdo de uma seção
-    const atualizarConteudo = (indexSecao, indexConteudo, campo, valor) => {
-        const novasSecoes = [...secoes];
-        if (!novasSecoes[indexSecao].conteudos[indexConteudo]) {
-            novasSecoes[indexSecao].conteudos[indexConteudo] = {};
+    // Criar conteúdo inicial baseado no tipo
+    const criarConteudoInicial = (tipo) => {
+        switch(tipo) {
+            case 'titulo':
+            case 'paragrafo':
+                return { texto: "" };
+            case 'lista':
+                return { item: "" };
+            case 'area_atuacao':
+                return { titulo: "", descricao: "" };
+            case 'passo_a_passo':
+                return { numero: secoes.filter(s => s.tipo === 'passo_a_passo').length + 1, instrucao: "", imagem: "" };
+            case 'imagem':
+                return { url: "", descricao: "" };
+            default:
+                return {};
         }
-        novasSecoes[indexSecao].conteudos[indexConteudo][campo] = valor;
-        novasSecoes[indexSecao].editando = true;
+    };
+
+    // Atualizar conteúdo da seção
+    const atualizarConteudo = (secaoIndex, conteudoIndex, campo, valor) => {
+        const novasSecoes = [...secoes];
+        if (!novasSecoes[secaoIndex].conteudos[conteudoIndex]) {
+            novasSecoes[secaoIndex].conteudos[conteudoIndex] = {};
+        }
+        novasSecoes[secaoIndex].conteudos[conteudoIndex][campo] = valor;
+        novasSecoes[secaoIndex].editando = true;
         setSecoes(novasSecoes);
     };
 
-    // 🚀 Salvar todas as alterações no backend
-    const salvarAlteracoes = async () => {
-        if (!idCursoSelecionado) {
-            setErro("Selecione um curso primeiro!");
+    // Remover seção (apenas o conteúdo, não o curso)
+    const removerSecao = async (secaoIndex) => {
+        const secao = secoes[secaoIndex];
+        
+        if (!secao.id_secao_curso) {
+            setSecoes(secoes.filter((_, i) => i !== secaoIndex));
             return;
         }
 
         try {
-            setCarregando(true);
-            setErro(null);
-
-            for (const secao of secoes.filter(s => s.editando)) {
-                try {
-                    if (secao.id_secao_curso) {
-                        // Seção existente - atualizar conteúdo
-                        for (const conteudo of secao.conteudos) {
-                            const response = await fetch(`http://localhost:3000/cursos/conteudo/${secao.tipo}`, {
-                                method: "POST",
-                                headers: { "Content-Type": "application/json" },
-                                body: JSON.stringify({
-                                    id_secao_curso: secao.id_secao_curso,
-                                    ...conteudo
-                                })
-                            });
-
-                            if (!response.ok) {
-                                throw new Error(`Erro ao salvar conteúdo: ${response.status}`);
-                            }
-                        }
-                    } else {
-                        // Nova seção - criar primeiro a seção
-                        const secaoResponse = await fetch(`http://localhost:3000/cursos/${idCursoSelecionado}/sections`, {
-                            method: "POST",
-                            headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify({
-                                tipo: secao.tipo,
-                                ordem: secao.ordem,
-                                ...(secao.tipo === 'titulo' && secao.conteudos[0]?.texto ? { titulo: secao.conteudos[0].texto } : {})
-                            })
-                        });
-                        
-                        if (!secaoResponse.ok) {
-                            throw new Error(`Erro ao criar seção: ${secaoResponse.status}`);
-                        }
-
-                        const novaSecao = await secaoResponse.json();
-                        
-                        // Depois criar os conteúdos (exceto título que já foi criado)
-                        if (secao.tipo !== 'titulo') {
-                            for (const conteudo of secao.conteudos) {
-                                const contentResponse = await fetch(`http://localhost:3000/cursos/conteudo/${secao.tipo}`, {
-                                    method: "POST",
-                                    headers: { "Content-Type": "application/json" },
-                                    body: JSON.stringify({
-                                        id_secao_curso: novaSecao.id_secao_curso,
-                                        ...conteudo
-                                    })
-                                });
-
-                                if (!contentResponse.ok) {
-                                    throw new Error(`Erro ao salvar conteúdo: ${contentResponse.status}`);
-                                }
-                            }
-                        }
-                    }
-                } catch (error) {
-                    console.error(`Erro ao processar seção:`, error);
-                    throw error;
-                }
-            }
-
-            // Recarrega as seções após salvar
-            const response = await fetch(`http://localhost:3000/cursos/${idCursoSelecionado}/content`);
-            if (!response.ok) {
-                throw new Error(`Erro ao recarregar conteúdo: ${response.status}`);
-            }
-
-            const data = await response.json();
-            setSecoes((Array.isArray(data) ? data : []).map(s => ({ ...s, editando: false })));
+            setLoading(true);
             
-            alert("Alterações salvas com sucesso!");
-        } catch (error) {
-            console.error("Erro ao salvar:", error);
-            setErro("Erro ao salvar alterações: " + error.message);
+            const response = await fetch(`http://localhost:3000/cursos/conteudo/${secao.id_secao_curso}`, {
+                method: "DELETE"
+            });
+
+            if (!response.ok) throw new Error("Erro ao remover seção");
+
+            setSecoes(secoes.filter((_, i) => i !== secaoIndex));
+            setSuccess("Seção removida com sucesso!");
+        } catch (err) {
+            console.error("Erro ao remover seção:", err);
+            setError("Erro ao remover seção: " + err.message);
         } finally {
-            setCarregando(false);
+            setLoading(false);
         }
     };
 
-    // 🚀 Renderizar inputs de edição para cada tipo de seção
-    const renderizarEditorSecao = (secao, indexSecao) => {
-        const conteudos = Array.isArray(secao.conteudos) ? secao.conteudos : [];
-        
-        return conteudos.map((conteudo, indexConteudo) => {
-            switch (secao.tipo) {
-                case "titulo":
-                case "paragrafo":
-                    return (
-                        <div key={indexConteudo} className="mb-3">
-                            <h4>{secao.tipo === "titulo" ? "Título" : "Parágrafo"}:</h4>
-                            <input
-                                type="text"
-                                className="form-control"
-                                value={conteudo.texto || ""}
-                                onChange={(e) => atualizarConteudo(indexSecao, indexConteudo, 'texto', e.target.value)}
-                            />
-                        </div>
-                    );
-                case "lista":
-                    return (
-                        <div key={indexConteudo} className="mb-3">
-                            <h4>Item da Lista:</h4>
-                            <input
-                                type="text"
-                                className="form-control"
-                                value={conteudo.item || ""}
-                                onChange={(e) => atualizarConteudo(indexSecao, indexConteudo, 'item', e.target.value)}
-                            />
-                        </div>
-                    );
-                case "area_atuacao":
-                    return (
-                        <div key={indexConteudo} className="mb-3">
-                            <h4>Área de Atuação:</h4>
-                            <input
-                                type="text"
-                                className="form-control mb-2"
-                                placeholder="Título"
-                                value={conteudo.titulo || ""}
-                                onChange={(e) => atualizarConteudo(indexSecao, indexConteudo, 'titulo', e.target.value)}
-                            />
-                            <textarea
-                                className="form-control"
-                                placeholder="Descrição"
-                                value={conteudo.descricao || ""}
-                                onChange={(e) => atualizarConteudo(indexSecao, indexConteudo, 'descricao', e.target.value)}
-                            />
-                        </div>
-                    );
-                case "passo_a_passo":
-                    return (
-                        <div key={indexConteudo} className="mb-3">
-                            <h4>Passo {conteudo.numero || indexConteudo + 1}:</h4>
-                            <div className="mb-2">
-                                <label className="form-label">Número do Passo</label>
-                                <input
-                                    type="number"
-                                    className="form-control"
-                                    value={conteudo.numero || indexConteudo + 1}
-                                    onChange={(e) => atualizarConteudo(indexSecao, indexConteudo, 'numero', parseInt(e.target.value))}
-                                />
-                            </div>
-                            <div className="mb-2">
-                                <label className="form-label">Instrução</label>
-                                <textarea
-                                    className="form-control"
-                                    value={conteudo.instrucao || ""}
-                                    onChange={(e) => atualizarConteudo(indexSecao, indexConteudo, 'instrucao', e.target.value)}
-                                />
-                            </div>
-                            <div>
-                                <label className="form-label">URL da Imagem (opcional)</label>
-                                <input
-                                    type="text"
-                                    className="form-control"
-                                    value={conteudo.imagem || ""}
-                                    onChange={(e) => atualizarConteudo(indexSecao, indexConteudo, 'imagem', e.target.value)}
-                                />
-                            </div>
-                        </div>
-                    );
-                default:
-                    return null;
+    // Salvar alterações
+    const salvarAlteracoes = async () => {
+        if (!formData.id_curso) {
+            setError("Selecione um curso primeiro!");
+            return;
+        }
+
+        try {
+            setLoading(true);
+            setError(null);
+            setSuccess(null);
+
+            // Processa apenas as seções modificadas
+            const secoesModificadas = secoes.filter(s => s.editando);
+            
+            for (const secao of secoesModificadas) {
+                if (secao.id_secao_curso) {
+                    // Atualizar conteúdo existente
+                    await fetch(`http://localhost:3000/cursos/conteudo`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            id_secao_curso: secao.id_secao_curso,
+                            tipo: secao.tipo,
+                            ...secao.conteudos[0]
+                        })
+                    });
+                } else {
+                    // Criar nova seção e conteúdo
+                    const secaoResponse = await fetch(`http://localhost:3000/cursos/${formData.id_curso}/sections`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            tipo: secao.tipo,
+                            ordem: secao.ordem
+                        })
+                    });
+                    
+                    const novaSecao = await secaoResponse.json();
+                    
+                    await fetch(`http://localhost:3000/cursos/conteudo`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            id_secao_curso: novaSecao.id_secao_curso,
+                            tipo: secao.tipo,
+                            ...secao.conteudos[0]
+                        })
+                    });
+                }
             }
-        });
+
+            setSuccess("Alterações salvas com sucesso!");
+            
+            // Recarrega as seções atualizadas
+            const response = await fetch(`http://localhost:3000/cursos/${formData.id_curso}/content`);
+            const data = await response.json();
+            setSecoes((Array.isArray(data) ? data : []).map(s => ({ ...s, editando: false })));
+        } catch (err) {
+            console.error("Erro ao salvar:", err);
+            setError("Erro ao salvar alterações: " + err.message);
+        } finally {
+            setLoading(false);
+        }
     };
 
+    // Renderização condicional
+    if (loading && cursos.length === 0) {
+        return (
+            <div className="container text-center py-5">
+                <div className="spinner-border text-primary" role="status">
+                    <span className="visually-hidden">Carregando...</span>
+                </div>
+                <p className="mt-2">Carregando dados...</p>
+            </div>
+        );
+    }
+
     return (
-        <div className="min-vh-100 d-flex flex-column">
+        <div className="d-flex flex-column min-vh-100">
             {/* Cabeçalho */}
-            <header className="bg-light py-3">
-                <div className="container">
+            <header className="bg-light shadow-sm">
+                <div className="container py-3">
                     <div className="d-flex justify-content-between align-items-center">
                         <nav className="d-flex gap-3">
-                            <Link to="/" className="btn btn-link">HOME</Link>
-                            <Link to="/cursos" className="btn btn-link">CURSOS</Link>
-                            <Link to="/categorias" className="btn btn-link">CATEGORIAS</Link>
-                            <button className="btn btn-link">CONTATO</button>
+                            <Link to="/" className="btn btn-link">Home</Link>
+                            <Link to="/cursos" className="btn btn-link">Cursos</Link>
+                            <Link to="/categorias" className="btn btn-link">Categorias</Link>
                         </nav>
                         <button className="btn btn-primary">Fazer Login</button>
                     </div>
@@ -289,141 +242,313 @@ const GerenciarConteudoCurso = () => {
 
             {/* Conteúdo Principal */}
             <main className="container flex-grow-1 py-4">
-                <h2 className="mb-4">Gerenciamento de Conteúdo do Curso</h2>
-                
-                {/* Mensagens de Erro */}
-                {erro && (
-                    <div className="alert alert-danger">
-                        {erro}
-                    </div>
-                )}
+                <div className="row justify-content-center">
+                    <div className="col-lg-10">
+                        <h2 className="mb-4">Gerenciar Conteúdo de Curso</h2>
 
-                {/* Seleção do Curso */}
-                <div className="card mb-4">
-                    <div className="card-body">
-                        <h5 className="card-title">Selecione o Curso</h5>
-                        <select 
-                            className="form-select"
-                            value={idCursoSelecionado} 
-                            onChange={(e) => setIdCursoSelecionado(e.target.value)}
-                            disabled={carregando}
-                        >
-                            <option value="">Selecione um curso</option>
-                            {cursos.map((curso) => (
-                                <option key={curso.id_cursos} value={curso.id_cursos}>
-                                    {curso.nome_curso}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-                </div>
+                        {/* Mensagens de status */}
+                        {error && (
+                            <div className="alert alert-danger alert-dismissible fade show">
+                                {error}
+                                <button 
+                                    type="button" 
+                                    className="btn-close" 
+                                    onClick={() => setError(null)}
+                                />
+                            </div>
+                        )}
 
-                {/* Controles de Adição */}
-                <div className="card mb-4">
-                    <div className="card-body">
-                        <h5 className="card-title">Adicionar Seção</h5>
-                        <div className="d-flex flex-wrap gap-2">
-                            <button 
-                                className="btn btn-primary"
-                                onClick={() => adicionarSecao("titulo")}
-                                disabled={!idCursoSelecionado || carregando}
+                        {success && (
+                            <div className="alert alert-success alert-dismissible fade show">
+                                {success}
+                            </div>
+                        )}
+
+                        {/* Formulário básico */}
+                        <div className="card shadow-sm mb-4">
+                            <div className="card-body">
+                                <div className="mb-3">
+                                    <label className="form-label">Curso Relacionado*</label>
+                                    <select 
+                                        className="form-select"
+                                        name="id_curso"
+                                        value={formData.id_curso}
+                                        onChange={handleInputChange}
+                                        required
+                                        disabled={loading}
+                                    >
+                                        <option value="">Selecione um curso</option>
+                                        {cursos.map(curso => (
+                                            <option key={curso.id_cursos} value={curso.id_cursos}>
+                                                {curso.nome_curso}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                <div className="mb-3">
+                                    <label className="form-label">Título</label>
+                                    <input
+                                        type="text"
+                                        className="form-control"
+                                        name="titulo"
+                                        value={formData.titulo}
+                                        onChange={handleInputChange}
+                                        placeholder="Digite o título"
+                                        disabled={loading}
+                                    />
+                                </div>
+
+                                <div className="mb-3">
+                                    <label className="form-label">Descrição</label>
+                                    <textarea
+                                        className="form-control"
+                                        rows="3"
+                                        name="descricao"
+                                        value={formData.descricao}
+                                        onChange={handleInputChange}
+                                        placeholder="Digite uma descrição"
+                                        disabled={loading}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Gerenciamento de Seções */}
+                        <div className="card shadow-sm mb-4">
+                            <div className="card-header bg-light d-flex justify-content-between align-items-center">
+                                <h5 className="mb-0">Conteúdo do Curso</h5>
+                                <div className="d-flex gap-2">
+                                    <button 
+                                        className="btn btn-sm btn-primary"
+                                        onClick={() => adicionarSecao("titulo")}
+                                        disabled={loading || !formData.id_curso}
+                                    >
+                                        + Título
+                                    </button>
+                                    <button 
+                                        className="btn btn-sm btn-primary"
+                                        onClick={() => adicionarSecao("paragrafo")}
+                                        disabled={loading || !formData.id_curso}
+                                    >
+                                        + Parágrafo
+                                    </button>
+                                    <button 
+                                        className="btn btn-sm btn-primary"
+                                        onClick={() => adicionarSecao("lista")}
+                                        disabled={loading || !formData.id_curso}
+                                    >
+                                        + Lista
+                                    </button>
+                                    <button 
+                                        className="btn btn-sm btn-primary"
+                                        onClick={() => adicionarSecao("area_atuacao")}
+                                        disabled={loading || !formData.id_curso}
+                                    >
+                                        + Área
+                                    </button>
+                                    <button 
+                                        className="btn btn-sm btn-primary"
+                                        onClick={() => adicionarSecao("passo_a_passo")}
+                                        disabled={loading || !formData.id_curso}
+                                    >
+                                        + Passo a Passo
+                                    </button>
+                                    <button 
+                                        className="btn btn-sm btn-primary"
+                                        onClick={() => adicionarSecao("imagem")}
+                                        disabled={loading || !formData.id_curso}
+                                    >
+                                        + Imagem
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div className="card-body">
+                                {loading && secoes.length === 0 ? (
+                                    <div className="text-center py-4">
+                                        <div className="spinner-border text-primary" role="status">
+                                            <span className="visually-hidden">Carregando...</span>
+                                        </div>
+                                    </div>
+                                ) : secoes.length === 0 ? (
+                                    <div className="text-center py-4 text-muted">
+                                        {formData.id_curso 
+                                            ? "Nenhuma seção adicionada ainda" 
+                                            : "Selecione um curso para começar"}
+                                    </div>
+                                ) : (
+                                    secoes.map((secao, secaoIndex) => (
+                                        <div 
+                                            key={`secao-${secao.id_secao_curso || secaoIndex}`}
+                                            className={`mb-4 p-3 border rounded ${secao.editando ? 'border-primary' : ''}`}
+                                        >
+                                            <div className="d-flex justify-content-between align-items-center mb-3">
+                                                <h6 className="mb-0 text-capitalize">
+                                                    <span className="badge bg-secondary me-2">
+                                                        {secao.ordem}
+                                                    </span>
+                                                    {secao.tipo}
+                                                    {secao.id_secao_curso && (
+                                                        <small className="text-muted ms-2">(ID: {secao.id_secao_curso})</small>
+                                                    )}
+                                                </h6>
+                                                <div>
+                                                    {secao.editando && (
+                                                        <span className="badge bg-primary me-2">Modificado</span>
+                                                    )}
+                                                    <button
+                                                        className="btn btn-sm btn-outline-danger"
+                                                        onClick={() => removerSecao(secaoIndex)}
+                                                        disabled={loading}
+                                                    >
+                                                        Remover
+                                                    </button>
+                                                </div>
+                                            </div>
+
+                                            {/* Renderização do conteúdo específico */}
+                                            {["titulo", "paragrafo"].includes(secao.tipo) && (
+                                                <input
+                                                    type="text"
+                                                    className="form-control mb-2"
+                                                    value={secao.conteudos[0]?.texto || ""}
+                                                    onChange={(e) => atualizarConteudo(secaoIndex, 0, "texto", e.target.value)}
+                                                    placeholder={`Digite ${secao.tipo}`}
+                                                    disabled={loading}
+                                                />
+                                            )}
+
+                                            {secao.tipo === "lista" && (
+                                                <input
+                                                    type="text"
+                                                    className="form-control mb-2"
+                                                    value={secao.conteudos[0]?.item || ""}
+                                                    onChange={(e) => atualizarConteudo(secaoIndex, 0, "item", e.target.value)}
+                                                    placeholder="Digite item da lista"
+                                                    disabled={loading}
+                                                />
+                                            )}
+
+                                            {secao.tipo === "area_atuacao" && (
+                                                <div>
+                                                    <input
+                                                        type="text"
+                                                        className="form-control mb-2"
+                                                        value={secao.conteudos[0]?.titulo || ""}
+                                                        onChange={(e) => atualizarConteudo(secaoIndex, 0, "titulo", e.target.value)}
+                                                        placeholder="Título da área"
+                                                        disabled={loading}
+                                                    />
+                                                    <textarea
+                                                        className="form-control"
+                                                        rows="3"
+                                                        value={secao.conteudos[0]?.descricao || ""}
+                                                        onChange={(e) => atualizarConteudo(secaoIndex, 0, "descricao", e.target.value)}
+                                                        placeholder="Descrição da área"
+                                                        disabled={loading}
+                                                    />
+                                                </div>
+                                            )}
+
+                                            {secao.tipo === "passo_a_passo" && (
+                                                <div>
+                                                    <div className="mb-2">
+                                                        <label className="form-label">Número do Passo</label>
+                                                        <input
+                                                            type="number"
+                                                            className="form-control"
+                                                            value={secao.conteudos[0]?.numero || secaoIndex + 1}
+                                                            onChange={(e) => atualizarConteudo(secaoIndex, 0, "numero", parseInt(e.target.value))}
+                                                            disabled={loading}
+                                                        />
+                                                    </div>
+                                                    <div className="mb-2">
+                                                        <label className="form-label">Instrução</label>
+                                                        <textarea
+                                                            className="form-control"
+                                                            value={secao.conteudos[0]?.instrucao || ""}
+                                                            onChange={(e) => atualizarConteudo(secaoIndex, 0, "instrucao", e.target.value)}
+                                                            disabled={loading}
+                                                        />
+                                                    </div>
+                                                    <div>
+                                                        <label className="form-label">URL da Imagem (opcional)</label>
+                                                        <input
+                                                            type="text"
+                                                            className="form-control"
+                                                            value={secao.conteudos[0]?.imagem || ""}
+                                                            onChange={(e) => atualizarConteudo(secaoIndex, 0, "imagem", e.target.value)}
+                                                            placeholder="https://exemplo.com/imagem.jpg"
+                                                            disabled={loading}
+                                                        />
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            {secao.tipo === "imagem" && (
+                                                <div>
+                                                    <div className="mb-2">
+                                                        <label className="form-label">URL da Imagem</label>
+                                                        <input
+                                                            type="text"
+                                                            className="form-control"
+                                                            value={secao.conteudos[0]?.url || ""}
+                                                            onChange={(e) => atualizarConteudo(secaoIndex, 0, "url", e.target.value)}
+                                                            placeholder="https://exemplo.com/imagem.jpg"
+                                                            disabled={loading}
+                                                        />
+                                                        <small className="text-muted">(Funcionalidade de imagem será implementada posteriormente)</small>
+                                                    </div>
+                                                    <div className="mb-2">
+                                                        <label className="form-label">Descrição</label>
+                                                        <input
+                                                            type="text"
+                                                            className="form-control"
+                                                            value={secao.conteudos[0]?.descricao || ""}
+                                                            onChange={(e) => atualizarConteudo(secaoIndex, 0, "descricao", e.target.value)}
+                                                            placeholder="Descrição da imagem"
+                                                            disabled={loading}
+                                                        />
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    ))
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Botões de ação */}
+                        <div className="d-flex justify-content-between">
+                            <button
+                                className="btn btn-outline-secondary"
+                                onClick={() => navigate(-1)}
+                                disabled={loading}
                             >
-                                Adicionar Título
+                                Cancelar
                             </button>
-                            <button 
-                                className="btn btn-secondary"
-                                onClick={() => adicionarSecao("paragrafo")}
-                                disabled={!idCursoSelecionado || carregando}
+                            <button
+                                className="btn btn-primary px-4"
+                                onClick={salvarAlteracoes}
+                                disabled={loading || !formData.id_curso || !secoes.some(s => s.editando)}
                             >
-                                Adicionar Parágrafo
-                            </button>
-                            <button 
-                                className="btn btn-warning"
-                                onClick={() => adicionarSecao("lista")}
-                                disabled={!idCursoSelecionado || carregando}
-                            >
-                                Adicionar Lista
-                            </button>
-                            <button 
-                                className="btn btn-info"
-                                onClick={() => adicionarSecao("area_atuacao")}
-                                disabled={!idCursoSelecionado || carregando}
-                            >
-                                Adicionar Área
-                            </button>
-                            <button 
-                                className="btn btn-success"
-                                onClick={() => adicionarSecao("passo_a_passo")}
-                                disabled={!idCursoSelecionado || carregando}
-                            >
-                                Adicionar Passo a Passo
+                                {loading ? (
+                                    <>
+                                        <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                        Salvando...
+                                    </>
+                                ) : (
+                                    "Salvar Alterações"
+                                )}
                             </button>
                         </div>
                     </div>
                 </div>
-
-                {/* Lista de Seções */}
-                <div className="card">
-                    <div className="card-body">
-                        <h5 className="card-title">Seções do Conteúdo</h5>
-                        
-                        {carregando && secoes.length === 0 ? (
-                            <div className="text-center py-4">
-                                <div className="spinner-border text-primary" role="status">
-                                    <span className="visually-hidden">Carregando...</span>
-                                </div>
-                            </div>
-                        ) : secoes.length === 0 ? (
-                            <div className="alert alert-info">
-                                {idCursoSelecionado 
-                                    ? "Nenhuma seção encontrada. Adicione uma seção."
-                                    : "Selecione um curso para visualizar ou adicionar seções."}
-                            </div>
-                        ) : (
-                            <div className="list-group">
-                                {secoes.map((secao, index) => (
-                                    <div 
-                                        key={`${secao.id_secao_curso || 'new'}-${index}`}
-                                        className={`list-group-item ${secao.editando ? 'border-primary' : ''}`}
-                                    >
-                                        <div className="d-flex justify-content-between align-items-center mb-2">
-                                            <h6 className="mb-0 text-capitalize">
-                                                {secao.tipo} - Ordem: {secao.ordem}
-                                                {secao.id_secao_curso && <small className="text-muted ms-2">(ID: {secao.id_secao_curso})</small>}
-                                            </h6>
-                                            {secao.editando && (
-                                                <span className="badge bg-primary">Modificado</span>
-                                            )}
-                                        </div>
-                                        {renderizarEditorSecao(secao, index)}
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-                    </div>
-                </div>
-
-                {/* Botão de Salvar */}
-                <div className="mt-4">
-                    <button 
-                        className="btn btn-success px-4 py-2"
-                        onClick={salvarAlteracoes}
-                        disabled={!idCursoSelecionado || carregando || !secoes.some(s => s.editando)}
-                    >
-                        {carregando ? (
-                            <>
-                                <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                                Salvando...
-                            </>
-                        ) : (
-                            "Salvar Todas as Alterações"
-                        )}
-                    </button>
-                </div>
             </main>
 
             {/* Rodapé */}
-            <footer className="bg-primary text-white py-3 mt-4">
+            <footer className="bg-dark text-white py-3 mt-auto">
                 <div className="container text-center">
                     <p className="mb-0">&copy; {new Date().getFullYear()} - Desenvolvido por Brasilierenses</p>
                 </div>

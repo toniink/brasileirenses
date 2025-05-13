@@ -340,6 +340,30 @@ class TutoriaisContentService {
     });
   }
 
+  static async updateContent(id, tableName, idField, contentData) {
+    return new Promise((resolve, reject) => {
+        const fields = Object.keys(contentData);
+        const values = Object.values(contentData);
+        
+        const setClause = fields.map(field => `${field} = ?`).join(', ');
+        
+        db.run(
+            `UPDATE ${tableName} SET ${setClause} WHERE ${idField} = ?`,
+            [...values, id],
+            function(err) {
+                if (err) {
+                    console.error(`[TutoriaisContentService] Erro ao atualizar conteúdo em ${tableName}:`, err);
+                    reject(err);
+                } else {
+                    resolve({
+                        id,
+                        ...contentData
+                    });
+                }
+            }
+        );
+    });
+}
   static async deleteContent(tipo, id) {
     return new Promise((resolve, reject) => {
       let tableName, idField;

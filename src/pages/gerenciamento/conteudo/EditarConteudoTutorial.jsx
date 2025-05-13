@@ -21,44 +21,47 @@ const EditarConteudoTutorial = () => {
 
     // 🚀 Carregar conteúdo existente
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                setCarregando(true);
-                setErro(null);
-                
-                // 1. Buscar informações básicas do tutorial
-                const tutorialRes = await fetch(`http://localhost:3000/tutoriais/${id}`);
-                if (!tutorialRes.ok) throw new Error("Tutorial não encontrado");
-                const tutorialData = await tutorialRes.json();
-                setTutorial(tutorialData);
-                
-                // 2. Buscar conteúdo existente
-                const contentRes = await fetch(`http://localhost:3000/tutoriais/${id}/secoes`);
-                if (!contentRes.ok) throw new Error("Erro ao buscar seções");
-                
-                const contentData = await contentRes.json();
-                const dadosArray = Array.isArray(contentData) ? contentData : [];
-                
-                // Formatar seções
-                const secoesFormatadas = dadosArray.map(secao => ({
-                    id_secao: secao.id_secao,
-                    tipo: secao.tipo,
-                    ordem: secao.ordem,
-                    conteudos: Array.isArray(secao.conteudos) ? secao.conteudos : []
-                }));
-                
-                setSecoes(secoesFormatadas);
-                
-            } catch (error) {
-                console.error("Erro ao carregar dados:", error);
-                setErro(error.message);
-            } finally {
-                setCarregando(false);
-            }
-        };
-        
-        fetchData();
-    }, [id]);
+    const fetchData = async () => {
+        try {
+            setCarregando(true);
+            setErro(null);
+            
+            // Buscar tutorial
+            const tutorialRes = await fetch(`http://localhost:3000/tutoriais/${id}`);
+            if (!tutorialRes.ok) throw new Error("Tutorial não encontrado");
+            const tutorialData = await tutorialRes.json();
+            setTutorial(tutorialData);
+            
+            // Buscar seções e normalizar dados
+            const contentRes = await fetch(`http://localhost:3000/tutoriais/${id}/secoes`);
+            if (!contentRes.ok) throw new Error("Erro ao buscar seções");
+            
+            const contentData = await contentRes.json();
+            
+            // Normaliza os dados para o formato esperado pelo frontend
+            const secoesNormalizadas = contentData.map(secao => ({
+                ...secao,
+                conteudos: (secao.conteudos || []).map(conteudo => {
+                    // Para listas, onde o service retorna 'item' mas o front espera 'texto'
+                    if (secao.tipo === 'lista') {
+                        return { ...conteudo, texto: conteudo.item };
+                    }
+                    return conteudo;
+                })
+            }));
+            
+            setSecoes(secoesNormalizadas);
+            
+        } catch (error) {
+            console.error("Erro ao carregar dados:", error);
+            setErro(error.message);
+        } finally {
+            setCarregando(false);
+        }
+    };
+    
+    fetchData();
+}, [id]);
 
     // 🚀 Adicionar nova seção
     const handleAddSection = async () => {
@@ -106,40 +109,50 @@ const EditarConteudoTutorial = () => {
     };
 
     // 🚀 Adicionar conteúdo a uma seção
-    const handleAddContent = async (id_secao, tipo) => {
-        try {
-            setCarregando(true);
-            const response = await fetch(`http://localhost:3000/tutoriais/${id}/secoes/${id_secao}/conteudo`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ tipo, ...newContent })
-            });
-            
-            if (!response.ok) throw new Error("Erro ao adicionar conteúdo");
-            
-            const data = await response.json();
-            
-            setSecoes(secoes.map(sec => {
-                if (sec.id_secao === id_secao) {
-                    return {
-                        ...sec,
-                        conteudos: [...(sec.conteudos || []), data]
-                    };
-                }
-                return sec;
-            }));
-            
-            setShowAddContentModal(false);
-            setNewContent({});
-        } catch (err) {
-            console.error("Erro ao adicionar conteúdo:", err);
-            setErro(err.message);
-        } finally {
-            setCarregando(false);
-        }
-    };
+    // No modal de adicionar conteúdo
+const handleAddContent = async (id_secao, tipo) => {
+    try {
+        setCarregando(true);
+        
+        // Prepara os dados no formato esperado pelo service
+        const conteudoParaEnviar = tipo === 'lista' 
+            ? { item: newContent.texto } 
+            : newContent;
+        
+        const response = await fetch(`http://localhost:3000/tutoriais/${id}/secoes/${id_secao}/conteudo`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ tipo, ...conteudoParaEnviar })
+        });
+        
+        if (!response.ok) throw new Error("Erro ao adicionar conteúdo");
+        
+        const data = await response.json();
+        
+        // Normaliza a resposta para o formato do frontend
+        const conteudoNormalizado = tipo === 'lista' 
+            ? { ...data, texto: data.item }
+            : data;
+        
+        setSecoes(secoes.map(sec => {
+            if (sec.id_secao === id_secao) {
+                return {
+                    ...sec,
+                    conteudos: [...(sec.conteudos || []), conteudoNormalizado]
+                };
+            }
+            return sec;
+        }));
+        
+        setShowAddContentModal(false);
+        setNewContent({});
+    } catch (err) {
+        console.error("Erro ao adicionar conteúdo:", err);
+        setErro(err.message);
+    } finally {
+        setCarregando(false);
+    }
+};
 
     // 🚀 Remover conteúdo de uma seção
     const handleRemoveContent = async (id_secao, tipo, id_conteudo) => {
@@ -171,31 +184,33 @@ const EditarConteudoTutorial = () => {
 
     // 🚀 Renderizar conteúdo de acordo com o tipo
     const renderContent = (conteudo, tipo) => {
-        switch (tipo) {
-            case 'titulo':
-            case 'paragrafo':
-                return <p>{conteudo.texto}</p>;
-            case 'imagem':
-                return (
-                    <div>
-                        <img src={conteudo.url} alt={conteudo.descricao} className="img-fluid" />
-                        <p>{conteudo.descricao}</p>
-                    </div>
-                );
-            case 'lista':
-                return <li>{conteudo.texto}</li>;
-            case 'passo':
-                return (
-                    <div>
-                        <h5>Passo {conteudo.numero}</h5>
-                        <p>{conteudo.instrucao}</p>
-                        {conteudo.imagem && <img src={conteudo.imagem} className="img-fluid" />}
-                    </div>
-                );
-            default:
-                return null;
-        }
-    };
+    if (!conteudo) return null;
+    
+    switch (tipo) {
+        case 'titulo':
+        case 'paragrafo':
+            return <p>{conteudo.texto || conteudo.item || 'Sem conteúdo'}</p>;
+        case 'imagem':
+            return (
+                <div>
+                    <img src={conteudo.url || ''} alt={conteudo.descricao || ''} className="img-fluid" />
+                    <p>{conteudo.descricao || 'Sem descrição'}</p>
+                </div>
+            );
+        case 'lista':
+            return <li>{conteudo.item || conteudo.texto || 'Item sem texto'}</li>;
+        case 'passo':
+            return (
+                <div>
+                    <h5>Passo {conteudo.numero || '0'}</h5>
+                    <p>{conteudo.instrucao || 'Sem instruções'}</p>
+                    {conteudo.imagem && <img src={conteudo.imagem} className="img-fluid" alt="Passo" />}
+                </div>
+            );
+        default:
+            return null;
+    }
+};
 
     // 🚀 Renderização condicional
     if (carregando && !tutorial) {

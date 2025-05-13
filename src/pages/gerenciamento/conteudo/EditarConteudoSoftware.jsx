@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate, Link } from "react-router-dom";
-import "bootstrap/dist/css/bootstrap.min.css";
+import { useParams, useNavigate } from "react-router-dom";
+import { Button, Container, Card, Alert, Spinner, Form } from "react-bootstrap";
 
 const EditarConteudoSoftware = () => {
     const { id } = useParams();
@@ -9,37 +9,44 @@ const EditarConteudoSoftware = () => {
     const [carregando, setCarregando] = useState(true);
     const [erro, setErro] = useState(null);
     const [software, setSoftware] = useState(null);
+    const [conteudoEditando, setConteudoEditando] = useState(null);
 
-    // 🚀 Carregar conteúdo existente
     useEffect(() => {
-        const fetchData = async () => {
+        const carregarDados = async () => {
             try {
                 setCarregando(true);
                 setErro(null);
                 
-                // 1. Buscar informações básicas do software
-                const softwareRes = await fetch(`http://localhost:3000/softwares/${id}`);
-                if (!softwareRes.ok) throw new Error("Software não encontrado");
-                const softwareData = await softwareRes.json();
-                setSoftware(softwareData);
+                // 1. Buscar dados do software
+                const resSoftware = await fetch(`http://localhost:3000/softwares/${id}`);
+                if (!resSoftware.ok) throw new Error("Software não encontrado");
+                const dadosSoftware = await resSoftware.json();
+                setSoftware(dadosSoftware);
                 
-                // 2. Buscar conteúdo existente
-                const contentRes = await fetch(`http://localhost:3000/softwares/${id}/content`);
-                if (!contentRes.ok) throw new Error("Erro ao buscar conteúdo");
+                // 2. Buscar seções e conteúdos
+                const resConteudo = await fetch(`http://localhost:3000/softwares/${id}/content`);
+                if (!resConteudo.ok) throw new Error("Erro ao buscar conteúdo");
                 
-                const contentData = await contentRes.json();
-                const dadosArray = Array.isArray(contentData) ? contentData : [];
+                const dadosConteudo = await resConteudo.json();
                 
-                // Marcar todas as seções como editáveis
-                const secoesFormatadas = dadosArray.map(secao => ({
-                    id_secao: secao.id_secao,
-                    tipo: secao.tipo,
-                    ordem: secao.ordem,
-                    conteudos: Array.isArray(secao.conteudos) ? secao.conteudos : [],
-                    editando: true // Todas as seções são editáveis por padrão
-                }));
+                console.log("Dados recebidos do backend:", dadosConteudo); // Log para depuração
                 
-                setSecoes(secoesFormatadas);
+                // Verifica se há dados e formata corretamente
+                if (dadosConteudo && dadosConteudo.length > 0) {
+                    const secoesFormatadas = dadosConteudo.map(secao => ({
+                        ...secao,
+                        conteudos: secao.conteudos ? secao.conteudos.map(conteudo => {
+                            // Converte 'item' para 'texto' para listas
+                            if (secao.tipo === 'lista') {
+                                return { ...conteudo, texto: conteudo.item };
+                            }
+                            return conteudo;
+                        }) : []
+                    }));
+                    setSecoes(secoesFormatadas);
+                } else {
+                    setSecoes([]);
+                }
                 
             } catch (error) {
                 console.error("Erro ao carregar dados:", error);
@@ -48,55 +55,58 @@ const EditarConteudoSoftware = () => {
                 setCarregando(false);
             }
         };
-        
-        fetchData();
+
+        carregarDados();
     }, [id]);
 
-    // 🚀 Atualizar conteúdo de uma seção
-    const atualizarConteudo = (indexSecao, indexConteudo, campo, valor) => {
-        const novasSecoes = [...secoes];
-        if (!novasSecoes[indexSecao].conteudos[indexConteudo]) {
-            novasSecoes[indexSecao].conteudos[indexConteudo] = {};
-        }
-        novasSecoes[indexSecao].conteudos[indexConteudo][campo] = valor;
-        novasSecoes[indexSecao].editando = true;
-        setSecoes(novasSecoes);
+    const handleEditarConteudo = (secao, conteudo) => {
+        setConteudoEditando({ secao, conteudo });
     };
 
-    // 🚀 Salvar alterações
-    const salvarAlteracoes = async () => {
+    const handleSalvarConteudo = async () => {
         try {
             setCarregando(true);
-            setErro(null);
-
-            // Processa cada seção modificada
-            for (const secao of secoes) {
-                try {
-                    // Atualizar conteúdo de cada seção existente
-                    for (const conteudo of secao.conteudos) {
-                        const response = await fetch(`http://localhost:3000/softwares/conteudo`, {
-                            method: "PUT", // Usando PUT para atualização
-                            headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify({
-                                id_secao: secao.id_secao,
-                                tipo: secao.tipo,
-                                ...conteudo
-                            })
-                        });
-
-                        if (!response.ok) {
-                            throw new Error(`Erro ao atualizar conteúdo: ${response.status}`);
-                        }
-                    }
-                } catch (error) {
-                    console.error(`Erro ao processar seção:`, error);
-                    throw error;
-                }
+            
+            const { secao, conteudo } = conteudoEditando;
+            const dadosAtualizados = { ...conteudo };
+            
+            // Converte de volta para o formato do backend se for lista
+            if (secao.tipo === 'lista') {
+                dadosAtualizados.item = dadosAtualizados.texto;
+                delete dadosAtualizados.texto;
             }
             
-            alert("Conteúdo atualizado com sucesso!");
-            navigate(`/softwares/${id}`);
-            
+            const response = await fetch(`http://localhost:3000/softwares/conteudo`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    id_secao: secao.id_secao,
+                    tipo: secao.tipo,
+                    ...dadosAtualizados
+                })
+            });
+
+            if (!response.ok) throw new Error("Erro ao salvar conteúdo");
+
+            // Atualiza o estado local
+            setSecoes(secoes.map(s => {
+                if (s.id_secao === secao.id_secao) {
+                    return {
+                        ...s,
+                        conteudos: s.conteudos.map(c => {
+                            if (c.id === conteudo.id) {
+                                return secao.tipo === 'lista' 
+                                    ? { ...conteudo, item: conteudo.texto }
+                                    : conteudo;
+                            }
+                            return c;
+                        })
+                    };
+                }
+                return s;
+            }));
+
+            setConteudoEditando(null);
         } catch (error) {
             console.error("Erro ao salvar:", error);
             setErro("Erro ao salvar alterações: " + error.message);
@@ -105,191 +115,173 @@ const EditarConteudoSoftware = () => {
         }
     };
 
-    // 🚀 Renderizar inputs de edição
-    const renderizarEditorSecao = (secao, indexSecao) => {
-        const conteudos = Array.isArray(secao.conteudos) ? secao.conteudos : [];
-        
-        return conteudos.map((conteudo, indexConteudo) => {
-            switch (secao.tipo) {
-                case "titulo":
-                case "paragrafo":
-                    return (
-                        <div key={indexConteudo} className="mb-3">
-                            <h4>{secao.tipo === "titulo" ? "Título" : "Parágrafo"}:</h4>
-                            <input
-                                type="text"
-                                className="form-control"
-                                value={conteudo.texto || ""}
-                                onChange={(e) => atualizarConteudo(indexSecao, indexConteudo, 'texto', e.target.value)}
-                            />
-                        </div>
-                    );
-                case "lista":
-                    return (
-                        <div key={indexConteudo} className="mb-3">
-                            <h4>Item da Lista:</h4>
-                            <input
-                                type="text"
-                                className="form-control"
-                                value={conteudo.item || ""}
-                                onChange={(e) => atualizarConteudo(indexSecao, indexConteudo, 'item', e.target.value)}
-                            />
-                        </div>
-                    );
-                case "area_atuacao":
-                    return (
-                        <div key={indexConteudo} className="mb-3">
-                            <h4>Área de Atuação:</h4>
-                            <input
-                                type="text"
-                                className="form-control mb-2"
-                                placeholder="Título"
-                                value={conteudo.titulo || ""}
-                                onChange={(e) => atualizarConteudo(indexSecao, indexConteudo, 'titulo', e.target.value)}
-                            />
-                            <textarea
-                                className="form-control"
-                                placeholder="Descrição"
-                                value={conteudo.descricao || ""}
-                                onChange={(e) => atualizarConteudo(indexSecao, indexConteudo, 'descricao', e.target.value)}
-                            />
-                        </div>
-                    );
-                default:
-                    return null;
-            }
-        });
+    const renderizarConteudo = (secao, conteudo) => {
+        switch (secao.tipo) {
+            case "titulo":
+            case "paragrafo":
+                return <p>{conteudo.texto}</p>;
+            case "lista":
+                return <li>{conteudo.item || conteudo.texto}</li>;
+            case "area_atuacao":
+                return (
+                    <div>
+                        <h5>{conteudo.titulo}</h5>
+                        <p>{conteudo.descricao}</p>
+                    </div>
+                );
+            default:
+                return <p>Conteúdo não reconhecido</p>;
+        }
     };
 
-    // 🚀 Renderização condicional
     if (carregando && !software) {
         return (
-            <div className="container text-center py-5">
-                <div className="spinner-border text-primary" role="status">
-                    <span className="visually-hidden">Carregando...</span>
-                </div>
+            <Container className="text-center py-5">
+                <Spinner animation="border" />
                 <p className="mt-3">Carregando conteúdo do software...</p>
-            </div>
+            </Container>
         );
     }
 
     if (erro) {
         return (
-            <div className="container text-center py-5">
-                <div className="alert alert-danger">
+            <Container className="text-center py-5">
+                <Alert variant="danger">
                     <h4>Erro ao carregar conteúdo</h4>
                     <p>{erro}</p>
-                </div>
-                <button 
-                    className="btn btn-primary"
-                    onClick={() => navigate(-1)}
-                >
-                    Voltar
-                </button>
-            </div>
+                </Alert>
+                <Button onClick={() => navigate(-1)}>Voltar</Button>
+            </Container>
         );
     }
 
     return (
-        <div className="min-vh-100 d-flex flex-column">
-            {/* Cabeçalho */}
-            <header className="bg-light py-3">
-                <div className="container">
-                    <div className="d-flex justify-content-between align-items-center">
-                        <nav className="d-flex gap-3">
-                            <Link to="/" className="btn btn-link">HOME</Link>
-                            <Link to="/softwares" className="btn btn-link">SOFTWARES</Link>
-                            <Link to="/categorias" className="btn btn-link">CATEGORIAS</Link>
-                        </nav>
-                        <button className="btn btn-primary">Fazer Login</button>
-                    </div>
-                </div>
-            </header>
+        <Container className="my-4">
+            <div className="d-flex justify-content-between align-items-center mb-4">
+                <h2>Editando: {software?.nome}</h2>
+                <Button variant="outline-secondary" onClick={() => navigate(`/softwares/${id}`)}>
+                    Ver Página Pública
+                </Button>
+            </div>
+            
+            {erro && <Alert variant="danger">{erro}</Alert>}
 
-            {/* Conteúdo Principal */}
-            <main className="container flex-grow-1 py-4">
-                <div className="d-flex justify-content-between align-items-center mb-4">
-                    <h2>Editando Conteúdo: {software?.nome}</h2>
-                    <button 
-                        className="btn btn-outline-secondary"
-                        onClick={() => navigate(`/softwares/${id}`)}
-                    >
-                        Ver Página Pública
-                    </button>
-                </div>
-                
-                {/* Mensagens de Erro */}
-                {erro && (
-                    <div className="alert alert-danger">
-                        {erro}
-                    </div>
-                )}
-
-                {/* Lista de Seções Editáveis */}
-                <div className="card shadow">
-                    <div className="card-body">
-                        <h5 className="card-title mb-4">Seções do Conteúdo</h5>
-                        
-                        {secoes.length === 0 ? (
-                            <div className="alert alert-info">
-                                Nenhuma seção encontrada para este software.
-                            </div>
-                        ) : (
-                            <div className="list-group">
-                                {secoes.map((secao, index) => (
-                                    <div 
-                                        key={secao.id_secao}
-                                        className="list-group-item border-primary"
-                                    >
-                                        <div className="d-flex justify-content-between align-items-center mb-2">
-                                            <h6 className="mb-0 text-capitalize">
-                                                {secao.tipo} - Ordem: {secao.ordem}
-                                                <small className="text-muted ms-2">(ID: {secao.id_secao})</small>
-                                            </h6>
-                                            <span className="badge bg-info">Editando</span>
-                                        </div>
-                                        {renderizarEditorSecao(secao, index)}
+            {secoes.length === 0 ? (
+                <Alert variant="info">Nenhuma seção encontrada para este software.</Alert>
+            ) : (
+                secoes.map((secao, indexSecao) => (
+                    <Card key={secao.id_secao} className="mb-4">
+                        <Card.Header className="d-flex justify-content-between align-items-center">
+                            <h5 className="mb-0 text-capitalize">
+                                {secao.tipo} - Ordem: {secao.ordem}
+                            </h5>
+                        </Card.Header>
+                        <Card.Body>
+                            {secao.conteudos && secao.conteudos.length > 0 ? (
+                                secao.conteudos.map((conteudo, indexConteudo) => (
+                                    <div key={conteudo.id || indexConteudo} className="mb-3">
+                                        {conteudoEditando?.conteudo?.id === conteudo.id ? (
+                                            <Form>
+                                                {secao.tipo === "titulo" || secao.tipo === "paragrafo" ? (
+                                                    <Form.Group>
+                                                        <Form.Control
+                                                            as={secao.tipo === "paragrafo" ? "textarea" : "input"}
+                                                            rows={3}
+                                                            value={conteudo.texto || ""}
+                                                            onChange={(e) => setConteudoEditando({
+                                                                ...conteudoEditando,
+                                                                conteudo: {
+                                                                    ...conteudoEditando.conteudo,
+                                                                    texto: e.target.value
+                                                                }
+                                                            })}
+                                                        />
+                                                    </Form.Group>
+                                                ) : secao.tipo === "lista" ? (
+                                                    <Form.Group>
+                                                        <Form.Control
+                                                            type="text"
+                                                            value={conteudo.texto || ""}
+                                                            onChange={(e) => setConteudoEditando({
+                                                                ...conteudoEditando,
+                                                                conteudo: {
+                                                                    ...conteudoEditando.conteudo,
+                                                                    texto: e.target.value
+                                                                }
+                                                            })}
+                                                        />
+                                                    </Form.Group>
+                                                ) : secao.tipo === "area_atuacao" ? (
+                                                    <>
+                                                        <Form.Group className="mb-3">
+                                                            <Form.Control
+                                                                type="text"
+                                                                value={conteudo.titulo || ""}
+                                                                onChange={(e) => setConteudoEditando({
+                                                                    ...conteudoEditando,
+                                                                    conteudo: {
+                                                                        ...conteudoEditando.conteudo,
+                                                                        titulo: e.target.value
+                                                                    }
+                                                                })}
+                                                            />
+                                                        </Form.Group>
+                                                        <Form.Group>
+                                                            <Form.Control
+                                                                as="textarea"
+                                                                rows={3}
+                                                                value={conteudo.descricao || ""}
+                                                                onChange={(e) => setConteudoEditando({
+                                                                    ...conteudoEditando,
+                                                                    conteudo: {
+                                                                        ...conteudoEditando.conteudo,
+                                                                        descricao: e.target.value
+                                                                    }
+                                                                })}
+                                                            />
+                                                        </Form.Group>
+                                                    </>
+                                                ) : null}
+                                                
+                                                <div className="d-flex justify-content-end mt-3">
+                                                    <Button 
+                                                        variant="secondary" 
+                                                        className="me-2"
+                                                        onClick={() => setConteudoEditando(null)}
+                                                    >
+                                                        Cancelar
+                                                    </Button>
+                                                    <Button 
+                                                        variant="primary"
+                                                        onClick={handleSalvarConteudo}
+                                                        disabled={carregando}
+                                                    >
+                                                        Salvar
+                                                    </Button>
+                                                </div>
+                                            </Form>
+                                        ) : (
+                                            <div className="d-flex justify-content-between align-items-center">
+                                                {renderizarConteudo(secao, conteudo)}
+                                                <Button 
+                                                    variant="outline-primary"
+                                                    size="sm"
+                                                    onClick={() => handleEditarConteudo(secao, conteudo)}
+                                                >
+                                                    Editar
+                                                </Button>
+                                            </div>
+                                        )}
                                     </div>
-                                ))}
-                            </div>
-                        )}
-                    </div>
-                </div>
-
-                {/* Botões de Ação */}
-                <div className="d-flex justify-content-between mt-4">
-                    <button
-                        className="btn btn-secondary"
-                        onClick={() => navigate(-1)}
-                        disabled={carregando}
-                    >
-                        Cancelar
-                    </button>
-                    
-                    <button
-                        className="btn btn-primary"
-                        onClick={salvarAlteracoes}
-                        disabled={carregando}
-                    >
-                        {carregando ? (
-                            <>
-                                <span className="spinner-border spinner-border-sm me-2" role="status"></span>
-                                Salvando...
-                            </>
-                        ) : (
-                            "Salvar Alterações"
-                        )}
-                    </button>
-                </div>
-            </main>
-
-            {/* Rodapé */}
-            <footer className="bg-primary text-white py-3 mt-4">
-                <div className="container text-center">
-                    <p className="mb-0">&copy; {new Date().getFullYear()} - CMS de Conteúdo</p>
-                </div>
-            </footer>
-        </div>
+                                ))
+                            ) : (
+                                <Alert variant="warning">Nenhum conteúdo nesta seção.</Alert>
+                            )}
+                        </Card.Body>
+                    </Card>
+                ))
+            )}
+        </Container>
     );
 };
 

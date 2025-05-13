@@ -266,3 +266,85 @@ exports.buscarTutorialPorSoftware = (req, res) => {
         }
     );
 };
+exports.updateContent = async (req, res) => {
+    try {
+        const { id_secao, tipo, id_conteudo } = req.params;
+        const dados = req.body;
+
+        // Verifica se a seção existe
+        const secao = await new Promise((resolve, reject) => {
+            db.get("SELECT tipo FROM secoes_tutorial WHERE id_secao = ?", 
+                  [id_secao], (err, row) => {
+                if (err) reject(err);
+                else resolve(row);
+            });
+        });
+
+        if (!secao) {
+            return res.status(404).json({ error: "Seção não encontrada" });
+        }
+
+        if (secao.tipo !== tipo) {
+            return res.status(400).json({ error: "Tipo de conteúdo não corresponde ao tipo da seção" });
+        }
+
+        // Atualiza o conteúdo conforme o tipo
+        let result;
+        switch(tipo) {
+            case 'titulo':
+                result = await TutoriaisContentService.updateContent(
+                    id_conteudo, 
+                    'conteudo_titulo', 
+                    'id_titulo', 
+                    { texto: dados.texto }
+                );
+                break;
+            case 'paragrafo':
+                result = await TutoriaisContentService.updateContent(
+                    id_conteudo, 
+                    'conteudo_paragrafo', 
+                    'id_paragrafo', 
+                    { texto: dados.texto }
+                );
+                break;
+            case 'imagem':
+                result = await TutoriaisContentService.updateContent(
+                    id_conteudo, 
+                    'conteudo_imagem', 
+                    'id_imagem', 
+                    { url: dados.url, descricao: dados.descricao }
+                );
+                break;
+            case 'lista':
+                result = await TutoriaisContentService.updateContent(
+                    id_conteudo, 
+                    'conteudo_lista', 
+                    'id_item', 
+                    { item: dados.texto } // Note que aqui convertemos texto para item
+                );
+                break;
+            case 'passo':
+                result = await TutoriaisContentService.updateContent(
+                    id_conteudo, 
+                    'conteudo_passo_tutorial', 
+                    'id_passo', 
+                    { 
+                        numero: dados.numero, 
+                        instrucao: dados.instrucao, 
+                        imagem: dados.imagem 
+                    }
+                );
+                break;
+            default:
+                return res.status(400).json({ error: "Tipo de conteúdo inválido" });
+        }
+
+        res.json(result);
+    } catch (error) {
+        console.error("Erro ao atualizar conteúdo:", error);
+        res.status(500).json({ 
+            error: "Erro ao atualizar conteúdo",
+            details: error.message
+        });
+    }
+};

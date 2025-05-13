@@ -19,5 +19,7 @@ router.delete('/:id/secoes/:id_secao', tutoriaisController.deleteSection);
 router.get('/:id/secoes/:id_secao/conteudo', tutoriaisController.getSectionContent);
 router.post('/:id/secoes/:id_secao/conteudo', tutoriaisController.addContent);
 router.delete('/:id/conteudo/:tipo/:id', tutoriaisController.deleteContent);
+// Adicione esta linha junto com as outras rotas de conteúdo
+router.put('/:id/secoes/:id_secao/conteudo/:tipo/:id_conteudo', tutoriaisController.updateContent);
 
 module.exports = router;
