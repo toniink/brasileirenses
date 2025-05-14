@@ -19,7 +19,7 @@ const DashboardGerenciamento = () => {
               <Card.Text>
                 Cadastro de entidades principais (cursos, softwares, etc)
               </Card.Text>
-              <Link to="/gerenciamento/objetos" className="btn btn-primary">
+              <Link to="/gerenciamento/entidades" className="btn btn-primary">
                 Acessar
               </Link>
             </Card.Body>

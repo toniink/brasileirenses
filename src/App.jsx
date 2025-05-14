@@ -20,9 +20,14 @@ const GerenciarCurso = lazy(() => import('./pages/gerenciamento/conteudo/Gerenci
 const ConteudoGerenciamento = lazy(() => import('./pages/gerenciamento/ConteudoGerenciamento'));
 import ListaConteudos from './pages/gerenciamento/conteudo/ListaConteudos';
 const EditarConteudo = lazy(() => import('./pages/gerenciamento/EditarConteudo'))
-const EditarSoftware = lazy(() => import('./pages/gerenciamento/entidades/EditarSoftwares'))
 const EditarConteudoSoftware = lazy(() => import('./pages/gerenciamento/conteudo/EditarConteudoSoftware'))
 const EditarConteudoTutorial = lazy(() => import('./pages/gerenciamento/conteudo/EditarConteudoTutorial'))
+
+const MenuEntidade = lazy(() => import('./pages/gerenciamento/entidades/MenuEntidade'))
+const SoftwareEntidade = lazy(() => import('./pages/gerenciamento/entidades/SoftwareEntidade'))
+const CategoriasEntidade = lazy(() => import('./pages/gerenciamento/entidades/CategoriasEntidade'))
+const SitesEntidade = lazy(() => import('./pages/gerenciamento/entidades/SitesEntidade'))
+const CursosEntidade = lazy(() => import('./pages/gerenciamento/entidades/CursosEntidade'))
 
 const App = () => (
     <Router>
@@ -50,9 +55,14 @@ const App = () => (
                 <Route path="gerenciamento/conteudo/softwares/novo" element={<GerenciarSoftware />} />
                 <Route path="/gerenciamento/conteudo/tutoriais/novo" element={<GerenciarTutorial />} />
                 <Route path="/gerenciamento/conteudo/:tipo/editar/:id" element={<EditarConteudo />} />
-                <Route path="gerenciamento/softwares/editar/:id" element={<EditarSoftware />} />
                 <Route path="gerenciamento/conteudo/softwares/editar-conteudo/:id" element={<EditarConteudoSoftware />} />
                 <Route path="gerenciamento/conteudo/tutoriais/editar-conteudo/:id" element={<EditarConteudoTutorial />} />
+
+                <Route path="gerenciamento/entidades/" element={<MenuEntidade />} />
+                <Route path="gerenciamento/entidades/softwares/" element={<SoftwareEntidade />} />
+                <Route path="gerenciamento/entidades/categorias/" element={<CategoriasEntidade />} />
+                <Route path="gerenciamento/entidades/sites/" element={<SitesEntidade />} />
+                <Route path="gerenciamento/entidades/cursos" element={<CursosEntidade />} />
 
 
             </Routes>
