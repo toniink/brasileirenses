@@ -51,8 +51,8 @@ db.serialize(() => {
     tipo_feedback TEXT NOT NULL,
     mensagem TEXT,
     email TEXT,
-    data_feedback DATE DEFAULT CURRENT_DATE,
-      );`);
+    data_feedback DATE DEFAULT CURRENT_DATE
+    );`);
 
   db.run(`CREATE TABLE IF NOT EXISTS playlistUsuarios (
     id_playlist INTEGER PRIMARY KEY AUTOINCREMENT,
