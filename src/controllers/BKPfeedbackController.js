@@ -1,9 +1,9 @@
 const db = require('../config/db'); // Configuração do banco de dados
 
-// 🔍 Buscar todos os feedbacks
+// Buscar todos os feedbacks
 exports.buscarTodosFeedbacks = (req, res) => {
     const query = `
-        SELECT id_feedback, tipo_feedback, mensagem, email, data_feedback
+        SELECT id_feedback, id_usuario, tipo_feedback, mensagem, data_feedback
         FROM feedback
         ORDER BY data_feedback DESC
     `;
@@ -18,30 +18,29 @@ exports.buscarTodosFeedbacks = (req, res) => {
     });
 };
 
-// 📝 Inserir novo feedback (Agora usando email)
+// Inserir novo feedback
 exports.criarFeedback = (req, res) => {
-    const { tipo_feedback, mensagem, email } = req.body;
+    const { id_usuario, tipo_feedback, mensagem } = req.body;
 
-    // Validação: tipo de feedback e email são obrigatórios
-    if (!tipo_feedback || !email) {
-        return res.status(400).send('Os campos "tipo_feedback" e "email" são obrigatórios.');
+    if (!id_usuario || !tipo_feedback) {
+        return res.status(400).send('Os campos "id_usuario" e "tipo_feedback" são obrigatórios.');
     }
 
     const query = `
-        INSERT INTO feedback (tipo_feedback, mensagem, email, data_feedback)
-        VALUES (?, ?, ?, CURRENT_DATE)
+        INSERT INTO feedback (id_usuario, tipo_feedback, mensagem)
+        VALUES (?, ?, ?)
     `;
 
-    db.run(query, [tipo_feedback, mensagem || null, email], function (err) {
+    db.run(query, [id_usuario, tipo_feedback, mensagem || null], function (err) {
         if (err) {
             console.error('Erro ao inserir feedback:', err);
             res.status(500).send('Erro ao inserir feedback.');
         } else {
             res.status(201).json({
                 id_feedback: this.lastID,
+                id_usuario,
                 tipo_feedback,
                 mensagem,
-                email,
                 data_feedback: new Date().toISOString().split('T')[0], // Data atual
             });
         }

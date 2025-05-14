@@ -48,12 +48,11 @@ db.serialize(() => {
   // Tabelas de feedback e playlists
   db.run(`CREATE TABLE IF NOT EXISTS feedback (
     id_feedback INTEGER PRIMARY KEY AUTOINCREMENT,
-    id_usuario INTEGER NOT NULL,
     tipo_feedback TEXT NOT NULL,
     mensagem TEXT,
+    email TEXT,
     data_feedback DATE DEFAULT CURRENT_DATE,
-    FOREIGN KEY (id_usuario) REFERENCES Usuarios(idUsuarios) ON DELETE CASCADE
-  );`);
+      );`);
 
   db.run(`CREATE TABLE IF NOT EXISTS playlistUsuarios (
     id_playlist INTEGER PRIMARY KEY AUTOINCREMENT,
