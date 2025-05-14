@@ -29,6 +29,8 @@ const CategoriasEntidade = lazy(() => import('./pages/gerenciamento/entidades/Ca
 const SitesEntidade = lazy(() => import('./pages/gerenciamento/entidades/SitesEntidade'))
 const CursosEntidade = lazy(() => import('./pages/gerenciamento/entidades/CursosEntidade'))
 
+const FeedbackPagina = lazy(() => import('./pages/feedbackPagina'))
+
 const App = () => (
     <Router>
         <Suspense fallback={<LoadingSpinner fullPage />}>
@@ -63,7 +65,7 @@ const App = () => (
                 <Route path="gerenciamento/entidades/categorias/" element={<CategoriasEntidade />} />
                 <Route path="gerenciamento/entidades/sites/" element={<SitesEntidade />} />
                 <Route path="gerenciamento/entidades/cursos" element={<CursosEntidade />} />
-
+                <Route path="feedback" element={<FeedbackPagina />} />
 
             </Routes>
         </Suspense>
