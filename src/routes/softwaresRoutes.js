@@ -8,7 +8,7 @@ router.get('/', SoftwareController.listAll);
 router.post('/', SoftwareController.create);
 router.get('/:id', SoftwareController.getById);
 router.put('/:id', SoftwareController.update);
-router.delete('/:id', SoftwareController.delete);
+router.delete('/softwares/:id', SoftwareController.delete);
 
 // 🎨 Rotas para o CMS
 router.get('/:id/content', SoftwareController.getContentBySoftware);

@@ -43,9 +43,21 @@ const SoftwaresEntidade = () => {
                     sitesRes.json()
                 ]);
 
+                // Padroniza os dados recebidos
+                const categoriasPadronizadas = categoriasData.map(cat => ({
+                    id_categoria: cat.id_categorias || cat.id_categoria,
+                    nome: cat.nome
+                }));
+
+                const sitesPadronizados = sitesData.map(site => ({
+                    id: site.id_site || site.id,
+                    nome: site.nome,
+                    categoria: site.categoria
+                }));
+
                 setSoftwares(softwaresData);
-                setCategorias(categoriasData);
-                setSites(sitesData);
+                setCategorias(categoriasPadronizadas);
+                setSites(sitesPadronizados);
 
             } catch (err) {
                 console.error("Erro ao carregar dados:", err);
@@ -89,7 +101,12 @@ const SoftwaresEntidade = () => {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(formData)
+                body: JSON.stringify({
+                    ...formData,
+                    // Garante que os IDs sejam números
+                    id_categoria: formData.id_categoria ? Number(formData.id_categoria) : null,
+                    id_site: formData.id_site ? Number(formData.id_site) : null
+                })
             });
 
             if (!response.ok) {
@@ -101,10 +118,23 @@ const SoftwaresEntidade = () => {
             
             setSuccess(editMode ? 'Software atualizado com sucesso!' : 'Software criado com sucesso!');
             
-            // Recarregar softwares
-            const softwaresResponse = await fetch('http://localhost:3000/softwares');
-            const softwaresData = await softwaresResponse.json();
+            // Recarregar dados
+            const [softwaresResponse, sitesResponse] = await Promise.all([
+                fetch('http://localhost:3000/softwares'),
+                fetch('http://localhost:3000/sites')
+            ]);
+            
+            const [softwaresData, sitesData] = await Promise.all([
+                softwaresResponse.json(),
+                sitesResponse.json()
+            ]);
+
             setSoftwares(softwaresData);
+            setSites(sitesData.map(site => ({
+                id: site.id_site || site.id,
+                nome: site.nome,
+                categoria: site.categoria
+            })));
             
             // Limpar formulário
             setFormData({
@@ -211,6 +241,11 @@ const SoftwaresEntidade = () => {
                         {success && (
                             <div className="alert alert-success alert-dismissible fade show">
                                 {success}
+                                <button 
+                                    type="button" 
+                                    className="btn-close" 
+                                    onClick={() => setSuccess(null)}
+                                />
                             </div>
                         )}
 
@@ -271,7 +306,7 @@ const SoftwaresEntidade = () => {
                                         >
                                             <option value="">Selecione uma categoria</option>
                                             {categorias.map(categoria => (
-                                                <option key={categoria.id_categorias} value={categoria.id_categorias}>
+                                                <option key={categoria.id_categoria} value={categoria.id_categoria}>
                                                     {categoria.nome}
                                                 </option>
                                             ))}
@@ -289,8 +324,8 @@ const SoftwaresEntidade = () => {
                                         >
                                             <option value="">Selecione um site</option>
                                             {sites.map(site => (
-                                                <option key={site.id_site} value={site.id_site}>
-                                                    {site.nome}
+                                                <option key={site.id} value={site.id}>
+                                                    {site.nome} {site.categoria && `(${site.categoria})`}
                                                 </option>
                                             ))}
                                         </select>
@@ -310,6 +345,8 @@ const SoftwaresEntidade = () => {
                                                     id_site: ''
                                                 });
                                                 setEditMode(false);
+                                                setError(null);
+                                                setSuccess(null);
                                             }}
                                             disabled={loading}
                                         >
@@ -358,6 +395,7 @@ const SoftwaresEntidade = () => {
                                                     <th>ID</th>
                                                     <th>Nome</th>
                                                     <th>Desenvolvedor</th>
+                                                    <th>Categoria</th>
                                                     <th>URL</th>
                                                     <th>Ações</th>
                                                 </tr>
@@ -369,11 +407,19 @@ const SoftwaresEntidade = () => {
                                                         <td>{software.nome}</td>
                                                         <td>{software.desenvolvedor || '-'}</td>
                                                         <td>
-                                                            {software.url && (
-                                                                <a href={software.url} target="_blank" rel="noopener noreferrer">
+                                                            {categorias.find(c => c.id_categoria === software.id_categoria)?.nome || '-'}
+                                                        </td>
+                                                        <td>
+                                                            {software.url ? (
+                                                                <a 
+                                                                    href={software.url} 
+                                                                    target="_blank" 
+                                                                    rel="noopener noreferrer"
+                                                                    className="text-decoration-none"
+                                                                >
                                                                     Acessar
                                                                 </a>
-                                                            )}
+                                                            ) : '-'}
                                                         </td>
                                                         <td>
                                                             <div className="d-flex gap-2">
