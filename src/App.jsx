@@ -37,7 +37,8 @@ const FeedbackPagina = lazy(() => import('./pages/feedbackPagina'))
 const LoginPagina = lazy(()=> import('./pages/LoginPagina'))
 const CadastroPagina = lazy(()=> import('./pages/CadastroPagina'))
 
-
+//faq
+const FAQ = lazy(()=> import ('./pages/FAQ'))
 
 const App = () => (
     <Router>
@@ -54,7 +55,7 @@ const App = () => (
                 <Route path="/tutorial/:id" element={<TutorialGenerico />} />
                 <Route path="/cadastro" element={<CadastroPagina />} />
                 <Route path="/login" element={<LoginPagina />} />
-
+                <Route path="/faq" element={<FAQ />} />
 
                 {/* --------------------------- */}
                 {/* ROTAS DE GERENCIAMENTO (ADMIN) */}

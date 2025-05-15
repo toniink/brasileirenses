@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+
 const usuariosController = require('../controllers/usuariosController');
 
 // Rota para listar todos os usuários
@@ -16,5 +17,7 @@ router.put('/:id', usuariosController.updateUsuario);
 
 // Rota para deletar um usuário
 router.delete('/:id', usuariosController.deleteUsuario);
+
+router.post('/login', usuariosController.loginUsuario);
 
 module.exports = router;

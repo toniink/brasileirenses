@@ -10,46 +10,48 @@ const LoginPagina = () => {
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
-    e.preventDefault();
-    setErro('');
-    
-    // Validação simples
-    if (!email || !senha) {
-      setErro('Preencha e-mail e senha!');
-      return;
+  e.preventDefault();
+  setErro('');
+  setCarregando(true);
+
+  try {
+    const response = await fetch('http://localhost:3000/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, senha })
+    });
+
+    // Verifica se a resposta é JSON
+    const contentType = response.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+      const text = await response.text();
+      throw new Error(text.includes('<!DOCTYPE html>') 
+        ? 'Endpoint não encontrado (404)' 
+        : text);
     }
 
-    setCarregando(true);
+    const data = await response.json();
 
-    try {
-      const response = await fetch('http://localhost:3000/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, senha }), // Envia os dados em texto plano
-      });
-
-      const data = await response.json();
-
-      if (!data.success) {
-        throw new Error(data.message || 'Erro ao fazer login');
-      }
-
-      // Salva o usuário no localStorage (opcional)
-      localStorage.setItem('usuario', JSON.stringify(data.usuario));
-      
-      // Redireciona para a página inicial
-      navigate('/');
-
-    } catch (error) {
-      setErro(error.message || 'Erro ao conectar com o servidor');
-    } finally {
-      setCarregando(false);
+    if (!response.ok) {
+      throw new Error(data.message || 'Erro no login');
     }
-  };
+
+    localStorage.setItem('usuario', JSON.stringify(data.usuario));
+    navigate('/');
+
+  } catch (error) {
+    console.error('Erro completo:', error);
+    setErro(error.message.includes('404') 
+      ? 'Servidor não encontrado - verifique a URL da API'
+      : error.message);
+  } finally {
+    setCarregando(false);
+  }
+};
 
   return (
     <div>
-      {/* Cabeçalho (igual ao da Home) */}
+      {/* Cabeçalho */}
       <header className="bg-light py-3">
         <div className="container">
           <div className="d-flex justify-content-between align-items-center">
@@ -70,7 +72,11 @@ const LoginPagina = () => {
               <div className="card-body p-4">
                 <h2 className="text-center mb-4">Faça seu Login</h2>
                 
-                {erro && <div className="alert alert-danger">{erro}</div>}
+                {erro && (
+                  <div className="alert alert-danger">
+                    {erro}
+                  </div>
+                )}
                 
                 <form onSubmit={handleLogin}>
                   <div className="mb-3">
@@ -82,6 +88,7 @@ const LoginPagina = () => {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
+                      disabled={carregando}
                     />
                   </div>
                   
@@ -94,15 +101,21 @@ const LoginPagina = () => {
                       value={senha}
                       onChange={(e) => setSenha(e.target.value)}
                       required
+                      disabled={carregando}
                     />
                   </div>
                   
                   <button 
                     type="submit" 
-                    className="btn btn-primary w-100"
+                    className="btn btn-primary w-100 py-2"
                     disabled={carregando}
                   >
-                    {carregando ? 'Carregando...' : 'Entrar'}
+                    {carregando ? (
+                      <>
+                        <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                        Carregando...
+                      </>
+                    ) : 'Entrar'}
                   </button>
                 </form>
                 
@@ -117,7 +130,7 @@ const LoginPagina = () => {
         </div>
       </main>
 
-      {/* Footer (igual ao da Home) */}
+      {/* Rodapé */}
       <footer className="bg-primary text-light py-4 mt-5">
         <div className="container-fluid">
           <div className="row">

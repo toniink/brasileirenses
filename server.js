@@ -3,7 +3,12 @@ const cors = require('cors');
 const usuariosRoutes = require('./src/routes/usuariosRoutes'); // Importar rotas de usuários
 
 const app = express();
-app.use(cors());
+
+app.use(cors({
+  origin: true, // Reflete dinamicamente a origin da requisição
+  credentials: true // Desative se não estiver usando cookies/sessão
+}));
+
 app.use(express.json());
 
 // Rota inicial de teste
@@ -13,6 +18,8 @@ app.get('/', (req, res) => {
 
 // Usar as rotas de usuários
 app.use('/usuarios', usuariosRoutes);
+const usuariosController = require('./src/controllers/usuariosController');
+app.post('/login', usuariosController.loginUsuario);
 
 //Usar rotas de cursos
 const rotasCursos = require('./src/routes/cursosRoutes');

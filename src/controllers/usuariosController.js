@@ -92,3 +92,69 @@ exports.deleteUsuario = (req, res) => {
   });
 };
 
+
+// Exemplo para o método de login
+exports.loginUsuario = async (req, res) => {
+  const { email, senha } = req.body;
+
+  // Validação básica dos campos
+  if (!email || !senha) {
+    return res.status(400).json({ 
+      success: false, 
+      message: "E-mail e senha são obrigatórios" 
+    });
+  }
+
+  try {
+    // 1. Busca o usuário no banco
+    db.get('SELECT * FROM usuarios WHERE email = ?', [email], async (err, usuario) => {
+      if (err) {
+        console.error('Erro no banco de dados:', err);
+        return res.status(500).json({ 
+          success: false, 
+          message: "Erro interno no servidor" 
+        });
+      }
+
+      // 2. Verifica se o usuário existe
+      if (!usuario) {
+        return res.status(401).json({ 
+          success: false, 
+          message: "E-mail ou senha incorretos" 
+        });
+      }
+
+      // 3. Compara a senha com bcrypt
+      try {
+        const senhaValida = await bcrypt.compare(senha, usuario.senha);
+        if (!senhaValida) {
+          return res.status(401).json({ 
+            success: false, 
+            message: "E-mail ou senha incorretos" 
+          });
+        }
+
+        // 4. Retorna os dados do usuário (sem a senha)
+        const { senha: _, ...usuarioSemSenha } = usuario;
+        res.status(200).json({ 
+          success: true, 
+          usuario: usuarioSemSenha 
+        });
+
+      } catch (bcryptError) {
+        console.error('Erro ao comparar senhas:', bcryptError);
+        res.status(500).json({ 
+          success: false, 
+          message: "Erro durante a autenticação" 
+        });
+      }
+    });
+
+  } catch (error) {
+    console.error('Erro geral no login:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: "Erro interno no servidor" 
+    });
+  }
+};
