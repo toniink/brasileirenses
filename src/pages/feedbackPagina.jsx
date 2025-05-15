@@ -116,6 +116,7 @@ function FeedbackPagina() {
         </tbody>
       </table>
     </div>
+    
   );
 }
 

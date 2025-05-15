@@ -198,7 +198,7 @@ const CursoDetalhes = () => {
                     <div className="row">
                         {/* Coluna Contato */}
                         <div className="col-md-3 text-center">
-                            <h5>Contato</h5>
+                            <h5>Ajuda</h5>
                             <p>
                                 Fale conosco preenchendo nosso formulário!<br />
                                 <button className="btn btn-link text-light text-decoration-underline">Clique aqui</button>

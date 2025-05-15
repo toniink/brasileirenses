@@ -171,7 +171,7 @@ const HomePage = () => (
                 <div className="row">
                     {/* Coluna Contato */}
                     <div className="col-md-3 text-center">
-                        <h5>Contato</h5>
+                        <h5>Ajuda</h5>
                         <p>
                             Precisa falar com a gente?<br />
                             Entre em contato usando nosso formulário!<br />
