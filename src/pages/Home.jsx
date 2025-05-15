@@ -17,7 +17,10 @@ const HomePage = () => (
                         <button className="btn btn-link">CONTATO</button>
                     </nav>
                     {/* Botão de Login */}
-                    <button className="btn btn-primary">Fazer Login</button>
+                    <button className="btn btn-primary">
+                        <Link to="/login" className='text-white text-decoration-none'>Fazer Login</Link>
+                       
+                        </button>
                 </div>
             </div>
         </header>

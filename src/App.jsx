@@ -12,7 +12,7 @@ const CursoDetalhe = lazy(() => import('./pages/CursoDetalhe'));
 const SoftwareDetalhes = lazy(() => import('./pages/SoftwareDetalhes'));
 const TutorialGenerico = lazy(() => import('./pages/TutorialGenerico'));
 
-// Rotas de gerenciamento (lazy loading individual)
+// Rotas de gerenciamento e de conteudo(lazy loading individual)
 const DashboardGerenciamento = lazy(() => import('./pages/gerenciamento/DashboardGerenciamento'))
 const GerenciarTutorial = lazy(() => import('./pages/gerenciamento/conteudo/GerenciarTutorial'));
 const GerenciarSoftware = lazy(() => import('./pages/gerenciamento/conteudo/GerenciarConteudoSoftware'));
@@ -23,13 +23,21 @@ const EditarConteudo = lazy(() => import('./pages/gerenciamento/EditarConteudo')
 const EditarConteudoSoftware = lazy(() => import('./pages/gerenciamento/conteudo/EditarConteudoSoftware'))
 const EditarConteudoTutorial = lazy(() => import('./pages/gerenciamento/conteudo/EditarConteudoTutorial'))
 
+//gerenciamento entidades
 const MenuEntidade = lazy(() => import('./pages/gerenciamento/entidades/MenuEntidade'))
 const SoftwareEntidade = lazy(() => import('./pages/gerenciamento/entidades/SoftwareEntidade'))
 const CategoriasEntidade = lazy(() => import('./pages/gerenciamento/entidades/CategoriasEntidade'))
 const SitesEntidade = lazy(() => import('./pages/gerenciamento/entidades/SitesEntidade'))
 const CursosEntidade = lazy(() => import('./pages/gerenciamento/entidades/CursosEntidade'))
 
+//feedback
 const FeedbackPagina = lazy(() => import('./pages/feedbackPagina'))
+
+//login e cadastro de usuarios
+const LoginPagina = lazy(()=> import('./pages/LoginPagina'))
+const CadastroPagina = lazy(()=> import('./pages/CadastroPagina'))
+
+
 
 const App = () => (
     <Router>
@@ -44,6 +52,9 @@ const App = () => (
                 <Route path="/softwares" element={<SoftwarePagina />} />
                 <Route path="/softwares/:id" element={<SoftwareDetalhes />} />
                 <Route path="/tutorial/:id" element={<TutorialGenerico />} />
+                <Route path="/cadastro" element={<CadastroPagina />} />
+                <Route path="/login" element={<LoginPagina />} />
+
 
                 {/* --------------------------- */}
                 {/* ROTAS DE GERENCIAMENTO (ADMIN) */}
