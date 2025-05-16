@@ -58,3 +58,20 @@
     padding-left: 1.5rem;
   }
 }
+.card {
+  border-radius: 12px;
+  background-color: #fff;
+  border: 1px solid #eee;
+}
+
+.btn-outline-success:hover {
+  background-color: #d4edda;
+}
+
+.btn-outline-warning:hover {
+  background-color: #fff3cd;
+}
+
+.btn-outline-danger:hover {
+  background-color: #f8d7da;
+}

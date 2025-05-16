@@ -53,22 +53,24 @@ function FeedbackPagina() {
 
   return (
     <div className="container mt-4">
-      <h2 className="mb-4">Deixe seu Feedback</h2>
+  <h2 className="text-center mb-4">Deixe seu Feedback</h2>
 
-      <form onSubmit={handleSubmit} className="mb-5">
-        <div className="mb-3">
-          <label className="form-label">Seu Email</label>
-          <input
-            type="email"
-            name="email"
-            className="form-control"
-            value={formData.email}
-            onChange={handleChange}
-            required
-          />
-        </div>
+  <div className="card p-4 shadow-sm">
+    <form onSubmit={handleSubmit}>
+      <div className="mb-3">
+        <label className="form-label">Seu Email</label>
+        <input
+          type="email"
+          className="form-control"
+          name="email"
+          value={formData.email}
+          onChange={handleChange}
+          placeholder="seu@email.com"
+          required
+        />
+      </div>
 
-        <div className="mb-3">
+      <div className="mb-3">
           <label className="form-label">Tipo</label>
           <select
             name="tipo_feedback"
@@ -80,24 +82,59 @@ function FeedbackPagina() {
             <option value="">Selecione</option>
             <option value="elogio">💚 Elogio</option>
             <option value="sugestao">💡 Sugestão</option>
-            <option value="reclamacao">⚠️ Reclamação</option>
+            <option value="reclamacao">⚠ Reclamação</option>
           </select>
         </div>
 
-        <div className="mb-3">
-          <label className="form-label">Mensagem</label>
-          <textarea
-            name="mensagem"
-            className="form-control"
-            value={formData.mensagem}
-            onChange={handleChange}
-            rows="4"
-            placeholder="Escreva aqui seu comentário, sugestão ou elogio..."
-          />
-        </div>
 
-        <button type="submit" className="btn btn-primary">Enviar Feedback</button>
-      </form>
+      <div className="mb-3">
+  <label className="form-label">Como você avalia o site?</label>
+  <div className="d-flex gap-3">
+    <button
+      type="button"
+      className={`btn ${formData.tipo_feedback === 'otimo' ? 'btn-success' : 'btn-outline-success'}`}
+      onClick={() => setFormData({ ...formData, tipo_feedback: 'otimo' })}
+    >
+      😊 Ótimo
+    </button>
+
+    <button
+      type="button"
+      className={`btn ${formData.tipo_feedback === 'razoavel' ? 'btn-warning' : 'btn-outline-warning'}`}
+      onClick={() => setFormData({ ...formData, tipo_feedback: 'razoavel' })}
+    >
+      😐 Razoável
+    </button>
+
+    <button
+      type="button"
+      className={`btn ${formData.tipo_feedback === 'ruim' ? 'btn-danger' : 'btn-outline-danger'}`}
+      onClick={() => setFormData({ ...formData, tipo_feedback: 'ruim' })}
+    >
+      🙁 Ruim
+    </button>
+  </div>
+</div>
+
+
+      <div className="mb-3 mt-4">
+        <label className="form-label">Comentário</label>
+        <textarea
+          className="form-control"
+          rows="4"
+          name="mensagem"
+          value={formData.mensagem}
+          onChange={handleChange}
+          placeholder="Deixe aqui sua sugestão ou observação"
+        ></textarea>
+      </div>
+
+      <div className="text-center">
+        <button className="btn btn-primary" type="submit">Enviar</button>
+      </div>
+    </form>
+  </div>
+
 
       <h4 className="mb-3">Feedbacks Recebidos</h4>
 
