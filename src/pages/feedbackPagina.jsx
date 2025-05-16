@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import './FeedbackPagina.css'; // (separar o CSS)
 
 function FeedbackPagina() {
   const [feedbacks, setFeedbacks] = useState([]);
@@ -8,25 +9,21 @@ function FeedbackPagina() {
     email: ''
   });
 
-  // Buscar feedbacks ao carregar a página
   useEffect(() => {
-    fetch('http://localhost:3000/feedback') // Ajuste para o endpoint correto
+    fetch('http://localhost:3000/feedback')
       .then(res => res.json())
       .then(data => setFeedbacks(data))
       .catch(err => console.error('Erro ao carregar feedbacks:', err));
   }, []);
 
-  // Lidar com mudanças no formulário
   const handleChange = e => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  // Enviar novo feedback
   const handleSubmit = e => {
     e.preventDefault();
-    
-    // Validação básica
+
     if (!formData.tipo_feedback || !formData.email) {
       alert('Tipo de feedback e email são obrigatórios!');
       return;
@@ -45,13 +42,22 @@ function FeedbackPagina() {
       .catch(err => console.error('Erro ao enviar feedback:', err));
   };
 
+  const getBadgeColor = (tipo) => {
+    switch (tipo) {
+      case 'elogio': return 'success';
+      case 'sugestao': return 'warning';
+      case 'reclamacao': return 'danger';
+      default: return 'secondary';
+    }
+  };
+
   return (
     <div className="container mt-4">
-      <h2>Feedbacks</h2>
+      <h2 className="mb-4">Deixe seu Feedback</h2>
 
-      <form onSubmit={handleSubmit} className="mb-4">
+      <form onSubmit={handleSubmit} className="mb-5">
         <div className="mb-3">
-          <label>Email</label>
+          <label className="form-label">Seu Email</label>
           <input
             type="email"
             name="email"
@@ -63,60 +69,63 @@ function FeedbackPagina() {
         </div>
 
         <div className="mb-3">
-          <label>Tipo de Feedback</label>
+          <label className="form-label">Tipo</label>
           <select
             name="tipo_feedback"
-            className="form-control"
+            className="form-select"
             value={formData.tipo_feedback}
             onChange={handleChange}
             required
           >
             <option value="">Selecione</option>
-            <option value="elogio">Elogio</option>
-            <option value="sugestao">Sugestão</option>
-            <option value="reclamacao">Reclamação</option>
+            <option value="elogio">💚 Elogio</option>
+            <option value="sugestao">💡 Sugestão</option>
+            <option value="reclamacao">⚠️ Reclamação</option>
           </select>
         </div>
 
         <div className="mb-3">
-          <label>Mensagem</label>
+          <label className="form-label">Mensagem</label>
           <textarea
             name="mensagem"
             className="form-control"
             value={formData.mensagem}
             onChange={handleChange}
             rows="4"
+            placeholder="Escreva aqui seu comentário, sugestão ou elogio..."
           />
         </div>
 
         <button type="submit" className="btn btn-primary">Enviar Feedback</button>
       </form>
 
-      <h4>Lista de Feedbacks</h4>
-      <table className="table table-bordered table-striped">
-        <thead className="table-dark">
-          <tr>
-            <th>ID</th>
-            <th>Tipo</th>
-            <th>Email</th>
-            <th>Mensagem</th>
-            <th>Data</th>
-          </tr>
-        </thead>
-        <tbody>
-          {feedbacks.map(fb => (
-            <tr key={fb.id_feedback}>
-              <td>{fb.id_feedback}</td>
-              <td>{fb.tipo_feedback}</td>
-              <td>{fb.email}</td>
-              <td>{fb.mensagem || '-'}</td>
-              <td>{new Date(fb.data_feedback).toLocaleDateString()}</td>
-            </tr>
+      <h4 className="mb-3">Feedbacks Recebidos</h4>
+
+      {feedbacks.length === 0 ? (
+        <p>Nenhum feedback ainda. Seja o primeiro!</p>
+      ) : (
+        <div className="row">
+          {feedbacks.map((fb) => (
+            <div className="col-md-6 mb-3" key={fb.id_feedback}>
+              <div className={`card border-${getBadgeColor(fb.tipo_feedback)}`}>
+                <div className="card-body">
+                  <h5 className="card-title">
+                    <span className={`badge bg-${getBadgeColor(fb.tipo_feedback)} me-2`}>
+                      {fb.tipo_feedback.toUpperCase()}
+                    </span>
+                    {fb.email}
+                  </h5>
+                  <p className="card-text">{fb.mensagem || '(Sem mensagem)'}</p>
+                  <p className="text-muted mb-0" style={{ fontSize: '0.8rem' }}>
+                    {new Date(fb.data_feedback).toLocaleDateString()}
+                  </p>
+                </div>
+              </div>
+            </div>
           ))}
-        </tbody>
-      </table>
+        </div>
+      )}
     </div>
-    
   );
 }
 
