@@ -20,63 +20,59 @@ const SoftwaresEntidade = () => {
     const [success, setSuccess] = useState(null);
     const [editMode, setEditMode] = useState(false);
 
-    // Buscar dados iniciais
+    // 🔄 Buscar dados iniciais (AJUSTADO)
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                setLoading(true);
-                setError(null);
-                
-                const [softwaresRes, categoriasRes, sitesRes] = await Promise.all([
-                    fetch("http://localhost:3000/softwares"),
-                    fetch("http://localhost:3000/categorias"),
-                    fetch("http://localhost:3000/sites")
-                ]);
+    const fetchData = async () => {
+        try {
+            setLoading(true);
+            setError(null);
 
-                if (!softwaresRes.ok) throw new Error("Erro ao buscar softwares");
-                if (!categoriasRes.ok) throw new Error("Erro ao buscar categorias");
-                if (!sitesRes.ok) throw new Error("Erro ao buscar sites");
-
-                const [softwaresData, categoriasData, sitesData] = await Promise.all([
-                    softwaresRes.json(),
-                    categoriasRes.json(),
-                    sitesRes.json()
-                ]);
-
-                // Padroniza os dados recebidos
-                const categoriasPadronizadas = categoriasData.map(cat => ({
-                    id_categoria: cat.id_categorias || cat.id_categoria,
+            // 1️⃣ Buscar CATEGORIAS - Correção aplicada
+            const categoriasRes = await fetch("http://localhost:3000/categorias");
+            if (categoriasRes.ok) {
+                const categoriasData = await categoriasRes.json();
+                setCategorias(categoriasData.map(cat => ({
+                    id_categorias: cat.id_categorias, // Mantemos o nome original do backend
                     nome: cat.nome
-                }));
+                })));
+            }
 
-                const sitesPadronizados = sitesData.map(site => ({
-                    id: site.id_site || site.id,
+            // 2️⃣ Buscar SITES (mantido igual)
+            const sitesRes = await fetch("http://localhost:3000/sites");
+            if (sitesRes.ok) {
+                const sitesData = await sitesRes.json();
+                setSites(sitesData.map(site => ({
+                    id: site.id_site,
                     nome: site.nome,
                     categoria: site.categoria
-                }));
-
-                setSoftwares(softwaresData);
-                setCategorias(categoriasPadronizadas);
-                setSites(sitesPadronizados);
-
-            } catch (err) {
-                console.error("Erro ao carregar dados:", err);
-                setError(err.message);
-            } finally {
-                setLoading(false);
+                })));
             }
-        };
 
-        fetchData();
-    }, []);
+            // 3️⃣ Buscar SOFTWARES - Adicionamos debug
+            const softwaresRes = await fetch("http://localhost:3000/softwares");
+            if (softwaresRes.ok) {
+                const softwaresData = await softwaresRes.json();
+                console.log("Dados dos softwares:", softwaresData); // Debug
+                setSoftwares(softwaresData);
+            }
 
-    // Manipulador de formulário
+        } catch (err) {
+            console.error("Erro:", err);
+            setError("Erro ao carregar dados");
+        } finally {
+            setLoading(false);
+        }
+    };
+    fetchData();
+}, []);
+
+    // ✏️ Manipulador de formulário
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
-    // Submeter formulário
+    // 📤 Submeter formulário
     const handleSubmit = async (e) => {
         e.preventDefault();
         
@@ -102,60 +98,49 @@ const SoftwaresEntidade = () => {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    ...formData,
-                    // Garante que os IDs sejam números
-                    id_categoria: formData.id_categoria ? Number(formData.id_categoria) : null,
-                    id_site: formData.id_site ? Number(formData.id_site) : null
+                    nome: formData.nome,
+                    url: formData.url,
+                    desenvolvedor: formData.desenvolvedor,
+                    id_categoria: formData.id_categoria || null,
+                    id_site: formData.id_site || null
                 })
             });
 
             if (!response.ok) {
                 const errorData = await response.json();
-                throw new Error(errorData.message || 'Erro ao salvar software');
+                throw new Error(errorData.error || 'Erro ao salvar software');
             }
 
-            const result = await response.json();
-            
             setSuccess(editMode ? 'Software atualizado com sucesso!' : 'Software criado com sucesso!');
             
-            // Recarregar dados
-            const [softwaresResponse, sitesResponse] = await Promise.all([
-                fetch('http://localhost:3000/softwares'),
-                fetch('http://localhost:3000/sites')
-            ]);
-            
-            const [softwaresData, sitesData] = await Promise.all([
-                softwaresResponse.json(),
-                sitesResponse.json()
-            ]);
+            // Atualizar lista de softwares após cadastro
+            const softwaresRes = await fetch("http://localhost:3000/softwares");
+            if (softwaresRes.ok) {
+                const softwaresData = await softwaresRes.json();
+                setSoftwares(softwaresData);
+            }
 
-            setSoftwares(softwaresData);
-            setSites(sitesData.map(site => ({
-                id: site.id_site || site.id,
-                nome: site.nome,
-                categoria: site.categoria
-            })));
-            
-            // Limpar formulário
-            setFormData({
-                id_softwares: '',
-                nome: '',
-                url: '',
-                desenvolvedor: '',
-                id_categoria: '',
-                id_site: ''
-            });
-            setEditMode(false);
+            // Limpar formulário se não estiver editando
+            if (!editMode) {
+                setFormData({
+                    id_softwares: '',
+                    nome: '',
+                    url: '',
+                    desenvolvedor: '',
+                    id_categoria: '',
+                    id_site: ''
+                });
+            }
             
         } catch (err) {
-            console.error("Erro ao salvar software:", err);
+            console.error("Erro ao salvar:", err);
             setError(err.message);
         } finally {
             setLoading(false);
         }
     };
 
-    // Editar software
+    // ✏️ Editar software
     const handleEdit = (software) => {
         setFormData({
             id_softwares: software.id_softwares,
@@ -169,7 +154,7 @@ const SoftwaresEntidade = () => {
         window.scrollTo(0, 0);
     };
 
-    // Excluir software
+    // 🗑️ Excluir software
     const handleDelete = async (id) => {
         if (!window.confirm('Tem certeza que deseja excluir este software?')) return;
 
@@ -187,13 +172,15 @@ const SoftwaresEntidade = () => {
 
             setSuccess('Software excluído com sucesso!');
             
-            // Recarregar softwares
-            const softwaresResponse = await fetch('http://localhost:3000/softwares');
-            const softwaresData = await softwaresResponse.json();
-            setSoftwares(softwaresData);
+            // Atualizar lista após exclusão
+            const softwaresRes = await fetch('http://localhost:3000/softwares');
+            if (softwaresRes.ok) {
+                const softwaresData = await softwaresRes.json();
+                setSoftwares(softwaresData);
+            }
             
         } catch (err) {
-            console.error("Erro ao excluir software:", err);
+            console.error("Erro ao excluir:", err);
             setError(err.message);
         } finally {
             setLoading(false);
@@ -202,7 +189,7 @@ const SoftwaresEntidade = () => {
 
     return (
         <div className="d-flex flex-column min-vh-100">
-            {/* Cabeçalho */}
+            {/* 🏷️ Cabeçalho */}
             <header className="bg-light shadow-sm">
                 <div className="container py-3">
                     <div className="d-flex justify-content-between align-items-center">
@@ -218,7 +205,7 @@ const SoftwaresEntidade = () => {
                 </div>
             </header>
 
-            {/* Conteúdo Principal */}
+            {/* 📌 Conteúdo Principal */}
             <main className="container flex-grow-1 py-4">
                 <div className="row justify-content-center">
                     <div className="col-lg-10">
@@ -226,7 +213,7 @@ const SoftwaresEntidade = () => {
                             {editMode ? "Editar Software" : "Adicionar Novo Software"}
                         </h2>
 
-                        {/* Mensagens de status */}
+                        {/* 🚨 Mensagens de status */}
                         {error && (
                             <div className="alert alert-danger alert-dismissible fade show">
                                 {error}
@@ -249,7 +236,7 @@ const SoftwaresEntidade = () => {
                             </div>
                         )}
 
-                        {/* Formulário */}
+                        {/* 📝 Formulário */}
                         <div className="card shadow-sm mb-4">
                             <div className="card-body">
                                 <form onSubmit={handleSubmit}>
@@ -295,6 +282,7 @@ const SoftwaresEntidade = () => {
                                         />
                                     </div>
 
+                                    {/* 🗂️ Lista Suspensa de Categorias (AJUSTADA) */}
                                     <div className="mb-3">
                                         <label className="form-label">Categoria</label>
                                         <select
@@ -302,7 +290,7 @@ const SoftwaresEntidade = () => {
                                             name="id_categoria"
                                             value={formData.id_categoria || ""}
                                             onChange={handleChange}
-                                            disabled={loading}
+                                            disabled={loading || categorias.length === 0}
                                         >
                                             <option value="">Selecione uma categoria</option>
                                             {categorias.map(categoria => (
@@ -311,8 +299,12 @@ const SoftwaresEntidade = () => {
                                                 </option>
                                             ))}
                                         </select>
+                                        {categorias.length === 0 && !loading && (
+                                            <small className="text-danger">Nenhuma categoria cadastrada</small>
+                                        )}
                                     </div>
 
+                                    {/* 🌐 Lista Suspensa de Sites (AJUSTADA) */}
                                     <div className="mb-3">
                                         <label className="form-label">Site Relacionado</label>
                                         <select
@@ -320,7 +312,7 @@ const SoftwaresEntidade = () => {
                                             name="id_site"
                                             value={formData.id_site || ""}
                                             onChange={handleChange}
-                                            disabled={loading}
+                                            disabled={loading || sites.length === 0}
                                         >
                                             <option value="">Selecione um site</option>
                                             {sites.map(site => (
@@ -329,6 +321,9 @@ const SoftwaresEntidade = () => {
                                                 </option>
                                             ))}
                                         </select>
+                                        {sites.length === 0 && !loading && (
+                                            <small className="text-danger">Nenhum site cadastrado</small>
+                                        )}
                                     </div>
 
                                     <div className="d-flex justify-content-between mt-4">
@@ -372,7 +367,7 @@ const SoftwaresEntidade = () => {
                             </div>
                         </div>
 
-                        {/* Lista de Softwares */}
+                        {/* 📋 Lista de Softwares */}
                         <div className="card shadow-sm">
                             <div className="card-body">
                                 <h5 className="card-title">Lista de Softwares</h5>
@@ -451,7 +446,7 @@ const SoftwaresEntidade = () => {
                 </div>
             </main>
 
-            {/* Rodapé */}
+            {/* 🏁 Rodapé */}
             <footer className="bg-dark text-white py-3 mt-auto">
                 <div className="container text-center">
                     <p className="mb-0">&copy; {new Date().getFullYear()} - Todos os direitos reservados</p>

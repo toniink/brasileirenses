@@ -6,7 +6,8 @@ const app = express();
 
 app.use(cors({
   origin: true, // Reflete dinamicamente a origin da requisição
-  credentials: true // Desative se não estiver usando cookies/sessão
+  credentials: false // Desative se não estiver usando cookies/sessão
+
 }));
 
 app.use(express.json());
@@ -86,4 +87,7 @@ app.listen(3000, () => {
 
 });
 
-//teste
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).send('Algo quebrou!');
+});
