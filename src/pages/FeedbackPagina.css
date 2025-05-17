@@ -1,0 +1,77 @@
+/* Estilo base dos cards de feedback */
+.feedback-card {
+  border-left: 6px solid #ccc;
+  border-radius: 8px;
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease;
+}
+
+.feedback-card:hover {
+  transform: scale(1.01);
+}
+
+.feedback-card .card-body {
+  position: relative;
+  padding-left: 2.5rem;
+}
+
+/* Ícone decorativo à esquerda */
+.feedback-icon {
+  position: absolute;
+  left: 1rem;
+  top: 1rem;
+  font-size: 1.5rem;
+  opacity: 0.4;
+}
+
+/* Cores por tipo */
+.feedback-elogio {
+  border-color: #28a745; /* verde */
+  background-color: #e8f9ee;
+}
+
+.feedback-sugestao {
+  border-color: #ffc107; /* amarelo */
+  background-color: #fffbe6;
+}
+
+.feedback-reclamacao {
+  border-color: #dc3545; /* vermelho */
+  background-color: #fdeaea;
+}
+
+/* Email do autor */
+.feedback-email {
+  font-weight: bold;
+  font-size: 0.95rem;
+}
+
+/* Data pequena e discreta */
+.feedback-data {
+  font-size: 0.75rem;
+  color: #666;
+}
+
+/* Responsivo */
+@media (max-width: 576px) {
+  .feedback-card .card-body {
+    padding-left: 1.5rem;
+  }
+}
+.card {
+  border-radius: 12px;
+  background-color: #fff;
+  border: 1px solid #eee;
+}
+
+.btn-outline-success:hover {
+  background-color: #d4edda;
+}
+
+.btn-outline-warning:hover {
+  background-color: #fff3cd;
+}
+
+.btn-outline-danger:hover {
+  background-color: #f8d7da;
+}
