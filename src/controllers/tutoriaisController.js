@@ -348,3 +348,153 @@ exports.updateContent = async (req, res) => {
         });
     }
 };
+// Adicionar no final do controller existente
+
+// Método seguro para deletar apenas o tutorial (sem afetar o software)
+exports.deleteTutorialSafe = async (req, res) => {
+    const tutorialID = req.params.id;
+
+    try {
+        // Inicia transação
+        await db.run("BEGIN TRANSACTION");
+
+        // 1. Primeiro deleta todo o conteúdo do tutorial
+        await new Promise((resolve, reject) => {
+            db.run(
+                `DELETE FROM secoes_tutorial 
+                 WHERE id_tutorial = ?`,
+                [tutorialID],
+                function(err) {
+                    if (err) reject(err);
+                    else resolve();
+                }
+            );
+        });
+
+        // 2. Depois deleta o tutorial
+        const result = await new Promise((resolve, reject) => {
+            db.run(
+                `DELETE FROM tutoriais 
+                 WHERE id_tutorial = ?`,
+                [tutorialID],
+                function(err) {
+                    if (err) reject(err);
+                    else resolve(this.changes);
+                }
+            );
+        });
+
+        await db.run("COMMIT");
+
+        if (result === 0) {
+            return res.status(404).json({ error: "Tutorial não encontrado" });
+        }
+
+        res.json({ 
+            success: true,
+            message: "Tutorial deletado com sucesso (software não foi afetado)"
+        });
+
+    } catch (error) {
+        await db.run("ROLLBACK");
+        console.error("Erro ao deletar tutorial:", error);
+        res.status(500).json({ 
+            error: "Erro ao deletar tutorial",
+            details: error.message
+        });
+    }
+};
+
+// Método para listar apenas tutoriais com conteúdo (usando estrutura atual)
+exports.listTutoriaisComConteudo = async (req, res) => {
+    try {
+        const tutoriais = await new Promise((resolve, reject) => {
+            db.all(
+                `SELECT t.* FROM tutoriais t
+                 WHERE EXISTS (
+                     SELECT 1 FROM secoes_tutorial st
+                     LEFT JOIN conteudo_paragrafo cp ON st.id_secao = cp.id_secao
+                     LEFT JOIN conteudo_titulo ct ON st.id_secao = ct.id_secao
+                     LEFT JOIN conteudo_lista cl ON st.id_secao = cl.id_secao
+                     LEFT JOIN conteudo_imagem ci ON st.id_secao = ci.id_secao
+                     WHERE st.id_tutorial = t.id_tutorial AND (
+                        cp.id_paragrafo IS NOT NULL OR
+                        ct.id_titulo IS NOT NULL OR
+                        cl.id_item IS NOT NULL OR
+                        ci.id_imagem IS NOT NULL
+                     )
+                 )`,
+                [],
+                (err, rows) => {
+                    if (err) reject(err);
+                    else resolve(rows || []);
+                }
+            );
+        });
+        
+        res.json(tutoriais);
+    } catch (error) {
+        console.error('Erro ao buscar tutoriais com conteúdo:', error);
+        res.status(500).json({ 
+            error: 'Erro interno',
+            details: error.message
+        });
+    }
+};
+// Adicione este método ao seu tutoriaisController.js
+exports.adicionarLista = async (req, res) => {
+    const { id_secao } = req.params;
+    const { itens } = req.body; // Recebe array de itens
+
+    try {
+        // Verifica se a seção existe
+        const secao = await new Promise((resolve, reject) => {
+            db.get("SELECT id_secao, tipo FROM secoes_tutorial WHERE id_secao = ?", 
+                  [id_secao], (err, row) => {
+                if (err) reject(err);
+                else resolve(row);
+            });
+        });
+
+        if (!secao || secao.tipo !== 'lista') {
+            return res.status(400).json({ error: "Seção de lista inválida" });
+        }
+
+        // Remove itens existentes (para atualização)
+        await new Promise((resolve, reject) => {
+            db.run("DELETE FROM conteudo_lista WHERE id_secao = ?", 
+                  [id_secao], (err) => {
+                if (err) reject(err);
+                else resolve();
+            });
+        });
+
+        // Insere os novos itens
+        const insertedItems = [];
+        for (const item of itens) {
+            const newItem = await new Promise((resolve, reject) => {
+                db.run(
+                    "INSERT INTO conteudo_lista (id_secao, item) VALUES (?, ?)",
+                    [id_secao, item.texto || item.item], // Compatibilidade com ambos formatos
+                    function(err) {
+                        if (err) reject(err);
+                        else resolve({
+                            id_item: this.lastID,
+                            id_secao,
+                            item: item.texto || item.item
+                        });
+                    }
+                );
+            });
+            insertedItems.push(newItem);
+        }
+
+        res.status(201).json(insertedItems);
+    } catch (error) {
+        console.error("Erro ao salvar lista:", error);
+        res.status(500).json({ 
+            error: "Erro ao salvar lista",
+            details: error.message
+        });
+    }
+};

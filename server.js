@@ -24,7 +24,6 @@ app.post('/login', usuariosController.loginUsuario);
 
 //Usar rotas de cursos
 const rotasCursos = require('./src/routes/cursosRoutes');
-
 app.use('/cursos', rotasCursos);
 
 //rotas para sites
@@ -78,6 +77,24 @@ app.use('/playlistCursos', rotasPlaylistCursos);
 const conteudoRoutes = require('./src/routes/conteudoRoutes');
 app.use('/conteudoSoftware', conteudoRoutes);
 
+// Tratamento de erros não capturados
+process.on('uncaughtException', (err) => {
+  console.error('Erro não tratado:', err);
+  // Não encerre o processo em produção
+  if (process.env.NODE_ENV !== 'production') {
+    process.exit(1);
+  }
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('Promise rejeitada não tratada em:', promise, 'motivo:', reason);
+});
+
+
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).send('Algo quebrou!');
+});
 
 
 // Inicializar o servidor
@@ -85,9 +102,4 @@ app.listen(3000, () => {
   console.log('Servidor rodando na porta 3000!');
 
 
-});
-
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).send('Algo quebrou!');
 });

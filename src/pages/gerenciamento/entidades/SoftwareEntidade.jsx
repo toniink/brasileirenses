@@ -22,49 +22,42 @@ const SoftwaresEntidade = () => {
 
     // 🔄 Buscar dados iniciais (AJUSTADO)
     useEffect(() => {
-    const fetchData = async () => {
-        try {
-            setLoading(true);
-            setError(null);
+        // Na função fetchData do useEffect
+        const fetchData = async () => {
+            try {
+                setLoading(true);
+                setError(null);
 
-            // 1️⃣ Buscar CATEGORIAS - Correção aplicada
-            const categoriasRes = await fetch("http://localhost:3000/categorias");
-            if (categoriasRes.ok) {
-                const categoriasData = await categoriasRes.json();
-                setCategorias(categoriasData.map(cat => ({
-                    id_categorias: cat.id_categorias, // Mantemos o nome original do backend
-                    nome: cat.nome
-                })));
+                // Buscar CATEGORIAS - Correção para usar id_categorias do banco
+                const categoriasRes = await fetch("http://localhost:3000/categorias");
+                if (categoriasRes.ok) {
+                    const categoriasData = await categoriasRes.json();
+                    setCategorias(categoriasData); // Mantém a estrutura original do backend
+                }
+
+                // Buscar SITES - Correção para usar id_site do banco
+                const sitesRes = await fetch("http://localhost:3000/sites");
+                if (sitesRes.ok) {
+                    const sitesData = await sitesRes.json();
+                    setSites(sitesData); // Mantém a estrutura original do backend
+                }
+
+                // Buscar SOFTWARES
+                const softwaresRes = await fetch("http://localhost:3000/softwares");
+                if (softwaresRes.ok) {
+                    const softwaresData = await softwaresRes.json();
+                    setSoftwares(softwaresData);
+                }
+
+            } catch (err) {
+                console.error("Erro:", err);
+                setError("Erro ao carregar dados");
+            } finally {
+                setLoading(false);
             }
-
-            // 2️⃣ Buscar SITES (mantido igual)
-            const sitesRes = await fetch("http://localhost:3000/sites");
-            if (sitesRes.ok) {
-                const sitesData = await sitesRes.json();
-                setSites(sitesData.map(site => ({
-                    id: site.id_site,
-                    nome: site.nome,
-                    categoria: site.categoria
-                })));
-            }
-
-            // 3️⃣ Buscar SOFTWARES - Adicionamos debug
-            const softwaresRes = await fetch("http://localhost:3000/softwares");
-            if (softwaresRes.ok) {
-                const softwaresData = await softwaresRes.json();
-                console.log("Dados dos softwares:", softwaresData); // Debug
-                setSoftwares(softwaresData);
-            }
-
-        } catch (err) {
-            console.error("Erro:", err);
-            setError("Erro ao carregar dados");
-        } finally {
-            setLoading(false);
-        }
-    };
-    fetchData();
-}, []);
+        };
+        fetchData();
+    }, []);
 
     // ✏️ Manipulador de formulário
     const handleChange = (e) => {
@@ -75,7 +68,7 @@ const SoftwaresEntidade = () => {
     // 📤 Submeter formulário
     const handleSubmit = async (e) => {
         e.preventDefault();
-        
+
         if (!formData.nome) {
             setError("O nome do software é obrigatório");
             return;
@@ -86,41 +79,44 @@ const SoftwaresEntidade = () => {
             setError(null);
             setSuccess(null);
 
-            const url = editMode 
+            const url = editMode
                 ? `http://localhost:3000/softwares/${formData.id_softwares}`
                 : 'http://localhost:3000/softwares';
-            
+
             const method = editMode ? 'PUT' : 'POST';
-            
+
+            // Converter strings vazias para null
+            const payload = {
+                nome: formData.nome,
+                url: formData.url || null,
+                desenvolvedor: formData.desenvolvedor || null,
+                id_categoria: formData.id_categoria || null,
+                id_site: formData.id_site || null
+            };
+
             const response = await fetch(url, {
                 method,
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({
-                    nome: formData.nome,
-                    url: formData.url,
-                    desenvolvedor: formData.desenvolvedor,
-                    id_categoria: formData.id_categoria || null,
-                    id_site: formData.id_site || null
-                })
+                body: JSON.stringify(payload)
             });
 
+            const data = await response.json();
+
             if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || 'Erro ao salvar software');
+                throw new Error(data.error || 'Erro ao salvar software');
             }
 
-            setSuccess(editMode ? 'Software atualizado com sucesso!' : 'Software criado com sucesso!');
-            
-            // Atualizar lista de softwares após cadastro
+            setSuccess(data.message || (editMode ? 'Software atualizado com sucesso!' : 'Software criado com sucesso!'));
+
+            // Atualizar lista de softwares
             const softwaresRes = await fetch("http://localhost:3000/softwares");
             if (softwaresRes.ok) {
                 const softwaresData = await softwaresRes.json();
                 setSoftwares(softwaresData);
             }
 
-            // Limpar formulário se não estiver editando
             if (!editMode) {
                 setFormData({
                     id_softwares: '',
@@ -131,7 +127,7 @@ const SoftwaresEntidade = () => {
                     id_site: ''
                 });
             }
-            
+
         } catch (err) {
             console.error("Erro ao salvar:", err);
             setError(err.message);
@@ -161,7 +157,7 @@ const SoftwaresEntidade = () => {
         try {
             setLoading(true);
             setError(null);
-            
+
             const response = await fetch(`http://localhost:3000/softwares/${id}`, {
                 method: 'DELETE'
             });
@@ -171,14 +167,14 @@ const SoftwaresEntidade = () => {
             }
 
             setSuccess('Software excluído com sucesso!');
-            
+
             // Atualizar lista após exclusão
             const softwaresRes = await fetch('http://localhost:3000/softwares');
             if (softwaresRes.ok) {
                 const softwaresData = await softwaresRes.json();
                 setSoftwares(softwaresData);
             }
-            
+
         } catch (err) {
             console.error("Erro ao excluir:", err);
             setError(err.message);
@@ -194,8 +190,8 @@ const SoftwaresEntidade = () => {
                 <div className="container py-3">
                     <div className="d-flex justify-content-between align-items-center">
                         <nav className="d-flex gap-3">
-                            <button 
-                                onClick={() => navigate(-1)} 
+                            <button
+                                onClick={() => navigate(-1)}
                                 className="btn btn-link"
                             >
                                 Voltar
@@ -217,9 +213,9 @@ const SoftwaresEntidade = () => {
                         {error && (
                             <div className="alert alert-danger alert-dismissible fade show">
                                 {error}
-                                <button 
-                                    type="button" 
-                                    className="btn-close" 
+                                <button
+                                    type="button"
+                                    className="btn-close"
                                     onClick={() => setError(null)}
                                 />
                             </div>
@@ -228,9 +224,9 @@ const SoftwaresEntidade = () => {
                         {success && (
                             <div className="alert alert-success alert-dismissible fade show">
                                 {success}
-                                <button 
-                                    type="button" 
-                                    className="btn-close" 
+                                <button
+                                    type="button"
+                                    className="btn-close"
                                     onClick={() => setSuccess(null)}
                                 />
                             </div>
@@ -241,7 +237,7 @@ const SoftwaresEntidade = () => {
                             <div className="card-body">
                                 <form onSubmit={handleSubmit}>
                                     <input type="hidden" name="id_softwares" value={formData.id_softwares} />
-                                    
+
                                     <div className="mb-3">
                                         <label className="form-label">Nome do Software *</label>
                                         <input
@@ -283,6 +279,7 @@ const SoftwaresEntidade = () => {
                                     </div>
 
                                     {/* 🗂️ Lista Suspensa de Categorias (AJUSTADA) */}
+                                    {/* Select de Categorias */}
                                     <div className="mb-3">
                                         <label className="form-label">Categoria</label>
                                         <select
@@ -294,17 +291,17 @@ const SoftwaresEntidade = () => {
                                         >
                                             <option value="">Selecione uma categoria</option>
                                             {categorias.map(categoria => (
-                                                <option key={categoria.id_categoria} value={categoria.id_categoria}>
+                                                <option
+                                                    key={categoria.id_categorias}
+                                                    value={categoria.id_categorias} // Usa o ID real do banco
+                                                >
                                                     {categoria.nome}
                                                 </option>
                                             ))}
                                         </select>
-                                        {categorias.length === 0 && !loading && (
-                                            <small className="text-danger">Nenhuma categoria cadastrada</small>
-                                        )}
                                     </div>
 
-                                    {/* 🌐 Lista Suspensa de Sites (AJUSTADA) */}
+                                    {/* Select de Sites */}
                                     <div className="mb-3">
                                         <label className="form-label">Site Relacionado</label>
                                         <select
@@ -316,14 +313,14 @@ const SoftwaresEntidade = () => {
                                         >
                                             <option value="">Selecione um site</option>
                                             {sites.map(site => (
-                                                <option key={site.id} value={site.id}>
+                                                <option
+                                                    key={site.id_site}
+                                                    value={site.id_site} // Usa o ID real do banco
+                                                >
                                                     {site.nome} {site.categoria && `(${site.categoria})`}
                                                 </option>
                                             ))}
                                         </select>
-                                        {sites.length === 0 && !loading && (
-                                            <small className="text-danger">Nenhum site cadastrado</small>
-                                        )}
                                     </div>
 
                                     <div className="d-flex justify-content-between mt-4">
@@ -347,7 +344,7 @@ const SoftwaresEntidade = () => {
                                         >
                                             Cancelar
                                         </button>
-                                        
+
                                         <button
                                             type="submit"
                                             className="btn btn-primary px-4"
@@ -371,7 +368,7 @@ const SoftwaresEntidade = () => {
                         <div className="card shadow-sm">
                             <div className="card-body">
                                 <h5 className="card-title">Lista de Softwares</h5>
-                                
+
                                 {loading && softwares.length === 0 ? (
                                     <div className="text-center py-4">
                                         <div className="spinner-border text-primary" role="status">
@@ -406,9 +403,9 @@ const SoftwaresEntidade = () => {
                                                         </td>
                                                         <td>
                                                             {software.url ? (
-                                                                <a 
-                                                                    href={software.url} 
-                                                                    target="_blank" 
+                                                                <a
+                                                                    href={software.url}
+                                                                    target="_blank"
                                                                     rel="noopener noreferrer"
                                                                     className="text-decoration-none"
                                                                 >

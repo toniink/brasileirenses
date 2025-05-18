@@ -48,26 +48,73 @@ class SoftwareController {
   }
 
   async create(req, res) {
-    const { nome, url, desenvolvedor, id_categoria, id_site } = req.body;
+  const { nome, url, desenvolvedor, id_categoria, id_site } = req.body;
 
-    if (!nome || !id_categoria || !id_site) {
+  if (!nome) {
+    return res.status(400).json({ 
+      error: "Nome do software é obrigatório"
+    });
+  }
+
+  try {
+    // Verificar se as chaves estrangeiras existem
+    if (id_categoria) {
+      const categoriaExists = await new Promise((resolve) => {
+        db.get("SELECT 1 FROM categorias WHERE id_categorias = ?", [id_categoria], (err, row) => {
+          resolve(!!row);
+        });
+      });
+      
+      if (!categoriaExists) {
+        return res.status(400).json({ error: "Categoria não encontrada" });
+      }
+    }
+
+    if (id_site) {
+      const siteExists = await new Promise((resolve) => {
+        db.get("SELECT 1 FROM sites WHERE id_site = ?", [id_site], (err, row) => {
+          resolve(!!row);
+        });
+      });
+      
+      if (!siteExists) {
+        return res.status(400).json({ error: "Site não encontrado" });
+      }
+    }
+
+    // Inserir o software
+    const { lastID } = await new Promise((resolve, reject) => {
+      db.run(
+        "INSERT INTO softwares (nome, url, desenvolvedor, id_categoria, id_site) VALUES (?, ?, ?, ?, ?)",
+        [nome, url, desenvolvedor, id_categoria || null, id_site || null],
+        function(err) {
+          if (err) reject(err);
+          else resolve({ lastID: this.lastID });
+        }
+      );
+    });
+
+    res.status(201).json({ 
+      id_softwares: lastID,
+      message: "Software criado com sucesso" 
+    });
+
+  } catch (err) {
+    console.error("Erro ao criar software:", err);
+    
+    if (err.code === 'SQLITE_CONSTRAINT') {
       return res.status(400).json({ 
-        error: "Campos obrigatórios faltando",
-        required: ["nome", "id_categoria", "id_site"]
+        error: "Violação de restrição no banco de dados",
+        details: err.message 
       });
     }
-
-    try {
-      const { lastID } = await db.run(
-        "INSERT INTO softwares (nome, url, desenvolvedor, id_categoria, id_site) VALUES (?, ?, ?, ?, ?)",
-        [nome, url, desenvolvedor, id_categoria, id_site]
-      );
-      res.status(201).json({ id_softwares: lastID });
-    } catch (err) {
-      console.error("Erro ao criar software:", err);
-      res.status(500).json({ error: "Erro ao criar software" });
-    }
+    
+    res.status(500).json({ 
+      error: "Erro ao criar software",
+      details: process.env.NODE_ENV === 'development' ? err.message : undefined
+    });
   }
+}
 
   async getById(req, res) {
     const softwareID = Number(req.params.id);

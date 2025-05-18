@@ -130,7 +130,7 @@ const GerenciarConteudoCurso = () => {
         try {
             setLoading(true);
             
-            const response = await fetch(`http://localhost:3000/cursos/conteudo/${secao.id_secao_curso}`, {
+            const response = await fetch(`http://localhost:3000/cursos/${secao.id_secao_curso}/conteudo`, {
                 method: "DELETE"
             });
 
@@ -146,12 +146,14 @@ const GerenciarConteudoCurso = () => {
         }
     };
 
-    // Salvar alterações
+    // Salvar alterações - VERSÃO CORRIGIDA
     const salvarAlteracoes = async () => {
         if (!formData.id_curso) {
             setError("Selecione um curso primeiro!");
             return;
         }
+
+        console.log("Iniciando salvamento...", { secoesModificadas: secoes.filter(s => s.editando) });
 
         try {
             setLoading(true);
@@ -162,50 +164,86 @@ const GerenciarConteudoCurso = () => {
             const secoesModificadas = secoes.filter(s => s.editando);
             
             for (const secao of secoesModificadas) {
+                console.log(`Processando seção: ${secao.tipo}`, secao);
+                
                 if (secao.id_secao_curso) {
                     // Atualizar conteúdo existente
-                    await fetch(`http://localhost:3000/cursos/conteudo`, {
+                    console.log("Atualizando conteúdo existente...");
+                    const response = await fetch(`http://localhost:3000/cursos/conteudo/${secao.tipo}`, {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({
                             id_secao_curso: secao.id_secao_curso,
-                            tipo: secao.tipo,
                             ...secao.conteudos[0]
                         })
                     });
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.error || `Falha ao atualizar ${secao.tipo}`);
+                    }
+                    
+                    console.log("Conteúdo atualizado com sucesso");
                 } else {
                     // Criar nova seção e conteúdo
+                    console.log("Criando nova seção...");
+                    
+                    // 1. Criar a seção primeiro
                     const secaoResponse = await fetch(`http://localhost:3000/cursos/${formData.id_curso}/sections`, {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({
                             tipo: secao.tipo,
-                            ordem: secao.ordem
+                            ordem: secao.ordem,
+                            titulo: secao.titulo || ""
                         })
                     });
                     
+                    if (!secaoResponse.ok) {
+                        const errorData = await secaoResponse.json();
+                        throw new Error(errorData.error || "Falha ao criar seção");
+                    }
+
                     const novaSecao = await secaoResponse.json();
+                    console.log("Seção criada:", novaSecao);
                     
-                    await fetch(`http://localhost:3000/cursos/conteudo`, {
+                    // 2. Adicionar conteúdo à seção
+                    console.log("Adicionando conteúdo à seção...");
+                    const conteudoResponse = await fetch(`http://localhost:3000/cursos/conteudo/${secao.tipo}`, {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({
                             id_secao_curso: novaSecao.id_secao_curso,
-                            tipo: secao.tipo,
                             ...secao.conteudos[0]
                         })
                     });
+
+                    if (!conteudoResponse.ok) {
+                        const errorData = await conteudoResponse.json();
+                        throw new Error(errorData.error || `Falha ao criar conteúdo ${secao.tipo}`);
+                    }
+                    
+                    console.log("Conteúdo adicionado com sucesso");
                 }
             }
 
             setSuccess("Alterações salvas com sucesso!");
+            console.log("Todas as alterações foram salvas");
             
             // Recarrega as seções atualizadas
             const response = await fetch(`http://localhost:3000/cursos/${formData.id_curso}/content`);
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || "Falha ao recarregar conteúdo");
+            }
+            
             const data = await response.json();
             setSecoes((Array.isArray(data) ? data : []).map(s => ({ ...s, editando: false })));
         } catch (err) {
-            console.error("Erro ao salvar:", err);
+            console.error("Erro detalhado ao salvar:", {
+                message: err.message,
+                stack: err.stack
+            });
             setError("Erro ao salvar alterações: " + err.message);
         } finally {
             setLoading(false);
@@ -261,6 +299,11 @@ const GerenciarConteudoCurso = () => {
                         {success && (
                             <div className="alert alert-success alert-dismissible fade show">
                                 {success}
+                                <button 
+                                    type="button" 
+                                    className="btn-close" 
+                                    onClick={() => setSuccess(null)}
+                                />
                             </div>
                         )}
 

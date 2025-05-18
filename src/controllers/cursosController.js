@@ -280,6 +280,12 @@ exports.addContent = async (req, res) => {
         const { tipo } = req.params;
         const { id_secao_curso, ...conteudo } = req.body;
 
+        console.log("Recebendo conteúdo para adicionar:", {
+            tipo,
+            id_secao_curso,
+            conteudo
+        });
+
         if (!id_secao_curso || !tipo) {
             return res.status(400).json({ 
                 error: "Campos obrigatórios faltando",
@@ -289,13 +295,17 @@ exports.addContent = async (req, res) => {
         }
 
         const result = await CursoContentService.addContent(id_secao_curso, tipo, conteudo);
+        
+        console.log("Conteúdo adicionado com sucesso:", result);
+        
         res.status(201).json(result);
 
     } catch (error) {
-        console.error("Erro ao adicionar conteúdo:", error);
+        console.error("Erro detalhado ao adicionar conteúdo:", error);
         res.status(500).json({ 
             error: "Erro ao adicionar conteúdo",
-            details: error.message
+            details: error.message,
+            stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
         });
     }
 };

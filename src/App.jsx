@@ -22,6 +22,7 @@ import ListaConteudos from './pages/gerenciamento/conteudo/ListaConteudos';
 const EditarConteudo = lazy(() => import('./pages/gerenciamento/EditarConteudo'))
 const EditarConteudoSoftware = lazy(() => import('./pages/gerenciamento/conteudo/EditarConteudoSoftware'))
 const EditarConteudoTutorial = lazy(() => import('./pages/gerenciamento/conteudo/EditarConteudoTutorial'))
+const TutoriaisLista = lazy(()=> import('./pages/gerenciamento/conteudo/ListaTutoriais'))
 
 //gerenciamento entidades
 const MenuEntidade = lazy(() => import('./pages/gerenciamento/entidades/MenuEntidade'))
@@ -63,7 +64,7 @@ const App = () => (
                 <Route path="/gerenciamento" element={<DashboardGerenciamento />} />
                 <Route path="/gerenciamento/conteudo/cursos" element={<ListaConteudos tipo="cursos" />} />
                 <Route path="/gerenciamento/conteudo/softwares" element={<ListaConteudos tipo="softwares" />} />
-                <Route path="/gerenciamento/conteudo/tutoriais" element={<ListaConteudos tipo="tutoriais" />} />
+                <Route path="/gerenciamento/conteudo/tutoriaisLista" element={<TutoriaisLista />} />
                 <Route path="/gerenciamento/conteudo" element={<ConteudoGerenciamento />} />
                 <Route path="/gerenciamento/conteudo/cursos/novo" element={<GerenciarCurso />} />
                 <Route path="gerenciamento/conteudo/softwares/novo" element={<GerenciarSoftware />} />

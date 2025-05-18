@@ -432,6 +432,109 @@ class TutoriaisContentService {
       );
     });
   }
+
+  // Adicionar no final do service existente
+
+static async safeDeleteTutorial(id_tutorial) {
+    return new Promise(async (resolve, reject) => {
+        try {
+            // Verifica se o tutorial existe
+            const tutorialExists = await new Promise((resolve) => {
+                db.get(
+                    "SELECT 1 FROM tutoriais WHERE id_tutorial = ?", 
+                    [id_tutorial],
+                    (err, row) => resolve(!!row)
+                );
+            });
+
+            if (!tutorialExists) {
+                throw new Error("Tutorial não encontrado");
+            }
+
+            // Inicia transação
+            await new Promise((resolve, reject) => {
+                db.run("BEGIN TRANSACTION", (err) => {
+                    if (err) reject(err);
+                    else resolve();
+                });
+            });
+
+            // 1. Deleta todo o conteúdo do tutorial
+            await new Promise((resolve, reject) => {
+                db.run(
+                    `DELETE FROM secoes_tutorial 
+                     WHERE id_tutorial = ?`,
+                    [id_tutorial],
+                    function(err) {
+                        if (err) reject(err);
+                        else resolve();
+                    }
+                );
+            });
+
+            // 2. Deleta o tutorial (não afetará o software devido ao ON DELETE CASCADE)
+            const result = await new Promise((resolve, reject) => {
+                db.run(
+                    `DELETE FROM tutoriais 
+                     WHERE id_tutorial = ?`,
+                    [id_tutorial],
+                    function(err) {
+                        if (err) reject(err);
+                        else resolve(this.changes);
+                    }
+                );
+            });
+
+            await new Promise((resolve, reject) => {
+                db.run("COMMIT", (err) => {
+                    if (err) reject(err);
+                    else resolve();
+                });
+            });
+
+            if (result === 0) {
+                throw new Error("Nenhum tutorial foi deletado");
+            }
+
+            resolve({
+                success: true,
+                id_tutorial,
+                message: "Tutorial deletado com sucesso (software não foi afetado)"
+            });
+
+        } catch (error) {
+            // Rollback em caso de erro
+            await new Promise((resolve) => {
+                db.run("ROLLBACK", () => resolve());
+            });
+            
+            console.error("[TutoriaisContentService] Erro no safeDeleteTutorial:", error);
+            reject(error);
+        }
+    });
 }
+
+static async tutorialHasContent(id_tutorial) {
+    return new Promise((resolve) => {
+        db.get(
+            `SELECT 1 FROM secoes_tutorial st
+             LEFT JOIN conteudo_paragrafo cp ON st.id_secao = cp.id_secao
+             LEFT JOIN conteudo_titulo ct ON st.id_secao = ct.id_secao
+             LEFT JOIN conteudo_lista cl ON st.id_secao = cl.id_secao
+             LEFT JOIN conteudo_imagem ci ON st.id_secao = ci.id_secao
+             WHERE st.id_tutorial = ? AND (
+                cp.id_paragrafo IS NOT NULL OR
+                ct.id_titulo IS NOT NULL OR
+                cl.id_item IS NOT NULL OR
+                ci.id_imagem IS NOT NULL
+             ) LIMIT 1`,
+            [id_tutorial],
+            (err, row) => resolve(!!row)
+        );
+    });
+}
+}
+
+
 
 module.exports = TutoriaisContentService;

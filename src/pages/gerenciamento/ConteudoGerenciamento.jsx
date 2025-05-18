@@ -61,7 +61,7 @@ const ConteudoGerenciamento = () => {
                 Gerencie os passos e materiais dos tutoriais
               </Card.Text>
               <Link 
-                to="/gerenciamento/conteudo/tutoriais" 
+                to="/gerenciamento/conteudo/tutoriaisLista" 
                 className="btn btn-outline-warning"
               >
                 Acessar
