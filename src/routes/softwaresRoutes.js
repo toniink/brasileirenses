@@ -6,6 +6,8 @@ const softwareContentController = require('../controllers/softwareContentControl
 
 // Rotas para conteúdo (colocar antes das rotas com :id)
 router.get('/com-conteudo', softwareContentController.listSoftwaresComConteudo);
+// Adicione esta nova rota antes das outras rotas GET
+router.get('/filtrados', SoftwareController.listByCategory);
 
 // 🚀 Rotas CRUD básicas
 router.get('/', SoftwareController.listAll);

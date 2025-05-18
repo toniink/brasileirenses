@@ -515,6 +515,39 @@ async getContentBySoftware(req, res) {
       });
     }
   }
+  async listByCategory(req, res) {
+    const categoriaId = req.query.categoria;
+    
+    if (!categoriaId) {
+        return res.status(400).json({ error: "ID da categoria é obrigatório" });
+    }
+
+    try {
+        const softwares = await new Promise((resolve, reject) => {
+            db.all(
+                `SELECT 
+                    s.id_softwares,
+                    s.nome,
+                    s.url,
+                    s.desenvolvedor,
+                    c.nome AS nome_categoria
+                FROM softwares s
+                LEFT JOIN categorias c ON s.id_categoria = c.id_categorias
+                WHERE s.id_categoria = ?`,
+                [categoriaId],
+                (err, rows) => {
+                    if (err) reject(err);
+                    else resolve(rows);
+                }
+            );
+        });
+
+        res.json(softwares || []);
+    } catch (err) {
+        console.error('Erro ao buscar softwares por categoria:', err);
+        res.status(500).json({ error: "Erro interno no servidor" });
+    }
+}
 }
 
 module.exports = new SoftwareController();

@@ -3,6 +3,22 @@ const router = express.Router();
 const cursosController = require('../controllers/cursosController');
 const cursosContentController = require('../controllers/cursosContentController');
 
+
+router.get('/filtrados', (req, res) => {
+    const categoriaId = req.query.categoria;
+    
+    // Validação básica
+    if (categoriaId && isNaN(parseInt(categoriaId))) {
+        return res.status(400).json({ 
+            success: false,
+            message: 'ID de categoria deve ser um número'
+        });
+    }
+    
+    // Chama o controller normalmente
+    cursosController.buscarCursosPorCategoria(req, res);
+});
+
 // Rotas de conteúdo (colocar primeiro)
 router.get('/com-conteudo', cursosContentController.listCursosComConteudo);
 router.get('/:id/tem-conteudo', cursosContentController.verificarConteudo);
@@ -26,5 +42,9 @@ router.post('/:id/sections', cursosController.createSection);
 
 router.get('/:id/sections', cursosController.getSections);
 router.delete('/content/:tipo/:id', cursosController.deleteContent);
+
+// rota para filtro
+// No cursosRoutes.js, adicione validação
+
 
 module.exports = router;

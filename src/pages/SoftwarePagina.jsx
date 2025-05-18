@@ -5,117 +5,201 @@ import Header from './components/ui/Header';
 
 const SoftwarePagina = () => {
     const [softwares, setSoftwares] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const [categorias, setCategorias] = useState([]);
+    const [categoriaSelecionada, setCategoriaSelecionada] = useState(null);
+    const [loading, setLoading] = useState({
+        softwares: true,
+        categorias: true
+    });
     const [error, setError] = useState(null);
     const navigate = useNavigate();
 
     useEffect(() => {
-        const fetchSoftwares = async () => {
-            try {
-                const response = await fetch('http://localhost:3000/softwares');
-                
-                if (!response.ok) {
-                    throw new Error('Erro ao carregar dados');
-                }
+        // Carrega categorias
+        fetch('http://localhost:3000/categorias')
+            .then(response => {
+                if (!response.ok) throw new Error('Erro ao carregar categorias');
+                return response.json();
+            })
+            .then(data => {
+                const categoriasData = Array.isArray(data) ? data : (data.data || data.result || []);
+                setCategorias(categoriasData);
+                setLoading(prev => ({ ...prev, categorias: false }));
+            })
+            .catch(error => {
+                console.error('Erro ao carregar categorias:', error);
+                setError('Falha ao carregar categorias');
+                setLoading(prev => ({ ...prev, categorias: false }));
+            });
 
-                const data = await response.json();
-                
-                // Garante que sempre será um array
-                setSoftwares(Array.isArray(data) ? data : []);
-            } catch (err) {
-                console.error('Erro ao buscar softwares:', err);
-                setError(err.message);
-                setSoftwares([]);
-            } finally {
-                setLoading(false);
-            }
-        };
-
+        // Carrega softwares iniciais
         fetchSoftwares();
     }, []);
+
+    const fetchSoftwares = (categoriaId = null) => {
+        setLoading(prev => ({ ...prev, softwares: true }));
+        setError(null);
+
+        let url = 'http://localhost:3000/softwares';
+        if (categoriaId) {
+            url += `/filtrados?categoria=${categoriaId}`;
+        }
+
+        fetch(url)
+            .then(response => {
+                if (!response.ok) throw new Error(`Erro HTTP: ${response.status}`);
+                return response.json();
+            })
+            .then(data => {
+                const softwaresData = Array.isArray(data) ? data : (data.data || data.result || []);
+                setSoftwares(softwaresData);
+                setLoading(prev => ({ ...prev, softwares: false }));
+            })
+            .catch(error => {
+                console.error('Erro ao buscar softwares:', error);
+                setError(error.message || 'Erro ao carregar softwares');
+                setSoftwares([]);
+                setLoading(prev => ({ ...prev, softwares: false }));
+            });
+    };
+
+    const handleFiltroCategoria = (categoriaId) => {
+        setCategoriaSelecionada(categoriaId);
+        fetchSoftwares(categoriaId);
+    };
 
     const handleSoftwareClick = (id) => {
         navigate(`/softwares/${id}`);
     };
 
-    if (loading) {
-        return (
-            <div className="container text-center my-5">
-                <div className="spinner-border text-primary" role="status">
-                    <span className="visually-hidden">Carregando...</span>
-                </div>
-                <p>Carregando softwares...</p>
-            </div>
-        );
-    }
-
-    if (error) {
-        return (
-            <div className="container text-center my-5">
-                <div className="alert alert-danger">
-                    <h4>Erro ao carregar softwares</h4>
-                    <p>{error}</p>
-                    <button 
-                        className="btn btn-primary"
-                        onClick={() => window.location.reload()}
-                    >
-                        Tentar novamente
-                    </button>
-                </div>
-            </div>
-        );
-    }
+    const isLoading = loading.softwares || loading.categorias;
 
     return (
         <div className="container-fluid">
-            {/* Cabeçalho */}
             <Header />
 
-            {/* Layout Principal */}
+            {/* Mensagem de erro */}
+            {error && (
+                <div className="alert alert-danger alert-dismissible fade show mt-3">
+                    {error}
+                    <button
+                        type="button"
+                        className="btn-close"
+                        onClick={() => setError(null)}
+                        aria-label="Close"
+                    ></button>
+                </div>
+            )}
+
             <div className="row mt-4">
                 {/* Coluna Lateral: Filtro */}
                 <div className="col-md-3">
-                    <div className="bg-secondary text-white p-3 rounded">
-                        <h5>Filtro</h5>
-                        <p>(Placeholder para filtros)</p>
+                    <div className="card p-3 shadow-sm">
+                        <h5 className="mb-3">Filtrar por Categoria</h5>
+                        {loading.categorias ? (
+                            <div className="text-center py-3">
+                                <div className="spinner-border spinner-border-sm" role="status">
+                                    <span className="visually-hidden">Carregando...</span>
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="list-group">
+                                <button
+                                    className={`list-group-item list-group-item-action ${!categoriaSelecionada ? 'active' : ''}`}
+                                    onClick={() => handleFiltroCategoria(null)}
+                                >
+                                    <i className="bi bi-grid-fill me-2"></i>
+                                    Todas as Categorias
+                                </button>
+                                {categorias.map(categoria => (
+                                    <button
+                                        key={categoria.id_categorias || categoria.id}
+                                        className={`list-group-item list-group-item-action ${categoriaSelecionada === (categoria.id_categorias || categoria.id) ? 'active' : ''}`}
+                                        onClick={() => handleFiltroCategoria(categoria.id_categorias || categoria.id)}
+                                    >
+                                        {categoria.nome || categoria.name}
+                                    </button>
+                                ))}
+                            </div>
+                        )}
                     </div>
                 </div>
 
                 {/* Conteúdo Principal: Softwares */}
                 <div className="col-md-9">
-                    <h2 className="mb-4">Softwares</h2>
-                    
-                    {softwares.length === 0 ? (
-                        <div className="alert alert-info">
-                            Nenhum software encontrado
+                    <div className="d-flex justify-content-between align-items-center mb-4">
+                        <h2 className="mb-0">
+                            {categoriaSelecionada
+                                ? categorias.find(c => (c.id_categorias || c.id) === categoriaSelecionada)?.nome
+                                : 'Todos os Softwares'}
+                        </h2>
+                        {!loading.softwares && (
+                            <span className="badge bg-primary">
+                                {softwares.length} {softwares.length === 1 ? 'software' : 'softwares'}
+                            </span>
+                        )}
+                    </div>
+
+                    {loading.softwares ? (
+                        <div className="text-center py-5">
+                            <div className="spinner-border text-primary" role="status">
+                                <span className="visually-hidden">Carregando...</span>
+                            </div>
                         </div>
                     ) : (
                         <div className="row">
-                            {softwares.map(software => (
-                                <div
-                                    className="col-md-4 mb-4"
-                                    key={software.id_softwares}
-                                    style={{ cursor: 'pointer' }}
-                                    onClick={() => handleSoftwareClick(software.id_softwares)}>
-                                    <div className="card h-100">
-                                        <div className="bg-secondary" style={{ height: '150px' }} />
-                                        <div className="card-body">
-                                            <h5 className="card-title">{software.nome || 'Nome não disponível'}</h5>
-                                            <p className="card-text">{software.desenvolvedor || 'Desenvolvedor não informado'}</p>
+                            {softwares.length > 0 ? (
+                                softwares.map(software => (
+                                    <div 
+                                        className="col-md-4 mb-4" 
+                                        key={software.id_softwares || software.id}
+                                        style={{ cursor: 'pointer' }}
+                                        onClick={() => handleSoftwareClick(software.id_softwares || software.id)}
+                                    >
+                                        <div className="card h-100 shadow-sm hover-shadow transition-all">
+                                            <div className="card-img-top bg-secondary" style={{ height: '150px' }} />
+                                            <div className="card-body d-flex flex-column">
+                                                <div className="d-flex justify-content-between align-items-start">
+                                                    <h5 className="card-title me-2">{software.nome || software.name}</h5>
+                                                    <span className="badge bg-info text-dark text-nowrap flex-shrink-0 align-self-start">
+                                                        {software.nome_categoria || software.categoria}
+                                                    </span>
+                                                </div>
+                                                <p className="card-text text-muted small flex-grow-1">
+                                                    {software.desenvolvedor || 'Desenvolvedor não informado'}
+                                                </p>
+                                                <div className="mt-2">
+                                                    {software.url && (
+                                                        <a href={software.url} target="_blank" rel="noopener noreferrer" className="btn btn-sm btn-outline-primary">
+                                                            Visitar Site
+                                                        </a>
+                                                    )}
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
+                                ))
+                            ) : (
+                                <div className="col-12">
+                                    <div className="alert alert-info">
+                                        {categoriaSelecionada
+                                            ? 'Nenhum software encontrado nesta categoria.'
+                                            : 'Nenhum software disponível no momento.'}
+                                    </div>
                                 </div>
-                            ))}
+                            )}
                         </div>
                     )}
-                    
-                    <button className="btn btn-primary">Ver mais softwares</button>
                 </div>
             </div>
 
-            {/* Footer (mantido igual) */}
+            {/* Footer */}
             <footer className="bg-primary text-light py-4 mt-4">
-                {/* ... conteúdo do footer ... */}
+                <div className="container">
+                    <div className="row">
+                        {/* Colunas do footer mantidas iguais */}
+                    </div>
+                </div>
             </footer>
         </div>
     );

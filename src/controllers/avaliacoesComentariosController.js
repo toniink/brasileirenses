@@ -1,26 +1,62 @@
 const db = require('../config/db');
 
+
 // Listar todas as avaliações e comentários, trazendo nome do usuário e curso associado
 exports.buscarTodasAvaliacoes = (req, res) => {
+    const id_curso = req.query.id_curso; // Novo parâmetro opcional
+    
+    let query = `
+        SELECT 
+            ac.*,
+            u.nome AS nome_usuario,
+            c.nome_curso
+        FROM avaliacoesComentarios ac
+        LEFT JOIN usuarios u ON ac.id_usuario = u.idUsuarios
+        LEFT JOIN cursos c ON ac.id_curso = c.id_cursos
+    `;
+    
+    const params = [];
+    
+    // Filtro por curso se o parâmetro foi fornecido
+    if (id_curso) {
+        query += ' WHERE ac.id_curso = ?';
+        params.push(id_curso);
+    }
+    
+    query += ' ORDER BY ac.data_avaliacao DESC';
+    
+    db.all(query, params, (err, rows) => {
+        if (err) {
+            console.error('Erro ao buscar avaliações:', err);
+            return res.status(500).send('Erro no servidor');
+        }
+        res.json(rows || []);
+    });
+};
+
+// Método alternativo específico para filtrar por curso (mantendo sua nomenclatura)
+exports.buscarAvaliacoesPorCurso = (req, res) => {
+    const id_curso = req.query.id_curso;
+    
+    if (!id_curso) {
+        return res.status(400).send('ID do curso é obrigatório');
+    }
+    
     db.all(
         `SELECT 
-            avaliacoesComentarios.id_comentario,
-            usuarios.nome AS nome_usuario,
-            cursos.nome_curso AS nome_curso,
-            avaliacoesComentarios.comentario,
-            avaliacoesComentarios.nota,
-            avaliacoesComentarios.data_avaliacao
-        FROM avaliacoesComentarios
-        LEFT JOIN usuarios ON avaliacoesComentarios.id_usuario = usuarios.idUsuarios
-        LEFT JOIN cursos ON avaliacoesComentarios.id_curso = cursos.id_cursos`,
-        [],
-        (err, resultados) => {
+            ac.*,
+            u.nome AS nome_usuario
+        FROM avaliacoesComentarios ac
+        LEFT JOIN usuarios u ON ac.id_usuario = u.idUsuarios
+        WHERE ac.id_curso = ?
+        ORDER BY ac.data_avaliacao DESC`,
+        [id_curso],
+        (err, rows) => {
             if (err) {
                 console.error('Erro ao buscar avaliações:', err);
-                res.status(500).send('Erro interno no servidor');
-            } else {
-                res.json(resultados);
+                return res.status(500).send('Erro no servidor');
             }
+            res.json(rows || []);
         }
     );
 };
@@ -110,50 +146,22 @@ exports.excluirAvaliacao = (req, res) => {
     });
 };
 
-// No controller (avaliacoesComentariosController.js)
-exports.buscarAvaliacoesPorCurso = (req, res) => {
-    const id_curso = req.query.id_curso;
-    const page = parseInt(req.query._page) || 1;
-    const limit = parseInt(req.query._limit) || 5;
-    const offset = (page - 1) * limit;
 
-    let query = `SELECT 
-        avaliacoesComentarios.id_comentario,
-        usuarios.nome AS nome_usuario,
-        cursos.nome_curso AS nome_curso,
-        avaliacoesComentarios.comentario,
-        avaliacoesComentarios.nota,
-        avaliacoesComentarios.data_avaliacao
-    FROM avaliacoesComentarios
-    LEFT JOIN usuarios ON avaliacoesComentarios.id_usuario = usuarios.idUsuarios
-    LEFT JOIN cursos ON avaliacoesComentarios.id_curso = cursos.id_cursos`;
-    
-    let countQuery = `SELECT COUNT(*) as total FROM avaliacoesComentarios`;
-    
-    const params = [];
-    
-    if (id_curso) {
-        query += ' WHERE avaliacoesComentarios.id_curso = ?';
-        countQuery += ' WHERE id_curso = ?';
-        params.push(id_curso);
-    }
-    
-    query += ' LIMIT ? OFFSET ?';
-    
-    db.all(query, [...params, limit, offset], (err, resultados) => {
-        if (err) {
-            console.error('Erro ao buscar avaliações:', err);
-            res.status(500).send('Erro interno no servidor');
-        } else {
-            db.get(countQuery, params, (err, countResult) => {
-                if (err) {
-                    console.error('Erro ao contar avaliações:', err);
-                    res.json(resultados);
-                } else {
-                    res.set('X-Total-Count', countResult.total);
-                    res.json(resultados);
-                }
-            });
+// Criar nova avaliação
+exports.criarAvaliacao = (req, res) => {
+    const { id_usuario, id_curso, comentario, nota } = req.body;
+
+    db.run(
+        `INSERT INTO avaliacoesComentarios 
+        (id_usuario, id_curso, comentario, nota) 
+        VALUES (?, ?, ?, ?)`,
+        [id_usuario, id_curso, comentario, nota],
+        function(err) {
+            if (err) {
+                console.error('Erro ao criar avaliação:', err);
+                return res.status(500).send('Erro ao criar avaliação');
+            }
+            res.send('Avaliação criada com sucesso');
         }
-    });
+    );
 };

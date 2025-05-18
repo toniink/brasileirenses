@@ -351,3 +351,51 @@ exports.deleteContent = async (req, res) => {
         });
     }
 };
+
+// No cursosController.js, adicione este novo método
+// No cursosController.js, modifique o método buscarCursosPorCategoria
+exports.buscarCursosPorCategoria = (req, res) => {
+    const categoriaId = req.query.categoria;
+    const id = categoriaId ? parseInt(categoriaId) : null;
+
+    let query = `
+        SELECT 
+            cursos.id_cursos,
+            cursos.nome_curso,
+            cursos.descricao,
+            cursos.duracao,
+            cursos.url,
+            cursos.formato,
+            cursos.nivel_dificuldade,
+            categorias.nome AS nome_categoria,
+            sites.nome AS nome_site
+        FROM cursos
+        LEFT JOIN categorias ON cursos.id_categoria = categorias.id_categorias
+        LEFT JOIN sites ON cursos.id_site = sites.id_site
+    `;
+    
+    const params = [];
+    
+    if (id) {
+        query += ` WHERE cursos.id_categoria = ? OR EXISTS (
+            SELECT 1 FROM categoriasCursos 
+            WHERE categoriasCursos.id_curso = cursos.id_cursos 
+            AND categoriasCursos.id_categoria = ?
+        )`;
+        params.push(id, id);
+    }
+    
+    db.all(query, params, (err, resultados) => {
+        if (err) {
+            console.error('Erro ao buscar cursos:', err);
+            return res.status(500).json({ 
+                success: false,
+                message: 'Erro no servidor'
+            });
+        }
+        res.json({
+            success: true,
+            data: resultados || []
+        });
+    });
+};
