@@ -109,3 +109,51 @@ exports.excluirAvaliacao = (req, res) => {
         }
     });
 };
+
+// No controller (avaliacoesComentariosController.js)
+exports.buscarAvaliacoesPorCurso = (req, res) => {
+    const id_curso = req.query.id_curso;
+    const page = parseInt(req.query._page) || 1;
+    const limit = parseInt(req.query._limit) || 5;
+    const offset = (page - 1) * limit;
+
+    let query = `SELECT 
+        avaliacoesComentarios.id_comentario,
+        usuarios.nome AS nome_usuario,
+        cursos.nome_curso AS nome_curso,
+        avaliacoesComentarios.comentario,
+        avaliacoesComentarios.nota,
+        avaliacoesComentarios.data_avaliacao
+    FROM avaliacoesComentarios
+    LEFT JOIN usuarios ON avaliacoesComentarios.id_usuario = usuarios.idUsuarios
+    LEFT JOIN cursos ON avaliacoesComentarios.id_curso = cursos.id_cursos`;
+    
+    let countQuery = `SELECT COUNT(*) as total FROM avaliacoesComentarios`;
+    
+    const params = [];
+    
+    if (id_curso) {
+        query += ' WHERE avaliacoesComentarios.id_curso = ?';
+        countQuery += ' WHERE id_curso = ?';
+        params.push(id_curso);
+    }
+    
+    query += ' LIMIT ? OFFSET ?';
+    
+    db.all(query, [...params, limit, offset], (err, resultados) => {
+        if (err) {
+            console.error('Erro ao buscar avaliações:', err);
+            res.status(500).send('Erro interno no servidor');
+        } else {
+            db.get(countQuery, params, (err, countResult) => {
+                if (err) {
+                    console.error('Erro ao contar avaliações:', err);
+                    res.json(resultados);
+                } else {
+                    res.set('X-Total-Count', countResult.total);
+                    res.json(resultados);
+                }
+            });
+        }
+    });
+};

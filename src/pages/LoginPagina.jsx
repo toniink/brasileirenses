@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { login } from '../api/auth';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import Header from './components/ui/Header';
 
 const LoginPagina = () => {
   const [email, setEmail] = useState('');
@@ -10,59 +12,35 @@ const LoginPagina = () => {
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
-  e.preventDefault();
-  setErro('');
-  setCarregando(true);
+    e.preventDefault();
+    setErro('');
+    setCarregando(true);
 
-  try {
-    const response = await fetch('http://localhost:3000/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, senha })
-    });
-
-    // Verifica se a resposta é JSON
-    const contentType = response.headers.get('content-type');
-    if (!contentType || !contentType.includes('application/json')) {
-      const text = await response.text();
-      throw new Error(text.includes('<!DOCTYPE html>') 
-        ? 'Endpoint não encontrado (404)' 
-        : text);
+    try {
+      await login(email, senha);
+      navigate('/');
+    } catch (error) {
+      console.error('Erro no login:', error);
+      
+      let mensagemErro = 'Erro no login';
+      if (error.message.includes('404')) {
+        mensagemErro = 'Servidor não encontrado - verifique a URL da API';
+      } else if (error.message.includes('Credenciais inválidas')) {
+        mensagemErro = 'E-mail ou senha incorretos';
+      } else if (error.message) {
+        mensagemErro = error.message;
+      }
+      
+      setErro(mensagemErro);
+    } finally {
+      setCarregando(false);
     }
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.message || 'Erro no login');
-    }
-
-    localStorage.setItem('usuario', JSON.stringify(data.usuario));
-    navigate('/');
-
-  } catch (error) {
-    console.error('Erro completo:', error);
-    setErro(error.message.includes('404') 
-      ? 'Servidor não encontrado - verifique a URL da API'
-      : error.message);
-  } finally {
-    setCarregando(false);
-  }
-};
+  };
 
   return (
     <div>
       {/* Cabeçalho */}
-      <header className="bg-light py-3">
-        <div className="container">
-          <div className="d-flex justify-content-between align-items-center">
-            <nav className="d-flex gap-3">
-              <Link to="/" className="btn btn-link">HOME</Link>
-              <Link to="/cursos" className="btn btn-link">CURSOS</Link>
-            </nav>
-            <Link to="/cadastro" className="btn btn-outline-primary">Criar Conta</Link>
-          </div>
-        </div>
-      </header>
+      <Header/>
 
       {/* Formulário de Login */}
       <main className="container mt-5">

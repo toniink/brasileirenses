@@ -7,7 +7,8 @@ router.get('/', avaliacoesComentariosController.buscarTodasAvaliacoes);
 
 // Rota para criar nova avaliação/comentário
 router.post('/', avaliacoesComentariosController.criarAvaliacao);
-
+// No routes (avaliacoesComentariosRoutes.js)
+router.get('/', avaliacoesComentariosController.buscarAvaliacoesPorCurso);
 // Rota para buscar avaliação por ID e trazer usuário e curso associados
 router.get('/:id', avaliacoesComentariosController.buscarAvaliacaoPorId);
 

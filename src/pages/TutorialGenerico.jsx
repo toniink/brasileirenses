@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
+import Header from './components/ui/Header';
 import { 
   Container, 
   Spinner, 
@@ -204,6 +205,7 @@ const TutorialGenerico = () => {
 
     return (
         <Container fluid className="px-0">
+            <Header />
             {/* Cabeçalho */}
             <div className="bg-primary text-white py-4 shadow">
                 <Container>

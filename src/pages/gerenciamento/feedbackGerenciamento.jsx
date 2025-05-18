@@ -96,7 +96,34 @@ function FeedbackPagina() {
           </div>
 
 
-          
+          <div className="mb-3">
+            <label className="form-label">Como você avalia o site?</label>
+            <div className="d-flex gap-3">
+              <button
+                type="button"
+                className={`btn ${formData.tipo_feedback === 'otimo' ? 'btn-success' : 'btn-outline-success'}`}
+                onClick={() => setFormData({ ...formData, tipo_feedback: 'otimo' })}
+              >
+                😊 Ótimo
+              </button>
+
+              <button
+                type="button"
+                className={`btn ${formData.tipo_feedback === 'razoavel' ? 'btn-warning' : 'btn-outline-warning'}`}
+                onClick={() => setFormData({ ...formData, tipo_feedback: 'razoavel' })}
+              >
+                😐 Razoável
+              </button>
+
+              <button
+                type="button"
+                className={`btn ${formData.tipo_feedback === 'ruim' ? 'btn-danger' : 'btn-outline-danger'}`}
+                onClick={() => setFormData({ ...formData, tipo_feedback: 'ruim' })}
+              >
+                🙁 Ruim
+              </button>
+            </div>
+          </div>
 
 
           <div className="mb-3 mt-4">
@@ -117,6 +144,33 @@ function FeedbackPagina() {
         </form>
       </div>
 
+
+      <h4 className="mb-3">Feedbacks Recebidos</h4>
+
+      {feedbacks.length === 0 ? (
+        <p>Nenhum feedback ainda. Seja o primeiro!</p>
+      ) : (
+        <div className="row">
+          {feedbacks.map((fb) => (
+            <div className="col-md-6 mb-3" key={fb.id_feedback}>
+              <div className={`card border-${getBadgeColor(fb.tipo_feedback)}`}>
+                <div className="card-body">
+                  <h5 className="card-title">
+                    <span className={`badge bg-${getBadgeColor(fb.tipo_feedback)} me-2`}>
+                      {fb.tipo_feedback.toUpperCase()}
+                    </span>
+                    {fb.email}
+                  </h5>
+                  <p className="card-text">{fb.mensagem || '(Sem mensagem)'}</p>
+                  <p className="text-muted mb-0" style={{ fontSize: '0.8rem' }}>
+                    {new Date(fb.data_feedback).toLocaleDateString()}
+                  </p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
     </div>
   );

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import Header from './components/ui/Header';
 
 const CadastroPagina = () => {
   const [nome, setNome] = useState('');
@@ -31,17 +32,7 @@ const CadastroPagina = () => {
   return (
     <div>
       {/* Cabeçalho igual ao da Home */}
-      <header className="bg-light py-3">
-        <div className="container">
-          <div className="d-flex justify-content-between align-items-center">
-            <nav className="d-flex gap-3">
-              <Link to="/" className="btn btn-link">HOME</Link>
-              <Link to="/cursos" className="btn btn-link">CURSOS</Link>
-            </nav>
-            <Link to="/login" className="btn btn-outline-primary">Fazer Login</Link>
-          </div>
-        </div>
-      </header>
+     <Header />
 
       {/* Formulário de Cadastro */}
       <main className="container mt-5">

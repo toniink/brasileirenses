@@ -3,6 +3,9 @@ const router = express.Router();
 
 const usuariosController = require('../controllers/usuariosController');
 
+router.post('/login', usuariosController.loginUsuario);
+router.post('/logout', usuariosController.verifyToken, usuariosController.logout);
+router.get('/current', usuariosController.verifyToken, usuariosController.getCurrentUser);
 // Rota para listar todos os usuários
 router.get('/', usuariosController.getAllUsuarios);
 
@@ -18,6 +21,6 @@ router.put('/:id', usuariosController.updateUsuario);
 // Rota para deletar um usuário
 router.delete('/:id', usuariosController.deleteUsuario);
 
-router.post('/login', usuariosController.loginUsuario);
+
 
 module.exports = router;

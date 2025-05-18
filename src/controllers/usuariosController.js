@@ -1,10 +1,12 @@
-const db = require('../config/db'); // Importa o banco
-const bcrypt = require('bcrypt');
-const saltRounds = 10;
+const db = require('../config/db');
+const jwt = require('jsonwebtoken');
+
+const JWT_SECRET = 'seuSegredoSuperSecreto';
+const JWT_EXPIRES_IN = '1d';
 
 // Listar todos os usuários
 exports.getAllUsuarios = (req, res) => {
-  db.all('SELECT * FROM usuarios', [], (err, results) => {
+  db.all('SELECT id, nome, email FROM usuarios', [], (err, results) => {
     if (err) {
       console.error('Erro ao buscar usuários:', err);
       res.status(500).send('Erro interno');
@@ -14,31 +16,28 @@ exports.getAllUsuarios = (req, res) => {
   });
 };
 
-// Criar novo usuário
-exports.createUsuario = async (req, res) => {
+// Criar novo usuário (sem bcrypt)
+exports.createUsuario = (req, res) => {
   const { nome, email, senha } = req.body;
 
-  try {
-    const hashSenha = await bcrypt.hash(senha, saltRounds);
-    db.run('INSERT INTO usuarios (nome, email, senha) VALUES (?, ?, ?)', [nome, email, hashSenha], function (err) {
+  db.run('INSERT INTO usuarios (nome, email, senha) VALUES (?, ?, ?)', 
+    [nome, email, senha], 
+    function(err) {
       if (err) {
         console.error('Erro ao inserir usuário:', err);
         res.status(500).send('Erro interno');
       } else {
         res.status(201).json({ id: this.lastID, nome, email });
       }
-    });
-  } catch (error) {
-    console.error('Erro ao criar hash da senha:', error);
-    res.status(500).send('Erro ao processar senha');
-  }
+    }
+  );
 };
 
 // Buscar um usuário por ID
 exports.getUsuarioById = (req, res) => {
   const usuarioID = req.params.id;
 
-  db.get('SELECT * FROM usuarios WHERE id = ?', [usuarioID], (err, row) => {
+  db.get('SELECT id, nome, email FROM usuarios WHERE id = ?', [usuarioID], (err, row) => {
     if (err) {
       res.status(500).send('Erro no servidor');
     } else if (!row) {
@@ -49,38 +48,38 @@ exports.getUsuarioById = (req, res) => {
   });
 };
 
-// Atualizar um usuário
-exports.updateUsuario = async (req, res) => {
+// Atualizar um usuário (sem bcrypt)
+exports.updateUsuario = (req, res) => {
   const usuarioID = req.params.id;
   const { nome, email, senha } = req.body;
 
-  try {
-    let senhaFinal = senha;
-    if (senha) {
-      senhaFinal = await bcrypt.hash(senha, saltRounds);
-    }
-
-    db.run('UPDATE usuarios SET nome = ?, email = ?, senha = ? WHERE id = ?', [nome, email, senhaFinal, usuarioID], function (err) {
-      if (err) {
-        console.error('Erro ao atualizar usuário:', err);
-        res.status(500).send('Erro interno');
-      } else if (this.changes === 0) {
-        res.status(404).send('Usuário não encontrado');
-      } else {
-        res.send('Usuário atualizado com sucesso!');
-      }
-    });
-  } catch (error) {
-    console.error('Erro ao criar hash da senha:', error);
-    res.status(500).send('Erro ao processar senha');
+  let query, params;
+  
+  if (senha) {
+    query = 'UPDATE usuarios SET nome = ?, email = ?, senha = ? WHERE id = ?';
+    params = [nome, email, senha, usuarioID];
+  } else {
+    query = 'UPDATE usuarios SET nome = ?, email = ? WHERE id = ?';
+    params = [nome, email, usuarioID];
   }
+
+  db.run(query, params, function(err) {
+    if (err) {
+      console.error('Erro ao atualizar usuário:', err);
+      res.status(500).send('Erro interno');
+    } else if (this.changes === 0) {
+      res.status(404).send('Usuário não encontrado');
+    } else {
+      res.send('Usuário atualizado com sucesso!');
+    }
+  });
 };
 
 // Deletar um usuário
 exports.deleteUsuario = (req, res) => {
   const usuarioID = req.params.id;
 
-  db.run('DELETE FROM usuarios WHERE id = ?', [usuarioID], function (err) {
+  db.run('DELETE FROM usuarios WHERE id = ?', [usuarioID], function(err) {
     if (err) {
       console.error('Erro ao deletar usuário:', err);
       res.status(500).send('Erro interno no servidor');
@@ -92,12 +91,10 @@ exports.deleteUsuario = (req, res) => {
   });
 };
 
-
-// Exemplo para o método de login
-exports.loginUsuario = async (req, res) => {
+// Login simplificado (sem bcrypt)
+exports.loginUsuario = (req, res) => {
   const { email, senha } = req.body;
 
-  // Validação básica dos campos
   if (!email || !senha) {
     return res.status(400).json({ 
       success: false, 
@@ -105,9 +102,10 @@ exports.loginUsuario = async (req, res) => {
     });
   }
 
-  try {
-    // 1. Busca o usuário no banco
-    db.get('SELECT * FROM usuarios WHERE email = ?', [email], async (err, usuario) => {
+  // Busca o usuário no banco
+  db.get('SELECT * FROM usuarios WHERE email = ? AND senha = ?', 
+    [email, senha], 
+    (err, usuario) => {
       if (err) {
         console.error('Erro no banco de dados:', err);
         return res.status(500).json({ 
@@ -116,7 +114,6 @@ exports.loginUsuario = async (req, res) => {
         });
       }
 
-      // 2. Verifica se o usuário existe
       if (!usuario) {
         return res.status(401).json({ 
           success: false, 
@@ -124,37 +121,72 @@ exports.loginUsuario = async (req, res) => {
         });
       }
 
-      // 3. Compara a senha com bcrypt
-      try {
-        const senhaValida = await bcrypt.compare(senha, usuario.senha);
-        if (!senhaValida) {
-          return res.status(401).json({ 
-            success: false, 
-            message: "E-mail ou senha incorretos" 
-          });
-        }
+      // Cria token JWT
+      const token = jwt.sign(
+        { id: usuario.id, email: usuario.email },
+        JWT_SECRET,
+        { expiresIn: JWT_EXPIRES_IN }
+      );
 
-        // 4. Retorna os dados do usuário (sem a senha)
-        const { senha: _, ...usuarioSemSenha } = usuario;
-        res.status(200).json({ 
-          success: true, 
-          usuario: usuarioSemSenha 
-        });
+      // Remove a senha do objeto de retorno
+      const { senha: _, ...usuarioSemSenha } = usuario;
+      
+      res.status(200).json({ 
+        success: true, 
+        usuario: usuarioSemSenha,
+        token
+      });
+    }
+  );
+};
 
-      } catch (bcryptError) {
-        console.error('Erro ao comparar senhas:', bcryptError);
-        res.status(500).json({ 
-          success: false, 
-          message: "Erro durante a autenticação" 
-        });
-      }
-    });
-
-  } catch (error) {
-    console.error('Erro geral no login:', error);
-    res.status(500).json({ 
+// Middleware de verificação de token
+exports.verifyToken = (req, res, next) => {
+  const token = req.headers['authorization']?.split(' ')[1];
+  
+  if (!token) {
+    return res.status(401).json({ 
       success: false, 
-      message: "Erro interno no servidor" 
+      message: "Token não fornecido" 
     });
   }
+
+  jwt.verify(token, JWT_SECRET, (err, decoded) => {
+    if (err) {
+      return res.status(401).json({ 
+        success: false, 
+        message: "Token inválido ou expirado" 
+      });
+    }
+    
+    req.userId = decoded.id;
+    next();
+  });
+};
+
+// Obter usuário atual
+exports.getCurrentUser = (req, res) => {
+  const userId = req.userId;
+  
+  db.get('SELECT id, nome, email FROM usuarios WHERE id = ?', 
+    [userId], 
+    (err, usuario) => {
+      if (err || !usuario) {
+        return res.status(404).json({ 
+          success: false, 
+          message: "Usuário não encontrado" 
+        });
+      }
+      res.json({ success: true, usuario });
+    }
+  );
+};
+
+// Adicione a função logout que estava faltando
+exports.logout = (req, res) => {
+  // Esta é uma implementação básica - o logout real é feito no cliente removendo o token
+  res.json({ 
+    success: true, 
+    message: "Logout realizado com sucesso (client-side)" 
+  });
 };

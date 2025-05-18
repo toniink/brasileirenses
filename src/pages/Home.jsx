@@ -1,29 +1,12 @@
 import React from 'react';
 import { Link } from 'react-router-dom'; // Importa o Link do React Router
 import 'bootstrap/dist/css/bootstrap.min.css'; // Importa os estilos do Bootstrap
+import Header from './components/ui/Header';
 
 const HomePage = () => (
-    <div>
+    <div className="container-fluid">
         {/* Cabeçalho */}
-        <header className="bg-light py-3">
-            <div className="container">
-                <div className="d-flex justify-content-between align-items-center">
-                    {/* Navegação no Header */}
-                    <nav className="d-flex gap-3">
-                        <Link to="/" className="btn btn-link">HOME</Link>
-                        <Link to="/cursos" className="btn btn-link">CURSOS</Link>
-                        <Link to="/softwares" className="btn btn-link">PROGRAMAS</Link>
-                        <button className="btn btn-link">CATEGORIAS</button>
-                        <button className="btn btn-link">CONTATO</button>
-                    </nav>
-                    {/* Botão de Login */}
-                    <button className="btn btn-primary">
-                        <Link to="/login" className='text-white text-decoration-none'>Fazer Login</Link>
-                       
-                        </button>
-                </div>
-            </div>
-        </header>
+        <Header />
 
         {/* Conteúdo Principal */}
         <main className="container mt-4">
@@ -37,7 +20,8 @@ const HomePage = () => (
     </p>
     <Link to="/cursos" className="btn btn-primary mb-3">IR AOS CURSOS</Link>
     <br />
-    <button className="btn btn-link text-primary">Tem dúvidas? Veja nosso suporte</button>
+        <Link to="/faq" className="btn btn-link text-primary">Tem dúvidas? Veja nosso suporte</Link>
+   
   </div>
   <div className="col-md-6 col-sm-12 text-end">
     <img
@@ -175,7 +159,8 @@ const HomePage = () => (
                         <p>
                             Precisa falar com a gente?<br />
                             Entre em contato usando nosso formulário!<br />
-                            <button className="btn btn-link text-light text-decoration-underline">Clique aqui</button>
+                            <Link to="/feedback" className="btn btn-link text-light text-decoration-underline">Clique aqui</Link>
+                            
                         </p>
                     </div>
 
@@ -196,7 +181,8 @@ const HomePage = () => (
                         <p>
                             Queremos ouvir você!<br />
                             Compartilhe sua opinião preenchendo nosso formulário.<br />
-                            <button className="btn btn-link text-light text-decoration-underline">Envie aqui</button>
+                            <Link to="/feedback" className="btn btn-link text-light text-decoration-underline">Envie aqui</Link>
+                           
                         </p>
                     </div>
 

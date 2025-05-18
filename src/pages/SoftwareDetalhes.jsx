@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import Header from './components/ui/Header';
 
 const SoftwareDetalhes = () => {
     const { id } = useParams();
@@ -157,18 +158,7 @@ const SoftwareDetalhes = () => {
     return (
         <div className="container-fluid">
             {/* Cabeçalho */}
-            <header className="bg-light py-3">
-                <div className="container d-flex justify-content-between align-items-center">
-                    <nav className="d-flex gap-3">
-                        <Link to="/" className="btn btn-link">HOME</Link>
-                        <Link to="/cursos" className="btn btn-link">CURSOS</Link>
-                        <Link to="/softwares" className="btn btn-link">PROGRAMAS</Link>
-                        <button className="btn btn-link">CATEGORIAS</button>
-                        <button className="btn btn-link">CONTATO</button>
-                    </nav>
-                    <button className="btn btn-primary">Fazer Login</button>
-                </div>
-            </header>
+            <Header/>
 
             <div className="row mt-4">
                 <div className="col-md-3">
