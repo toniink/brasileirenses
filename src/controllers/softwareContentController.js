@@ -128,5 +128,104 @@ module.exports = {
             }
             res.json({ temConteudo: !!row });
         });
+    },
+
+    // Atualizar conteúdo de um software
+updateSoftwareContent: (req, res) => {
+    const softwareId = Number(req.params.id);
+    const { secoes } = req.body;
+
+    if (isNaN(softwareId)) {
+        return res.status(400).json({ error: 'ID inválido' });
     }
+
+    if (!secoes || !Array.isArray(secoes)) {
+        return res.status(400).json({ error: 'Dados de seções inválidos' });
+    }
+
+    db.serialize(() => {
+        db.run("BEGIN TRANSACTION");
+        
+        // Verifica se o software existe
+        db.get("SELECT 1 FROM softwares WHERE id_softwares = ?", [softwareId], (err, row) => {
+            if (err) {
+                db.run("ROLLBACK");
+                console.error('Erro ao verificar software:', err);
+                return res.status(500).json({ error: 'Erro interno' });
+            }
+            
+            if (!row) {
+                db.run("ROLLBACK");
+                return res.status(404).json({ error: 'Software não encontrado' });
+            }
+
+            // Processa cada seção
+            const updatePromises = secoes.map(secao => {
+                return new Promise((resolve, reject) => {
+                    // Verifica se a seção existe
+                    db.get(
+                        "SELECT 1 FROM software_secoes WHERE id_secao = ? AND id_software = ?",
+                        [secao.id_secao, softwareId],
+                        (err, secRow) => {
+                            if (err) return reject(err);
+                            if (!secRow) return reject(new Error(`Seção ${secao.id_secao} não encontrada`));
+                            
+                            // Atualiza cada conteúdo da seção
+                            const contentPromises = secao.conteudos.map(conteudo => {
+                                return new Promise((resolve, reject) => {
+                                    let query, params;
+                                    
+                                    switch(secao.tipo) {
+                                        case 'titulo':
+                                            query = "UPDATE software_conteudo_titulo SET texto = ? WHERE id_titulo = ?";
+                                            params = [conteudo.texto, conteudo.id];
+                                            break;
+                                        case 'paragrafo':
+                                            query = "UPDATE software_conteudo_paragrafo SET texto = ? WHERE id_paragrafo = ?";
+                                            params = [conteudo.texto, conteudo.id];
+                                            break;
+                                        case 'area_atuacao':
+                                            query = "UPDATE software_conteudo_area_atuacao SET titulo = ?, descricao = ? WHERE id_area = ?";
+                                            params = [conteudo.titulo, conteudo.descricao, conteudo.id];
+                                            break;
+                                        case 'lista':
+                                            query = "UPDATE software_conteudo_lista SET item = ? WHERE id_item = ?";
+                                            params = [conteudo.texto, conteudo.id];
+                                            break;
+                                        default:
+                                            return reject(new Error(`Tipo de seção inválido: ${secao.tipo}`));
+                                    }
+
+                                    db.run(query, params, function(err) {
+                                        if (err) return reject(err);
+                                        if (this.changes === 0) {
+                                            console.warn(`Nenhum conteúdo atualizado para ID ${conteudo.id} (tipo: ${secao.tipo})`);
+                                        }
+                                        resolve();
+                                    });
+                                });
+                            });
+
+                            Promise.all(contentPromises)
+                                .then(resolve)
+                                .catch(reject);
+                        }
+                    );
+                });
+            });
+
+            Promise.all(updatePromises)
+                .then(() => {
+                    db.run("COMMIT");
+                    res.json({ success: true, message: 'Conteúdo atualizado com sucesso' });
+                })
+                .catch(err => {
+                    db.run("ROLLBACK");
+                    console.error('Erro ao atualizar conteúdo:', err);
+                    res.status(500).json({ error: err.message || 'Erro ao atualizar conteúdo' });
+                });
+        });
+    });
+}
+
 };

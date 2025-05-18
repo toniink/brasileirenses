@@ -111,5 +111,107 @@ module.exports = {
             }
             res.json({ temConteudo: !!row });
         });
+    },
+
+    // Atualizar conteúdo de um curso (novo método)
+updateCourseContent: (req, res) => {
+    const cursoId = Number(req.params.id);
+    const { secoes } = req.body;
+
+    if (isNaN(cursoId)) {
+        return res.status(400).json({ error: 'ID inválido' });
     }
+
+    if (!secoes || !Array.isArray(secoes)) {
+        return res.status(400).json({ error: 'Dados de seções inválidos' });
+    }
+
+    db.serialize(() => {
+        db.run("BEGIN TRANSACTION");
+        
+        // Primeiro verifica se o curso existe
+        db.get("SELECT 1 FROM cursos WHERE id_cursos = ?", [cursoId], (err, row) => {
+            if (err) {
+                db.run("ROLLBACK");
+                console.error('Erro ao verificar curso:', err);
+                return res.status(500).json({ error: 'Erro interno' });
+            }
+            
+            if (!row) {
+                db.run("ROLLBACK");
+                return res.status(404).json({ error: 'Curso não encontrado' });
+            }
+
+            // Processa cada seção
+            const updatePromises = secoes.map(secao => {
+                return new Promise((resolve, reject) => {
+                    // Verifica se a seção existe
+                    db.get(
+                        "SELECT 1 FROM curso_secoes WHERE id_secao_curso = ? AND id_curso = ?",
+                        [secao.id_secao_curso, cursoId],
+                        (err, secRow) => {
+                            if (err) return reject(err);
+                            if (!secRow) return reject(new Error(`Seção ${secao.id_secao_curso} não encontrada`));
+                            
+                            // Atualiza cada conteúdo da seção
+                            const contentPromises = secao.conteudos.map(conteudo => {
+                                return new Promise((resolve, reject) => {
+                                    let query, params;
+                                    
+                                    switch(secao.tipo) {
+                                        case 'titulo':
+                                            query = "UPDATE curso_conteudo_titulo SET texto = ? WHERE id_titulo_curso = ?";
+                                            params = [conteudo.texto, conteudo.id];
+                                            break;
+                                        case 'paragrafo':
+                                            query = "UPDATE curso_conteudo_paragrafo SET texto = ? WHERE id_paragrafo_curso = ?";
+                                            params = [conteudo.texto, conteudo.id];
+                                            break;
+                                        case 'area_atuacao':
+                                            query = "UPDATE curso_conteudo_area_atuacao SET titulo = ?, descricao = ? WHERE id_area_curso = ?";
+                                            params = [conteudo.titulo, conteudo.descricao, conteudo.id];
+                                            break;
+                                        case 'lista':
+                                            query = "UPDATE curso_conteudo_lista SET item = ? WHERE id_item_curso = ?";
+                                            params = [conteudo.texto, conteudo.id];
+                                            break;
+                                        case 'passo_a_passo':
+                                            query = "UPDATE curso_conteudo_passo SET instrucao = ?, imagem = ? WHERE id_passo_curso = ?";
+                                            params = [conteudo.instrucao, conteudo.imagem, conteudo.id];
+                                            break;
+                                        default:
+                                            return reject(new Error(`Tipo de seção inválido: ${secao.tipo}`));
+                                    }
+
+                                    db.run(query, params, function(err) {
+                                        if (err) return reject(err);
+                                        if (this.changes === 0) {
+                                            console.warn(`Nenhum conteúdo atualizado para ID ${conteudo.id} (tipo: ${secao.tipo})`);
+                                        }
+                                        resolve();
+                                    });
+                                });
+                            });
+
+                            Promise.all(contentPromises)
+                                .then(resolve)
+                                .catch(reject);
+                        }
+                    );
+                });
+            });
+
+            Promise.all(updatePromises)
+                .then(() => {
+                    db.run("COMMIT");
+                    res.json({ success: true, message: 'Conteúdo atualizado com sucesso' });
+                })
+                .catch(err => {
+                    db.run("ROLLBACK");
+                    console.error('Erro ao atualizar conteúdo:', err);
+                    res.status(500).json({ error: err.message || 'Erro ao atualizar conteúdo' });
+                });
+        });
+    });
+}
 };

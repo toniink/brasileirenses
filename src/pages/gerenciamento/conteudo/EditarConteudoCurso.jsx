@@ -12,35 +12,35 @@ import {
 } from 'react-bootstrap';
 import { ArrowLeft, Save } from 'react-bootstrap-icons';
 
-const EditarConteudoSoftware = () => {
+const EditarConteudoCurso = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [software, setSoftware] = useState(null);
+  const [curso, setCurso] = useState(null);
   const [secoes, setSecoes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [modificacoes, setModificacoes] = useState(false);
 
-  // Carregar dados do software
+  // Carregar dados do curso
   useEffect(() => {
     const carregarDados = async () => {
       try {
         setLoading(true);
         setError(null);
         
-        // Buscar dados do software
-        const [softwareRes, conteudoRes] = await Promise.all([
-          fetch(`http://localhost:3000/softwares/${id}`),
-          fetch(`http://localhost:3000/softwares/${id}/content`)
+        // Buscar dados do curso
+        const [cursoRes, conteudoRes] = await Promise.all([
+          fetch(`http://localhost:3000/cursos/${id}`),
+          fetch(`http://localhost:3000/cursos/${id}/content`)
         ]);
 
-        if (!softwareRes.ok) throw new Error("Software não encontrado");
+        if (!cursoRes.ok) throw new Error("Curso não encontrado");
         if (!conteudoRes.ok) throw new Error("Erro ao buscar conteúdo");
 
-        const softwareData = await softwareRes.json();
+        const cursoData = await cursoRes.json();
         const conteudoData = await conteudoRes.json();
 
-        setSoftware(softwareData);
+        setCurso(cursoData);
         setSecoes(conteudoData);
         
       } catch (err) {
@@ -65,32 +65,32 @@ const EditarConteudoSoftware = () => {
   // Salvar alterações
   const salvarAlteracoes = async () => {
     try {
-      setLoading(true);
-      
-      const response = await fetch(`http://localhost:3000/softwares/${id}/content`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ secoes })
-      });
+        setLoading(true);
+        
+        const response = await fetch(`http://localhost:3000/cursos/${id}/content`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ secoes })
+        });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Erro ao salvar alterações');
-      }
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Erro ao salvar alterações');
+        }
 
-      const result = await response.json();
-      setModificacoes(false);
-      alert(result.message || 'Alterações salvas com sucesso!');
-      
+        const result = await response.json();
+        setModificacoes(false);
+        alert(result.message || 'Alterações salvas com sucesso!');
+        
     } catch (err) {
-      console.error("Erro ao salvar:", err);
-      setError(err.message);
+        console.error("Erro ao salvar:", err);
+        setError(err.message);
     } finally {
-      setLoading(false);
+        setLoading(false);
     }
-  };
+};
 
   // Renderizar conteúdo baseado no tipo
   const renderConteudo = (secao, secaoIndex) => {
@@ -144,11 +144,11 @@ const EditarConteudoSoftware = () => {
     });
   };
 
-  if (loading && !software) {
+  if (loading && !curso) {
     return (
       <Container className="text-center py-5">
         <Spinner animation="border" />
-        <p>Carregando conteúdo do software...</p>
+        <p>Carregando conteúdo do curso...</p>
       </Container>
     );
   }
@@ -173,13 +173,13 @@ const EditarConteudoSoftware = () => {
         <Button variant="outline-secondary" onClick={() => navigate(-1)}>
           <ArrowLeft className="me-2" /> Voltar
         </Button>
-        <h2>Editando: {software?.nome}</h2>
+        <h2>Editando: {curso?.nome_curso}</h2>
       </div>
       
       {error && <Alert variant="danger">{error}</Alert>}
       
       {secoes.map((secao, index) => (
-        <Card key={secao.id_secao} className="mb-4">
+        <Card key={secao.id_secao_curso} className="mb-4">
           <Card.Header className="d-flex align-items-center">
             <Badge bg="secondary" className="me-2">{secao.ordem}</Badge>
             <span className="text-capitalize fw-bold">{secao.tipo}</span>
@@ -218,4 +218,4 @@ const EditarConteudoSoftware = () => {
   );
 };
 
-export default EditarConteudoSoftware;
+export default EditarConteudoCurso;

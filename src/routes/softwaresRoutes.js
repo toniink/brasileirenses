@@ -22,5 +22,6 @@ router.get('/:id/sections', SoftwareController.getSections);
 router.delete('/content/:type/:id', SoftwareController.deleteContent);
 router.delete('/:id/conteudo', softwareContentController.deleteOnlyContent);
 router.get('/:id/tem-conteudo', softwareContentController.verificarConteudo);
+router.put('/:id/content', softwareContentController.updateSoftwareContent);
 
 module.exports = router;

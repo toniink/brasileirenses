@@ -157,7 +157,7 @@ const TutoriaisLista = () => {
                       <td className="text-center">
                         <Button
                           as={Link}
-                          to={`/gerenciamento/conteudo/tutoriais/editar/${tutorial.id_tutorial}`}
+                          to={`/gerenciamento/conteudo/tutoriais/editar-conteudo/${tutorial.id_tutorial}`}
                           variant="outline-primary"
                           size="sm"
                           className="me-2"

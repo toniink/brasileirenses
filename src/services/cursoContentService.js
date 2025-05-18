@@ -394,6 +394,94 @@ class CursoContentService {
       });
     });
   }
+
+static async updateCourseContent(id_curso, secoes) {
+    return new Promise((resolve, reject) => {
+        db.serialize(() => {
+            db.run("BEGIN TRANSACTION");
+
+            // Verificar se o curso existe
+            db.get("SELECT 1 FROM cursos WHERE id_cursos = ?", [id_curso], (err, row) => {
+                if (err) {
+                    db.run("ROLLBACK");
+                    return reject(err);
+                }
+                
+                if (!row) {
+                    db.run("ROLLBACK");
+                    return reject(new Error('Curso não encontrado'));
+                }
+
+                // Processar cada seção
+                const updatePromises = secoes.map(secao => {
+                    return new Promise((resolve, reject) => {
+                        // Verificar se a seção existe e pertence ao curso
+                        db.get(
+                            "SELECT 1 FROM curso_secoes WHERE id_secao_curso = ? AND id_curso = ?",
+                            [secao.id_secao_curso, id_curso],
+                            (err, secRow) => {
+                                if (err) return reject(err);
+                                if (!secRow) return reject(new Error(`Seção ${secao.id_secao_curso} não encontrada`));
+                                
+                                // Atualizar cada conteúdo
+                                const contentPromises = secao.conteudos.map(conteudo => {
+                                    return new Promise((resolve, reject) => {
+                                        let query, params;
+                                        
+                                        switch(secao.tipo) {
+                                            case 'titulo':
+                                                query = "UPDATE curso_conteudo_titulo SET texto = ? WHERE id_titulo_curso = ?";
+                                                params = [conteudo.texto, conteudo.id];
+                                                break;
+                                            case 'paragrafo':
+                                                query = "UPDATE curso_conteudo_paragrafo SET texto = ? WHERE id_paragrafo_curso = ?";
+                                                params = [conteudo.texto, conteudo.id];
+                                                break;
+                                            case 'area_atuacao':
+                                                query = "UPDATE curso_conteudo_area_atuacao SET titulo = ?, descricao = ? WHERE id_area_curso = ?";
+                                                params = [conteudo.titulo, conteudo.descricao, conteudo.id];
+                                                break;
+                                            case 'lista':
+                                                query = "UPDATE curso_conteudo_lista SET item = ? WHERE id_item_curso = ?";
+                                                params = [conteudo.texto, conteudo.id];
+                                                break;
+                                            case 'passo_a_passo':
+                                                query = "UPDATE curso_conteudo_passo SET instrucao = ?, imagem = ? WHERE id_passo_curso = ?";
+                                                params = [conteudo.instrucao, conteudo.imagem, conteudo.id];
+                                                break;
+                                            default:
+                                                return reject(new Error(`Tipo de seção inválido: ${secao.tipo}`));
+                                        }
+
+                                        db.run(query, params, function(err) {
+                                            if (err) return reject(err);
+                                            resolve();
+                                        });
+                                    });
+                                });
+
+                                Promise.all(contentPromises)
+                                    .then(resolve)
+                                    .catch(reject);
+                            }
+                        );
+                    });
+                });
+
+                Promise.all(updatePromises)
+                    .then(() => {
+                        db.run("COMMIT");
+                        resolve({ success: true, message: 'Conteúdo atualizado com sucesso' });
+                    })
+                    .catch(err => {
+                        db.run("ROLLBACK");
+                        reject(err);
+                    });
+            });
+        });
+    });
+}
+
 }
 
 module.exports = CursoContentService;

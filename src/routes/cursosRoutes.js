@@ -7,6 +7,7 @@ const cursosContentController = require('../controllers/cursosContentController'
 router.get('/com-conteudo', cursosContentController.listCursosComConteudo);
 router.get('/:id/tem-conteudo', cursosContentController.verificarConteudo);
 router.delete('/:id/conteudo', cursosContentController.deleteOnlyContent);
+router.put('/:id/content', cursosContentController.updateCourseContent);
 
 // Rotas CRUD básicas
 router.get('/', cursosController.buscarTodosCursos);

@@ -20,6 +20,7 @@ const GerenciarCurso = lazy(() => import('./pages/gerenciamento/conteudo/Gerenci
 const ConteudoGerenciamento = lazy(() => import('./pages/gerenciamento/ConteudoGerenciamento'));
 import ListaConteudos from './pages/gerenciamento/conteudo/ListaConteudos';
 const EditarConteudo = lazy(() => import('./pages/gerenciamento/EditarConteudo'))
+const EditarConteudoCurso = lazy(() => import('./pages/gerenciamento/conteudo/EditarConteudoCurso'))
 const EditarConteudoSoftware = lazy(() => import('./pages/gerenciamento/conteudo/EditarConteudoSoftware'))
 const EditarConteudoTutorial = lazy(() => import('./pages/gerenciamento/conteudo/EditarConteudoTutorial'))
 const TutoriaisLista = lazy(()=> import('./pages/gerenciamento/conteudo/ListaTutoriais'))
@@ -70,6 +71,7 @@ const App = () => (
                 <Route path="gerenciamento/conteudo/softwares/novo" element={<GerenciarSoftware />} />
                 <Route path="/gerenciamento/conteudo/tutoriais/novo" element={<GerenciarTutorial />} />
                 <Route path="/gerenciamento/conteudo/:tipo/editar/:id" element={<EditarConteudo />} />
+                <Route path="gerenciamento/conteudo/cursos/editar-conteudo/:id" element={<EditarConteudoCurso />} />
                 <Route path="gerenciamento/conteudo/softwares/editar-conteudo/:id" element={<EditarConteudoSoftware />} />
                 <Route path="gerenciamento/conteudo/tutoriais/editar-conteudo/:id" element={<EditarConteudoTutorial />} />
 
