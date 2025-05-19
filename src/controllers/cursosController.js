@@ -10,6 +10,7 @@ exports.buscarTodosCursos = (req, res) => {
             cursos.descricao,
             cursos.duracao,
             cursos.url,
+            cursos.imagem_url,
             cursos.formato,
             cursos.nivel_dificuldade,
             categorias.nome AS nome_categoria,
@@ -21,9 +22,15 @@ exports.buscarTodosCursos = (req, res) => {
         (err, resultados) => {
             if (err) {
                 console.error('Erro ao buscar cursos:', err);
-                res.status(500).json({ error: 'Erro interno no servidor' });
+                res.status(500).json({ 
+                    success: false,
+                    error: 'Erro interno no servidor' 
+                });
             } else {
-                res.json(resultados || []);
+                res.json({
+                    success: true,
+                    data: resultados || []
+                });
             }
         }
     );
@@ -31,23 +38,32 @@ exports.buscarTodosCursos = (req, res) => {
 
 // Criar novo curso
 exports.criarCurso = (req, res) => {
-    const { nome_curso, descricao, duracao, url, formato, nivel_dificuldade, id_categoria, id_site } = req.body;
+    const { nome_curso, descricao, duracao, url, imagem_url, formato, nivel_dificuldade, id_categoria, id_site } = req.body;
 
     if (!nome_curso) {
-        return res.status(400).json({ error: 'Nome do curso é obrigatório' });
+        return res.status(400).json({ 
+            success: false,
+            error: 'Nome do curso é obrigatório' 
+        });
     }
 
     db.run(
-        'INSERT INTO cursos (nome_curso, descricao, duracao, url, formato, nivel_dificuldade, id_categoria, id_site) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-        [nome_curso, descricao, duracao, url, formato, nivel_dificuldade, id_categoria, id_site],
+        'INSERT INTO cursos (nome_curso, descricao, duracao, url, imagem_url, formato, nivel_dificuldade, id_categoria, id_site) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+        [nome_curso, descricao, duracao, url, imagem_url || null, formato, nivel_dificuldade, id_categoria, id_site],
         function (err) {
             if (err) {
                 console.error('Erro ao criar curso:', err);
-                res.status(500).json({ error: 'Erro ao criar curso' });
+                res.status(500).json({ 
+                    success: false,
+                    error: 'Erro ao criar curso' 
+                });
             } else {
                 res.status(201).json({ 
-                    id_cursos: this.lastID,
-                    message: 'Curso criado com sucesso'
+                    success: true,
+                    data: {
+                        id_cursos: this.lastID,
+                        message: 'Curso criado com sucesso'
+                    }
                 });
             }
         }
@@ -59,7 +75,10 @@ exports.buscarCursoPorId = (req, res) => {
     const cursoID = Number(req.params.id);
 
     if (isNaN(cursoID)) {
-        return res.status(400).json({ error: 'ID inválido' });
+        return res.status(400).json({ 
+            success: false,
+            error: 'ID inválido' 
+        });
     }
 
     db.get(
@@ -69,6 +88,7 @@ exports.buscarCursoPorId = (req, res) => {
             cursos.descricao,
             cursos.duracao,
             cursos.url,
+            cursos.imagem_url,
             cursos.formato,
             cursos.nivel_dificuldade,
             categorias.nome AS nome_categoria,
@@ -81,11 +101,20 @@ exports.buscarCursoPorId = (req, res) => {
         (err, linha) => {
             if (err) {
                 console.error('Erro ao buscar curso:', err);
-                res.status(500).json({ error: 'Erro no servidor' });
+                res.status(500).json({ 
+                    success: false,
+                    error: 'Erro no servidor' 
+                });
             } else if (!linha) {
-                res.status(404).json({ error: 'Curso não encontrado' });
+                res.status(404).json({ 
+                    success: false,
+                    error: 'Curso não encontrado' 
+                });
             } else {
-                res.json(linha);
+                res.json({ 
+                    success: true,
+                    data: linha 
+                });
             }
         }
     );
@@ -94,27 +123,72 @@ exports.buscarCursoPorId = (req, res) => {
 // Atualizar curso
 exports.atualizarCurso = (req, res) => {
     const cursoID = Number(req.params.id);
-    const { nome_curso, descricao, duracao, url, formato, nivel_dificuldade, id_categoria, id_site } = req.body;
+    const { nome_curso, descricao, duracao, url, imagem_url, formato, nivel_dificuldade, id_categoria, id_site } = req.body;
 
     if (isNaN(cursoID)) {
-        return res.status(400).json({ error: 'ID inválido' });
+        return res.status(400).json({ 
+            success: false,
+            error: 'ID inválido' 
+        });
     }
 
     if (!nome_curso) {
-        return res.status(400).json({ error: 'Nome do curso é obrigatório' });
+        return res.status(400).json({ 
+            success: false,
+            error: 'Nome do curso é obrigatório' 
+        });
     }
 
     db.run(
-        'UPDATE cursos SET nome_curso = ?, descricao = ?, duracao = ?, url = ?, formato = ?, nivel_dificuldade = ?, id_categoria = ?, id_site = ? WHERE id_cursos = ?',
-        [nome_curso, descricao, duracao, url, formato, nivel_dificuldade, id_categoria, id_site, cursoID],
+        'UPDATE cursos SET nome_curso = ?, descricao = ?, duracao = ?, url = ?, imagem_url = ?, formato = ?, nivel_dificuldade = ?, id_categoria = ?, id_site = ? WHERE id_cursos = ?',
+        [nome_curso, descricao, duracao, url, imagem_url || null, formato, nivel_dificuldade, id_categoria, id_site, cursoID],
         function (err) {
             if (err) {
                 console.error('Erro ao atualizar curso:', err);
-                res.status(500).json({ error: 'Erro interno' });
+                res.status(500).json({ 
+                    success: false,
+                    error: 'Erro interno' 
+                });
             } else if (this.changes === 0) {
-                res.status(404).json({ error: 'Curso não encontrado' });
+                res.status(404).json({ 
+                    success: false,
+                    error: 'Curso não encontrado' 
+                });
             } else {
-                res.json({ message: 'Curso atualizado com sucesso!' });
+                // Buscar o curso atualizado para retornar
+                db.get(
+                    `SELECT 
+                        cursos.id_cursos,
+                        cursos.nome_curso,
+                        cursos.descricao,
+                        cursos.duracao,
+                        cursos.url,
+                        cursos.imagem_url,
+                        cursos.formato,
+                        cursos.nivel_dificuldade,
+                        categorias.nome AS nome_categoria,
+                        sites.nome AS nome_site
+                    FROM cursos
+                    LEFT JOIN categorias ON cursos.id_categoria = categorias.id_categorias
+                    LEFT JOIN sites ON cursos.id_site = sites.id_site
+                    WHERE cursos.id_cursos = ?`,
+                    [cursoID],
+                    (err, cursoAtualizado) => {
+                        if (err) {
+                            console.error('Erro ao buscar curso atualizado:', err);
+                            res.json({ 
+                                success: true,
+                                message: 'Curso atualizado com sucesso!'
+                            });
+                        } else {
+                            res.json({ 
+                                success: true,
+                                data: cursoAtualizado,
+                                message: 'Curso atualizado com sucesso!'
+                            });
+                        }
+                    }
+                );
             }
         }
     );
@@ -125,17 +199,29 @@ exports.excluirCurso = (req, res) => {
     const cursoID = Number(req.params.id);
 
     if (isNaN(cursoID)) {
-        return res.status(400).json({ error: 'ID inválido' });
+        return res.status(400).json({ 
+            success: false,
+            error: 'ID inválido' 
+        });
     }
 
     db.run('DELETE FROM cursos WHERE id_cursos = ?', [cursoID], function (err) {
         if (err) {
             console.error('Erro ao deletar curso:', err);
-            res.status(500).json({ error: 'Erro interno no servidor' });
+            res.status(500).json({ 
+                success: false,
+                error: 'Erro interno no servidor' 
+            });
         } else if (this.changes === 0) {
-            res.status(404).json({ error: 'Curso não encontrado' });
+            res.status(404).json({ 
+                success: false,
+                error: 'Curso não encontrado' 
+            });
         } else {
-            res.json({ message: 'Curso deletado com sucesso!' });
+            res.json({ 
+                success: true,
+                message: 'Curso deletado com sucesso!' 
+            });
         }
     });
 };

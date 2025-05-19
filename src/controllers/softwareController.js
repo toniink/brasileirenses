@@ -14,6 +14,7 @@ class SoftwareController {
             s.id_softwares,
             s.nome,
             s.url,
+            s.imagem_url,
             s.desenvolvedor,
             c.nome AS nome_categoria,
             st.nome AS nome_site
@@ -48,7 +49,7 @@ class SoftwareController {
   }
 
   async create(req, res) {
-  const { nome, url, desenvolvedor, id_categoria, id_site } = req.body;
+  const { nome, url, imagem_url, desenvolvedor, id_categoria, id_site } = req.body;
 
   if (!nome) {
     return res.status(400).json({ 
@@ -85,8 +86,8 @@ class SoftwareController {
     // Inserir o software
     const { lastID } = await new Promise((resolve, reject) => {
       db.run(
-        "INSERT INTO softwares (nome, url, desenvolvedor, id_categoria, id_site) VALUES (?, ?, ?, ?, ?)",
-        [nome, url, desenvolvedor, id_categoria || null, id_site || null],
+        "INSERT INTO softwares (nome, url, imagem_url, desenvolvedor, id_categoria, id_site) VALUES (?, ?, ?, ?, ?)",
+        [nome, url, imagem_url, desenvolvedor, id_categoria || null, id_site || null],
         function(err) {
           if (err) reject(err);
           else resolve({ lastID: this.lastID });
@@ -130,6 +131,7 @@ class SoftwareController {
             s.id_softwares,
             s.nome,
             s.url,
+            s.imagem_url,
             s.desenvolvedor,
             c.nome AS nome_categoria,
             st.nome AS nome_site
@@ -173,8 +175,8 @@ class SoftwareController {
 
     try {
       const { changes } = await db.run(
-        "UPDATE softwares SET nome = ?, url = ?, desenvolvedor = ?, id_categoria = ?, id_site = ? WHERE id_softwares = ?",
-        [nome, url, desenvolvedor, id_categoria, id_site, softwareID]
+        "UPDATE softwares SET nome = ?, url = ?, imagem_url = ?, desenvolvedor = ?, id_categoria = ?, id_site = ? WHERE id_softwares = ?",
+        [nome, url, imagem_url, desenvolvedor, id_categoria, id_site, softwareID]
       );
 
       if (changes === 0) {

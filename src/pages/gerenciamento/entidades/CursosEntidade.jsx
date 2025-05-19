@@ -7,12 +7,14 @@ const CursosEntidade = () => {
     const [cursos, setCursos] = useState([]);
     const [categorias, setCategorias] = useState([]);
     const [sites, setSites] = useState([]);
+    const [images, setImages] = useState([]);
     const [formData, setFormData] = useState({
         id_cursos: '',
         nome_curso: '',
         descricao: '',
         duracao: '',
         url: '',
+        imagem_url: '',
         formato: '',
         nivel_dificuldade: '',
         id_categoria: '',
@@ -23,31 +25,63 @@ const CursosEntidade = () => {
     const [success, setSuccess] = useState(null);
     const [editMode, setEditMode] = useState(false);
 
-    // Buscar cursos, categorias e sites
+    const getCourseImages = async () => {
+        try {
+            const imageModules = import.meta.glob('/src/assets/cursos/*.{png,jpg,jpeg,gif,webp}');
+            const imagePaths = Object.keys(imageModules);
+
+            const loadedImages = await Promise.all(
+                imagePaths.map(async (path) => {
+                    const module = await imageModules[path]();
+                    return {
+                        name: path.split('/').pop(),
+                        path: module.default
+                    };
+                })
+            );
+            return loadedImages;
+        } catch (error) {
+            console.error('Erro ao carregar imagens:', error);
+            return [];
+        }
+    };
+
     useEffect(() => {
         const fetchData = async () => {
             try {
                 setLoading(true);
-                
-                const [cursosRes, categoriasRes, sitesRes] = await Promise.all([
-                    fetch('http://localhost:3000/cursos'),
+
+                // Carrega categorias e sites primeiro
+                const [categoriasRes, sitesRes] = await Promise.all([
                     fetch('http://localhost:3000/categorias'),
                     fetch('http://localhost:3000/sites')
                 ]);
 
-                if (!cursosRes.ok) throw new Error('Erro ao buscar cursos');
-                if (!categoriasRes.ok) throw new Error('Erro ao buscar categorias');
-                if (!sitesRes.ok) throw new Error('Erro ao buscar sites');
-
-                const [cursosData, categoriasData, sitesData] = await Promise.all([
-                    cursosRes.json(),
+                const [categoriasData, sitesData] = await Promise.all([
                     categoriasRes.json(),
                     sitesRes.json()
                 ]);
 
-                setCursos(cursosData);
-                setCategorias(categoriasData);
-                setSites(sitesData);
+                // Garante que são arrays mesmo se vierem com a estrutura {success, data}
+                const categoriasArray = Array.isArray(categoriasData) ? categoriasData :
+                    (categoriasData.success ? categoriasData.data : []);
+
+                const sitesArray = Array.isArray(sitesData) ? sitesData :
+                    (sitesData.success ? sitesData.data : []);
+
+                setCategorias(categoriasArray);
+                setSites(sitesArray);
+
+                // Depois carrega cursos
+                const cursosRes = await fetch('http://localhost:3000/cursos');
+                const cursosData = await cursosRes.json();
+                const cursosArray = Array.isArray(cursosData) ? cursosData :
+                    (cursosData.success ? cursosData.data : []);
+                setCursos(cursosArray);
+
+                // Carrega imagens
+                const loadedImages = await getCourseImages();
+                setImages(loadedImages);
 
             } catch (err) {
                 console.error('Erro ao carregar dados:', err);
@@ -60,18 +94,20 @@ const CursosEntidade = () => {
         fetchData();
     }, []);
 
-    // Manipulador de formulário
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
-    // Submeter formulário
+    const handleImageSelect = (e) => {
+        const selectedImageName = e.target.value;
+        setFormData(prev => ({ ...prev, imagem_url: selectedImageName }));
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
-        
-        // Validação
-        if (!formData.nome_curso || !formData.descricao || !formData.duracao || 
+
+        if (!formData.nome_curso || !formData.descricao || !formData.duracao ||
             !formData.formato || !formData.nivel_dificuldade || !formData.id_categoria || !formData.id_site) {
             setError('Todos os campos são obrigatórios');
             return;
@@ -82,12 +118,12 @@ const CursosEntidade = () => {
             setError(null);
             setSuccess(null);
 
-            const url = editMode 
+            const url = editMode
                 ? `http://localhost:3000/cursos/${formData.id_cursos}`
                 : 'http://localhost:3000/cursos';
-            
+
             const method = editMode ? 'PUT' : 'POST';
-            
+
             const response = await fetch(url, {
                 method,
                 headers: {
@@ -102,14 +138,13 @@ const CursosEntidade = () => {
             }
 
             const result = await response.json();
-            
             setSuccess(editMode ? 'Curso atualizado com sucesso!' : 'Curso criado com sucesso!');
-            
+
             // Recarregar cursos
             const cursosResponse = await fetch('http://localhost:3000/cursos');
             const cursosData = await cursosResponse.json();
-            setCursos(cursosData);
-            
+            setCursos(cursosData.success ? cursosData.data : []);
+
             // Limpar formulário
             setFormData({
                 id_cursos: '',
@@ -117,13 +152,14 @@ const CursosEntidade = () => {
                 descricao: '',
                 duracao: '',
                 url: '',
+                imagem_url: '',
                 formato: '',
                 nivel_dificuldade: '',
                 id_categoria: '',
                 id_site: ''
             });
             setEditMode(false);
-            
+
         } catch (err) {
             console.error('Erro ao salvar curso:', err);
             setError(err.message);
@@ -132,31 +168,39 @@ const CursosEntidade = () => {
         }
     };
 
-    // Editar curso
     const handleEdit = (curso) => {
+        // Encontra a categoria correspondente pelo nome
+        const categoriaCorrespondente = categorias.find(
+            c => c.nome === curso.nome_categoria
+        );
+
+        // Encontra o site correspondente pelo nome
+        const siteCorrespondente = sites.find(
+            s => s.nome === curso.nome_site
+        );
+
         setFormData({
             id_cursos: curso.id_cursos,
             nome_curso: curso.nome_curso,
             descricao: curso.descricao,
             duracao: curso.duracao,
             url: curso.url,
+            imagem_url: curso.imagem_url || '',
             formato: curso.formato,
             nivel_dificuldade: curso.nivel_dificuldade,
-            id_categoria: categorias.find(c => c.nome === curso.nome_categoria)?.id_categorias || '',
-            id_site: sites.find(s => s.nome === curso.nome_site)?.id_site || ''
+            id_categoria: categoriaCorrespondente?.id_categorias || '',
+            id_site: siteCorrespondente?.id_site || ''
         });
         setEditMode(true);
-        window.scrollTo(0, 0);
     };
 
-    // Excluir curso
     const handleDelete = async (id) => {
         if (!window.confirm('Tem certeza que deseja excluir este curso?')) return;
 
         try {
             setLoading(true);
             setError(null);
-            
+
             const response = await fetch(`http://localhost:3000/cursos/${id}`, {
                 method: 'DELETE'
             });
@@ -166,12 +210,12 @@ const CursosEntidade = () => {
             }
 
             setSuccess('Curso excluído com sucesso!');
-            
+
             // Recarregar cursos
             const cursosResponse = await fetch('http://localhost:3000/cursos');
             const cursosData = await cursosResponse.json();
-            setCursos(cursosData);
-            
+            setCursos(cursosData.success ? cursosData.data : []);
+
         } catch (err) {
             console.error('Erro ao excluir curso:', err);
             setError(err.message);
@@ -180,15 +224,20 @@ const CursosEntidade = () => {
         }
     };
 
+    const getImageUrl = (imageName) => {
+        if (!imageName) return null;
+        const image = images.find(img => img.name === imageName);
+        return image ? image.path : null;
+    };
+
     return (
         <div className="d-flex flex-column min-vh-100">
-            {/* Cabeçalho */}
             <header className="bg-light shadow-sm">
                 <div className="container py-3">
                     <div className="d-flex justify-content-between align-items-center">
                         <nav className="d-flex gap-3">
-                            <button 
-                                onClick={() => navigate(-1)} 
+                            <button
+                                onClick={() => navigate(-1)}
                                 className="btn btn-link"
                             >
                                 Voltar
@@ -198,19 +247,17 @@ const CursosEntidade = () => {
                 </div>
             </header>
 
-            {/* Conteúdo Principal */}
             <main className="container flex-grow-1 py-4">
                 <div className="row justify-content-center">
                     <div className="col-lg-12">
                         <h2 className="mb-4">Gerenciamento de Cursos</h2>
 
-                        {/* Mensagens de status */}
                         {error && (
                             <div className="alert alert-danger alert-dismissible fade show">
                                 {error}
-                                <button 
-                                    type="button" 
-                                    className="btn-close" 
+                                <button
+                                    type="button"
+                                    className="btn-close"
                                     onClick={() => setError(null)}
                                 />
                             </div>
@@ -222,7 +269,6 @@ const CursosEntidade = () => {
                             </div>
                         )}
 
-                        {/* Formulário */}
                         <div className="card shadow-sm mb-4">
                             <div className="card-body">
                                 <h5 className="card-title">
@@ -230,7 +276,7 @@ const CursosEntidade = () => {
                                 </h5>
                                 <form onSubmit={handleSubmit}>
                                     <input type="hidden" name="id_cursos" value={formData.id_cursos} />
-                                    
+
                                     <div className="row">
                                         <div className="col-md-6 mb-3">
                                             <label className="form-label">Nome do Curso *</label>
@@ -342,6 +388,9 @@ const CursosEntidade = () => {
                                                     </option>
                                                 ))}
                                             </select>
+                                            {!loading && categorias.length === 0 && (
+                                                <small className="text-danger">Nenhuma categoria carregada</small>
+                                            )}
                                         </div>
                                     </div>
 
@@ -362,7 +411,49 @@ const CursosEntidade = () => {
                                                 </option>
                                             ))}
                                         </select>
+                                        {!loading && sites.length === 0 && (
+                                            <small className="text-danger">Nenhum site carregado</small>
+                                        )}
                                     </div>
+                                    <div className="mb-3">
+                                        <label className="form-label">Imagem do Curso</label>
+                                        <select
+                                            className="form-select"
+                                            name="imagem_url"
+                                            value={formData.imagem_url || ""}
+                                            onChange={handleImageSelect}
+                                            disabled={loading || images.length === 0}
+                                        >
+                                            <option value="">Selecione uma imagem</option>
+                                            {images.map((image, index) => (
+                                                <option key={index} value={image.name}>
+                                                    {image.name}
+                                                </option>
+                                            ))}
+                                        </select>
+                                        {images.length === 0 && (
+                                            <small className="text-muted">
+                                                Nenhuma imagem encontrada na pasta assets/cursos
+                                            </small>
+                                        )}
+                                    </div>
+
+                                    {formData.imagem_url && getImageUrl(formData.imagem_url) && (
+                                        <div className="mb-3">
+                                            <label className="form-label">Pré-visualização:</label>
+                                            <div className="border p-2 rounded" style={{ maxWidth: '300px' }}>
+                                                <img
+                                                    src={getImageUrl(formData.imagem_url)}
+                                                    alt="Pré-visualização"
+                                                    className="img-fluid"
+                                                    style={{ maxHeight: '150px' }}
+                                                />
+                                                <div className="mt-2">
+                                                    <small>{formData.imagem_url}</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
 
                                     <div className="d-flex justify-content-end gap-2">
                                         {editMode && (
@@ -376,6 +467,7 @@ const CursosEntidade = () => {
                                                         descricao: '',
                                                         duracao: '',
                                                         url: '',
+                                                        imagem_url: '',
                                                         formato: '',
                                                         nivel_dificuldade: '',
                                                         id_categoria: '',
@@ -388,7 +480,7 @@ const CursosEntidade = () => {
                                                 Cancelar Edição
                                             </button>
                                         )}
-                                        
+
                                         <button
                                             type="submit"
                                             className="btn btn-primary"
@@ -408,11 +500,10 @@ const CursosEntidade = () => {
                             </div>
                         </div>
 
-                        {/* Lista de Cursos */}
                         <div className="card shadow-sm">
                             <div className="card-body">
                                 <h5 className="card-title">Lista de Cursos</h5>
-                                
+
                                 {loading && cursos.length === 0 ? (
                                     <div className="text-center py-4">
                                         <div className="spinner-border text-primary" role="status">
@@ -429,6 +520,7 @@ const CursosEntidade = () => {
                                             <thead>
                                                 <tr>
                                                     <th>ID</th>
+                                                    <th>Imagem</th>
                                                     <th>Nome</th>
                                                     <th>Duração</th>
                                                     <th>Formato</th>
@@ -442,6 +534,19 @@ const CursosEntidade = () => {
                                                 {cursos.map(curso => (
                                                     <tr key={curso.id_cursos}>
                                                         <td>{curso.id_cursos}</td>
+                                                        <td>
+                                                            {curso.imagem_url && (
+                                                                <img
+                                                                    src={`/src/assets/cursos/${curso.imagem_url}`}
+                                                                    alt={`Capa ${curso.nome_curso}`}
+                                                                    style={{ width: '50px', height: '30px', objectFit: 'cover' }}
+                                                                    onError={(e) => {
+                                                                        e.target.onerror = null;
+                                                                        e.target.style.display = 'none';
+                                                                    }}
+                                                                />
+                                                            )}
+                                                        </td>
                                                         <td>{curso.nome_curso}</td>
                                                         <td>{curso.duracao}</td>
                                                         <td>{curso.formato}</td>
@@ -478,7 +583,6 @@ const CursosEntidade = () => {
                 </div>
             </main>
 
-            {/* Rodapé */}
             <footer className="bg-dark text-white py-3 mt-auto">
                 <div className="container text-center">
                     <p className="mb-0">&copy; {new Date().getFullYear()} - Todos os direitos reservados</p>

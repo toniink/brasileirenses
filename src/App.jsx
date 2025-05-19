@@ -2,6 +2,7 @@ import React, { lazy, Suspense } from 'react';
 import { HashRouter as Router, Route, Routes } from 'react-router-dom';
 import LoadingSpinner from './pages/components/ui/Loading';
 
+
 // Rotas públicas (carregamento imediato)
 import HomePage from './pages/Home';
 import CursoPagina from './pages/CursoPagina';

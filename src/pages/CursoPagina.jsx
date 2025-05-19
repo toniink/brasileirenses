@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import Header from './components/ui/Header';
 
 const CursoPagina = () => {
@@ -15,22 +15,14 @@ const CursoPagina = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        // Carrega categorias (com tratamento para diferentes estruturas de resposta)
+        // Carrega categorias
         fetch('http://localhost:3000/categorias')
             .then(response => {
                 if (!response.ok) throw new Error('Erro ao carregar categorias');
                 return response.json();
             })
             .then(data => {
-                // Aceita tanto { data: [...] } quanto o array direto
-                const categoriasData = Array.isArray(data) ? data :
-                    data.data ? data.data :
-                        data.result ? data.result : [];
-
-                if (categoriasData.length === 0) {
-                    throw new Error('Nenhuma categoria encontrada');
-                }
-
+                const categoriasData = Array.isArray(data) ? data : data.data || [];
                 setCategorias(categoriasData);
                 setLoading(prev => ({ ...prev, categorias: false }));
             })
@@ -49,9 +41,7 @@ const CursoPagina = () => {
         setError(null);
 
         let url = 'http://localhost:3000/cursos/filtrados';
-        if (categoriaId) {
-            url += `?categoria=${categoriaId}`;
-        }
+        if (categoriaId) url += `?categoria=${categoriaId}`;
 
         fetch(url)
             .then(response => {
@@ -59,18 +49,13 @@ const CursoPagina = () => {
                 return response.json();
             })
             .then(data => {
-                // Aceita tanto { data: [...] } quanto o array direto
-                const cursosData = Array.isArray(data) ? data :
-                    data.data ? data.data :
-                        data.result ? data.result : [];
-
+                const cursosData = Array.isArray(data) ? data : data.data || [];
                 setCursos(cursosData);
                 setLoading(prev => ({ ...prev, cursos: false }));
             })
             .catch(error => {
                 console.error('Erro ao buscar cursos:', error);
                 setError(error.message || 'Erro ao carregar cursos');
-                setCursos([]);
                 setLoading(prev => ({ ...prev, cursos: false }));
             });
     };
@@ -90,21 +75,14 @@ const CursoPagina = () => {
         <div className="container-fluid">
             <Header />
 
-            {/* Mensagem de erro */}
             {error && (
                 <div className="alert alert-danger alert-dismissible fade show mt-3">
                     {error}
-                    <button
-                        type="button"
-                        className="btn-close"
-                        onClick={() => setError(null)}
-                        aria-label="Close"
-                    ></button>
+                    <button type="button" className="btn-close" onClick={() => setError(null)} aria-label="Close"></button>
                 </div>
             )}
 
             <div className="row mt-4">
-                {/* Coluna Lateral: Filtro */}
                 <div className="col-md-3">
                     <div className="card p-3 shadow-sm">
                         <h5 className="mb-3">Filtrar por Categoria</h5>
@@ -120,8 +98,7 @@ const CursoPagina = () => {
                                     className={`list-group-item list-group-item-action ${!categoriaSelecionada ? 'active' : ''}`}
                                     onClick={() => handleFiltroCategoria(null)}
                                 >
-                                    <i className="bi bi-grid-fill me-2"></i>
-                                    Todas as Categorias
+                                    <i className="bi bi-grid-fill me-2"></i> Todas as Categorias
                                 </button>
                                 {categorias.map(categoria => (
                                     <button
@@ -137,7 +114,6 @@ const CursoPagina = () => {
                     </div>
                 </div>
 
-                {/* Conteúdo Principal: Cursos */}
                 <div className="col-md-9">
                     <div className="d-flex justify-content-between align-items-center mb-4">
                         <h2 className="mb-0">
@@ -145,11 +121,7 @@ const CursoPagina = () => {
                                 ? categorias.find(c => (c.id_categorias || c.id) === categoriaSelecionada)?.nome
                                 : 'Todos os Cursos'}
                         </h2>
-                        {!loading.cursos && (
-                            <span className="badge bg-primary">
-                                {cursos.length} {cursos.length === 1 ? 'curso' : 'cursos'}
-                            </span>
-                        )}
+                        {!loading.cursos && <span className="badge bg-primary">{cursos.length} {cursos.length === 1 ? 'curso' : 'cursos'}</span>}
                     </div>
 
                     {loading.cursos ? (
@@ -160,48 +132,51 @@ const CursoPagina = () => {
                         </div>
                     ) : (
                         <div className="row">
-                            {cursos.length > 0 ? (
-                                cursos.map(curso => (
-                                    <div 
-                                        className="col-md-4 mb-4" 
-                                        key={curso.id_cursos || curso.id}
-                                        style={{ cursor: 'pointer' }}
-                                        onClick={() => handleCursoClick(curso.id_cursos || curso.id)}
-                                    >
-                                        <div className="card h-100 shadow-sm hover-shadow transition-all">
-                                            <div className="card-img-top bg-secondary" style={{ height: '150px' }} />
-                                            <div className="card-body d-flex flex-column">
-                                                <div className="d-flex justify-content-between align-items-start">
-                                                    <h5 className="card-title me-2">{curso.nome_curso || curso.nome}</h5>
-                                                    <span className={`badge ${
-                                                        (curso.nivel_dificuldade || '').toLowerCase() === 'iniciante' ? 'bg-success' :
-                                                        (curso.nivel_dificuldade || '').toLowerCase() === 'intermediario' ? 'bg-warning text-dark' :
-                                                        'bg-danger'
-                                                    } text-nowrap flex-shrink-0 align-self-start`}>
-                                                        {curso.nivel_dificuldade}
-                                                    </span>
+                            {cursos.length > 0 ? cursos.map(curso => (
+                                <div className="col-md-4 mb-4" key={curso.id_cursos} onClick={() => handleCursoClick(curso.id_cursos)} style={{ cursor: 'pointer' }}>
+                                    <div className="card h-100 shadow-sm hover-shadow transition-all">
+                                        <div className="card-img-top" style={{ height: '150px', overflow: 'hidden' }}>
+                                            {curso.imagem_url ? (
+                                                <img 
+                                                    src={`/assets/cursos/${curso.imagem_url}`}
+                                                    alt={curso.nome_curso}
+                                                    className="img-fluid h-100 w-100 object-fit-cover"
+                                                    onError={(e) => {
+                                                        e.target.onerror = null;
+                                                        e.target.src = 'data:image/svg+xml;charset=UTF-8,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"%3E%3Crect fill="%23DDDDDD" width="100" height="100"/%3E%3Ctext fill="%23666666" font-family="sans-serif" font-size="16" dy=".5em" text-anchor="middle" x="50" y="50"%3EImagem não disponível%3C/text%3E%3C/svg%3E';
+                                                    }}
+                                                />
+                                            ) : (
+                                                <div className="bg-secondary h-100 d-flex align-items-center justify-content-center">
+                                                    <span className="text-white">Sem imagem</span>
                                                 </div>
-                                                <p className="card-text text-muted small flex-grow-1">
-                                                    {curso.descricao?.substring(0, 100)}{curso.descricao?.length > 100 ? '...' : ''}
-                                                </p>
-                                                <div className="mt-2">
-                                                    <span className="badge bg-primary me-1">
-                                                        {curso.nome_categoria || curso.categoria}
-                                                    </span>
-                                                    <span className="badge bg-info text-dark">
-                                                        {curso.formato}
-                                                    </span>
-                                                </div>
+                                            )}
+                                        </div>
+                                        <div className="card-body d-flex flex-column">
+                                            <div className="d-flex justify-content-between align-items-start">
+                                                <h5 className="card-title me-2">{curso.nome_curso}</h5>
+                                                <span className={`badge ${
+                                                    curso.nivel_dificuldade?.toLowerCase() === 'iniciante' ? 'bg-success' :
+                                                    curso.nivel_dificuldade?.toLowerCase() === 'intermediario' ? 'bg-warning text-dark' :
+                                                    'bg-danger'
+                                                }`}>
+                                                    {curso.nivel_dificuldade}
+                                                </span>
+                                            </div>
+                                            <p className="card-text text-muted small flex-grow-1">
+                                                {curso.descricao?.substring(0, 100)}{curso.descricao?.length > 100 ? '...' : ''}
+                                            </p>
+                                            <div className="mt-2">
+                                                <span className="badge bg-primary me-1">{curso.nome_categoria}</span>
+                                                <span className="badge bg-info text-dark">{curso.formato}</span>
                                             </div>
                                         </div>
                                     </div>
-                                ))
-                            ) : (
+                                </div>
+                            )) : (
                                 <div className="col-12">
                                     <div className="alert alert-info">
-                                        {categoriaSelecionada
-                                            ? 'Nenhum curso encontrado nesta categoria.'
-                                            : 'Nenhum curso disponível no momento.'}
+                                        {categoriaSelecionada ? 'Nenhum curso encontrado nesta categoria.' : 'Nenhum curso disponível no momento.'}
                                     </div>
                                 </div>
                             )}
@@ -210,11 +185,10 @@ const CursoPagina = () => {
                 </div>
             </div>
 
-            {/* Footer */}
             <footer className="bg-primary text-light py-4 mt-4">
                 <div className="container">
                     <div className="row">
-                        {/* Colunas do footer mantidas iguais */}
+                        {/* Footer content */}
                     </div>
                 </div>
             </footer>

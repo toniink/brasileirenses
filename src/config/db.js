@@ -71,6 +71,7 @@ db.serialize(() => {
     descricao TEXT,
     duracao TEXT,
     url TEXT,
+    imagem_url TEXT, 
     formato TEXT CHECK (formato IN ('texto', 'video', 'interativo')),
     nivel_dificuldade TEXT CHECK (nivel_dificuldade IN ('iniciante', 'intermediario', 'avancado')),
     FOREIGN KEY (id_categoria) REFERENCES Categorias(id_categorias) ON DELETE SET NULL,
@@ -149,6 +150,7 @@ db.serialize(() => {
     id_site INTEGER,
     nome TEXT NOT NULL,
     url TEXT,
+    imagem_url TEXT, 
     desenvolvedor TEXT,
     FOREIGN KEY (id_categoria) REFERENCES Categorias(id_categorias) ON DELETE SET NULL,
     FOREIGN KEY (id_site) REFERENCES Sites(id_site) ON DELETE SET NULL
