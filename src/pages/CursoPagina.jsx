@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useNavigate, Link } from 'react-router-dom';
 import Header from './components/ui/Header';
+import Footer from './components/ui/Footer';
 
 const CursoPagina = () => {
     const [cursos, setCursos] = useState([]);
@@ -211,13 +212,7 @@ const CursoPagina = () => {
             </div>
 
             {/* Footer */}
-            <footer className="bg-primary text-light py-4 mt-4">
-                <div className="container">
-                    <div className="row">
-                        {/* Colunas do footer mantidas iguais */}
-                    </div>
-                </div>
-            </footer>
+            <Footer/>
         </div>
     );
 };

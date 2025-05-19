@@ -124,6 +124,16 @@ db.serialize(() => {
     FOREIGN KEY (id_secao_curso) REFERENCES curso_secoes(id_secao_curso) ON DELETE CASCADE
   );`);
 
+  // Tabela de associação muitos-para-muitos entre cursos e softwares
+  db.run(`CREATE TABLE IF NOT EXISTS cursos_softwares (
+      id_curso INTEGER NOT NULL,
+      id_software INTEGER NOT NULL,
+      PRIMARY KEY (id_curso, id_software),
+      FOREIGN KEY (id_curso) REFERENCES cursos(id_cursos) ON DELETE CASCADE,
+      FOREIGN KEY (id_software) REFERENCES softwares(id_softwares) ON DELETE CASCADE
+  );`);
+
+
   // Tabelas de relacionamento
   db.run(`CREATE TABLE IF NOT EXISTS categoriasCursos (
     id_curso INTEGER NOT NULL,
@@ -191,6 +201,9 @@ db.serialize(() => {
     item TEXT NOT NULL,
     FOREIGN KEY (id_secao) REFERENCES software_secoes(id_secao) ON DELETE CASCADE
   );`);
+
+
+
 
   // Tabelas de tutoriais e conteúdo
   db.run(`CREATE TABLE IF NOT EXISTS tutoriais (

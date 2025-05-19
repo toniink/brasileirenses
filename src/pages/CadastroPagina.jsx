@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Header from './components/ui/Header';
+import Footer from './components/ui/Footer';
 
 const CadastroPagina = () => {
   const [nome, setNome] = useState('');
@@ -88,15 +89,7 @@ const CadastroPagina = () => {
       </main>
 
       {/* Footer igual ao da Home */}
-      <footer className="bg-primary text-light py-4 mt-5">
-        <div className="container-fluid">
-          <div className="row">
-            <div className="col-12 text-center">
-              <p>&copy; 2025 - Desenvolvido por Brasilierenses</p>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <Footer/>
     </div>
   );
 };

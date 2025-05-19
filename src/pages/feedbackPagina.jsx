@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
+import { Link } from "react-router-dom";
 import './FeedbackPagina.css'; // (separar o CSS)
 import Header from './components/ui/Header';
+import Footer from './components/ui/Footer';
 
 function FeedbackPagina() {
 
@@ -54,70 +56,77 @@ function FeedbackPagina() {
     }
   };
 
-    
+
   return (
-      <div>
-        <Header />
-
-    <div className="container mt-4">
-      
+    <div>
+      <Header />
     
-      <h2 className="text-center mb-4">Deixe seu Feedback</h2>
+      <div className="container mt-4">
 
-      <div className="card p-4 shadow-sm">
-        <form onSubmit={handleSubmit}>
-          <div className="mb-3">
-            <label className="form-label">Seu Email</label>
-            <input
-              type="email"
-              className="form-control"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              placeholder="seu@email.com"
-              required
-            />
-          </div>
+      <Link to="/" className="btn btn-light me-3">
+          <i className="bi bi-arrow-left"></i> Voltar para página principal
 
-          <div className="mb-3">
-            <label className="form-label">Tipo</label>
-            <select
-              name="tipo_feedback"
-              className="form-select"
-              value={formData.tipo_feedback}
-              onChange={handleChange}
-              required
-            >
-              <option value="">Selecione</option>
-              <option value="elogio">💚 Elogio</option>
-              <option value="sugestao">💡 Sugestão</option>
-              <option value="reclamacao">⚠ Reclamação</option>
-            </select>
-          </div>
+        </Link>
+
+        <h2 className="text-center mb-4">Deixe seu Feedback</h2>
+
+        <div className="card p-4 shadow-sm">
+          <form onSubmit={handleSubmit}>
+            <div className="mb-3">
+              <label className="form-label">Seu Email</label>
+              <input
+                type="email"
+                className="form-control"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                placeholder="seu@email.com"
+                required
+              />
+            </div>
+
+            <div className="mb-3">
+              <label className="form-label">Tipo</label>
+              <select
+                name="tipo_feedback"
+                className="form-select"
+                value={formData.tipo_feedback}
+                onChange={handleChange}
+                required
+              >
+                <option value="">Selecione</option>
+                <option value="elogio">💚 Elogio</option>
+                <option value="sugestao">💡 Sugestão</option>
+                <option value="reclamacao">⚠ Reclamação</option>
+              </select>
+            </div>
 
 
-          
 
 
-          <div className="mb-3 mt-4">
-            <label className="form-label">Comentário</label>
-            <textarea
-              className="form-control"
-              rows="4"
-              name="mensagem"
-              value={formData.mensagem}
-              onChange={handleChange}
-              placeholder="Deixe aqui sua sugestão ou observação"
-            ></textarea>
-          </div>
 
-          <div className="text-center">
-            <button className="btn btn-primary" type="submit">Enviar</button>
-          </div>
-        </form>
+            <div className="mb-3 mt-4">
+              <label className="form-label">Comentário</label>
+              <textarea
+                className="form-control"
+                rows="4"
+                name="mensagem"
+                value={formData.mensagem}
+                onChange={handleChange}
+                placeholder="Deixe aqui sua sugestão ou observação"
+              ></textarea>
+            </div>
+
+            <div className="text-center">
+              <button className="btn btn-primary" type="submit">Enviar</button>
+            </div>
+          </form>
+        </div>
+
       </div>
 
-    </div>
+      <Footer/>
+
     </div>
   );
 }

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Header from './components/ui/Header';
+import Footer from './components/ui/Footer';
 
 const SoftwareDetalhes = () => {
     const { id } = useParams();
@@ -15,7 +16,7 @@ const SoftwareDetalhes = () => {
             try {
                 setLoading(true);
                 setError(null);
-                
+
                 // Busca dados do software e seções de conteúdo
                 const [softwareRes, sectionsRes] = await Promise.all([
                     fetch(`http://localhost:3000/softwares/${id}`),
@@ -24,8 +25,8 @@ const SoftwareDetalhes = () => {
 
                 // Verifica se o software existe
                 if (!softwareRes.ok) {
-                    throw new Error(softwareRes.status === 404 
-                        ? 'Software não encontrado' 
+                    throw new Error(softwareRes.status === 404
+                        ? 'Software não encontrado'
                         : 'Erro ao carregar dados do software');
                 }
 
@@ -77,7 +78,7 @@ const SoftwareDetalhes = () => {
         return sections.map((section, index) => {
             // Garante que conteudos seja um array
             const conteudos = Array.isArray(section.conteudos) ? section.conteudos : [];
-            
+
             switch (section.tipo) {
                 case 'titulo':
                     return (
@@ -158,7 +159,7 @@ const SoftwareDetalhes = () => {
     return (
         <div className="container-fluid">
             {/* Cabeçalho */}
-            <Header/>
+            <Header />
 
             <div className="row mt-4">
                 <div className="col-md-3">
@@ -167,7 +168,7 @@ const SoftwareDetalhes = () => {
                         <p>Desenvolvedor: {software.desenvolvedor || 'N/A'}</p>
                         <p>Categoria: {software.nome_categoria || 'N/A'}</p>
                         <div className="bg-dark" style={{ height: '150px', marginTop: '15px' }} />
-                        <button 
+                        <button
                             className="btn btn-primary w-100 mt-3"
                             onClick={() => window.open(software.url, '_blank')}
                             disabled={!software.url}
@@ -178,6 +179,10 @@ const SoftwareDetalhes = () => {
                 </div>
 
                 <div className="col-md-9">
+                    <Link to="/softwares" className="btn btn-light me-3">
+                        <i className="bi bi-arrow-left"></i> Voltar para lista de Softwares
+
+                    </Link>
                     {/* Conteúdo dinâmico do banco de dados */}
                     {renderContent()}
 
@@ -187,7 +192,7 @@ const SoftwareDetalhes = () => {
                         <Link to="/softwares" className="btn btn-secondary">
                             Voltar para lista
                         </Link>
-                        <button 
+                        <button
                             className="btn btn-primary"
                             onClick={() => window.open(software.url, '_blank')}
                             disabled={!software.url}
@@ -199,55 +204,7 @@ const SoftwareDetalhes = () => {
             </div>
 
             {/* Footer */}
-            <footer className="bg-primary text-light py-4 mt-4">
-                <div className="container">
-                    <div className="row">
-                        {/* Coluna Contato */}
-                        <div className="col-md-3 text-center">
-                            <h5>Contato</h5>
-                            <p>
-                                Fale conosco preenchendo nosso formulário!<br />
-                                <button className="btn btn-link text-light text-decoration-underline">Clique aqui</button>
-                            </p>
-                        </div>
-
-                        {/* Coluna Redes Sociais */}
-                        <div className="col-md-3 text-center">
-                            <h5>Redes Sociais</h5>
-                            <div className="d-flex justify-content-center gap-2">
-                                <div className="bg-secondary rounded-circle" style={{ width: '40px', height: '40px' }} />
-                                <div className="bg-secondary rounded-circle" style={{ width: '40px', height: '40px' }} />
-                                <div className="bg-secondary rounded-circle" style={{ width: '40px', height: '40px' }} />
-                            </div>
-                            <p className="mt-2">Siga-nos nas redes sociais!</p>
-                        </div>
-
-                        {/* Coluna Opinião */}
-                        <div className="col-md-3 text-center">
-                            <h5>Dê sua Opinião</h5>
-                            <p>
-                                Envie sua opinião para nós preenchendo o formulário!<br />
-                                <button className="btn btn-link text-light text-decoration-underline">Clique aqui</button>
-                            </p>
-                        </div>
-
-                        {/* Coluna Menu Rápido */}
-                        <div className="col-md-3 text-center">
-                            <h5>Menu Rápido</h5>
-                            <ul className="list-unstyled">
-                                <li><Link to="/" className="btn btn-link text-light text-decoration-underline">Página Principal</Link></li>
-                                <li><Link to="/cursos" className="btn btn-link text-light text-decoration-underline">Cursos</Link></li>
-                                <li><Link to="/softwares" className="btn btn-link text-light text-decoration-underline">Software</Link></li>
-                                <li><button className="btn btn-link text-light text-decoration-underline">Categorias</button></li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <div className="text-center mt-3">
-                        <p>&copy; 2025 - Desenvolvido por Brasilierenses</p>
-                    </div>
-                </div>
-            </footer>
+            <Footer />
         </div>
     );
 };

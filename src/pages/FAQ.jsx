@@ -2,6 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import Header from './components/ui/Header';
+import Footer from './components/ui/Footer';
 
 const faqSections = [
   {
@@ -53,6 +54,11 @@ const FAQ = () => {
 
       {/* Conteúdo FAQ */}
       <main className="container my-5">
+        <Link to="/" className="btn btn-light me-3">
+          <i className="bi bi-arrow-left"></i> Voltar para página principal
+
+        </Link>
+        
         <h1 className="mb-4 text-primary fw-bold border-bottom pb-2">
           Perguntas Frequentes
         </h1>
@@ -98,90 +104,7 @@ const FAQ = () => {
       </main>
 
       {/* Footer */}
-      <footer className="bg-primary text-light py-4">
-        <div className="container-fluid">
-          <div className="row">
-            {/* Coluna Contato */}
-            <div className="col-md-3 text-center">
-              <h5>Ajuda</h5>
-              <p>
-                Precisa falar com a gente?
-                <br />
-                Entre em contato usando nosso formulário!
-                <br />
-                <button className="btn btn-link text-light text-decoration-underline">
-                  Clique aqui
-                </button>
-              </p>
-            </div>
-
-            {/* Coluna Redes Sociais */}
-            <div className="col-md-3 text-center">
-              <h5>Redes Sociais</h5>
-              <div className="d-flex justify-content-center gap-2">
-                <div
-                  className="bg-secondary rounded-circle"
-                  style={{ width: "40px", height: "40px" }}
-                />
-                <div
-                  className="bg-secondary rounded-circle"
-                  style={{ width: "40px", height: "40px" }}
-                />
-                <div
-                  className="bg-secondary rounded-circle"
-                  style={{ width: "40px", height: "40px" }}
-                />
-              </div>
-              <p className="mt-2">Siga-nos nas redes sociais!</p>
-            </div>
-
-            {/* Coluna Opinião */}
-            <div className="col-md-3 text-center">
-              <h5>Dê sua Opinião</h5>
-              <p>
-                Queremos ouvir você!
-                <br />
-                Compartilhe sua opinião preenchendo nosso formulário.
-                <br />
-                <button className="btn btn-link text-light text-decoration-underline">
-                  Envie aqui
-                </button>
-              </p>
-            </div>
-
-            {/* Coluna Menu Rápido */}
-            <div className="col-md-3 text-center">
-              <h5>Menu Rápido</h5>
-              <ul className="list-unstyled">
-                <li>
-                  <button className="btn btn-link text-light text-decoration-underline">
-                    Página Principal
-                  </button>
-                </li>
-                <li>
-                  <button className="btn btn-link text-light text-decoration-underline">
-                    Cursos
-                  </button>
-                </li>
-                <li>
-                  <button className="btn btn-link text-light text-decoration-underline">
-                    Software
-                  </button>
-                </li>
-                <li>
-                  <button className="btn btn-link text-light text-decoration-underline">
-                    Categorias
-                  </button>
-                </li>
-              </ul>
-            </div>
-          </div>
-
-          <div className="text-center mt-3">
-            <p>&copy; 2025 - Desenvolvido por Brasilierenses</p>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 };

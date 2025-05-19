@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { login } from '../api/auth';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Header from './components/ui/Header';
+import Footer from './components/ui/Footer';
 
 const LoginPagina = () => {
   const [email, setEmail] = useState('');
@@ -109,15 +110,7 @@ const LoginPagina = () => {
       </main>
 
       {/* Rodapé */}
-      <footer className="bg-primary text-light py-4 mt-5">
-        <div className="container-fluid">
-          <div className="row">
-            <div className="col-12 text-center">
-              <p>&copy; 2025 - Desenvolvido por Brasilierenses</p>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 };

@@ -3,12 +3,14 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Header from './components/ui/Header';
+import Footer from './components/ui/Footer';
 import ComentariosCurso from '../pages/components/ui/ComentariosCurso';
 
 const CursoDetalhes = () => {
     const { id } = useParams();
     const [curso, setCurso] = useState(null);
     const [conteudos, setConteudos] = useState([]);
+    const [softwares, setSoftwares] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
@@ -17,20 +19,21 @@ const CursoDetalhes = () => {
             try {
                 // Busca dados do curso
                 const cursoResponse = await fetch(`http://localhost:3000/cursos/${id}`);
-                if (!cursoResponse.ok) {
-                    throw new Error(`Erro ao buscar curso ID ${id}`);
-                }
+                if (!cursoResponse.ok) throw new Error(`Erro ao buscar curso ID ${id}`);
                 const cursoData = await cursoResponse.json();
+
+                // Busca softwares associados
+                const softwaresResponse = await fetch(`http://localhost:3000/cursos/${id}/softwares`);
+                if (!softwaresResponse.ok) throw new Error(`Erro ao buscar softwares do curso`);
+                const softwaresData = await softwaresResponse.json();
 
                 // Busca conteúdos do curso
                 const conteudosResponse = await fetch(`http://localhost:3000/cursos/${id}/content`);
-                if (!conteudosResponse.ok) {
-                    throw new Error(`Erro ao buscar conteúdos do curso ID ${id}`);
-                }
-                const conteudosData = await conteudosResponse.json();
+                if (!conteudosResponse.ok) throw new Error(`Erro ao buscar conteúdos`);
 
                 setCurso(cursoData);
-                setConteudos(conteudosData);
+                setSoftwares(softwaresData);
+                setConteudos(await conteudosResponse.json());
                 setLoading(false);
             } catch (error) {
                 console.error('Erro ao carregar dados:', error);
@@ -84,9 +87,9 @@ const CursoDetalhes = () => {
                                 <h6>Passo {passo.numero || index + 1}</h6>
                                 <p>{passo.instrucao || 'Instrução do passo...'}</p>
                                 {passo.imagem && (
-                                    <img 
-                                        src={passo.imagem} 
-                                        alt={`Passo ${passo.numero}`} 
+                                    <img
+                                        src={passo.imagem}
+                                        alt={`Passo ${passo.numero}`}
                                         className="img-fluid mb-2"
                                     />
                                 )}
@@ -142,6 +145,7 @@ const CursoDetalhes = () => {
             {/* Cabeçalho */}
             <Header />
 
+
             <div className="row mt-4">
                 <div className="col-md-3">
                     <div className="bg-secondary text-white p-3 rounded">
@@ -150,10 +154,21 @@ const CursoDetalhes = () => {
                         <p>Nível: {curso.nivel_dificuldade || 'N/A'}</p>
                         <p>Formato: {curso.formato || 'N/A'}</p>
                         <div className="bg-dark" style={{ height: '150px', marginTop: '15px' }} />
+                        <button
+                            className="btn btn-primary w-100 mt-3"
+                            onClick={() => window.open(software.url, '_blank')}
+                            disabled={!curso.url}
+                        >
+                            {curso.url ? 'Acessar site oficial' : 'Link não disponível'}
+                        </button>
                     </div>
                 </div>
 
                 <div className="col-md-9">
+                    <Link to="/cursos" className="btn btn-light me-3">
+                        <i className="bi bi-arrow-left"></i> Voltar para lista de Cursos
+
+                    </Link>
                     {/* Visão Geral - Primeira seção */}
                     <section>
                         <h4>Visão Geral</h4>
@@ -170,73 +185,44 @@ const CursoDetalhes = () => {
                     ))}
 
                     {/* Botão de tutorial (se houver URL) */}
-                    {curso.url && (
-                        <a 
-                            href={curso.url} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            className="btn btn-primary mt-4"
-                        >
-                            Ir para Tutorial
-                        </a>
-                    )}
+                    {/* Botão de software associado */}
+                    <div className="d-flex gap-2 mt-4">
+                        {/* Verifica se existem softwares associados */}
+                        {softwares.length > 0 ? (
+                            // Se houver softwares, pega o primeiro (ou você pode mapear todos)
+                            <Link
+                                to={`/softwares/${softwares[0].id_softwares}`}
+                                className="btn btn-secondary"
+                            >
+                                Acessar Software Associado ({softwares[0].nome})
+                            </Link>
+                        ) : (
+                            // Se não houver softwares associados
+                            <button className="btn btn-secondary" disabled>
+                                Nenhum software associado
+                            </button>
+                        )}
+
+                        {curso.url && (
+                            <a
+                                href={curso.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="btn btn-primary"
+                            >
+                                Acessar site oficial
+                            </a>
+                        )}
+                    </div>
                 </div>
                 <div>
                     <ComentariosCurso />
                 </div>
-                
+
             </div>
 
             {/* Footer */}
-            <footer className="bg-primary text-light py-4 mt-4">
-                <div className="container">
-                    <div className="row">
-                        {/* Coluna Contato */}
-                        <div className="col-md-3 text-center">
-                            <h5>Ajuda</h5>
-                            <p>
-                                Fale conosco preenchendo nosso formulário!<br />
-                                <button className="btn btn-link text-light text-decoration-underline">Clique aqui</button>
-                            </p>
-                        </div>
-
-                        {/* Coluna Redes Sociais */}
-                        <div className="col-md-3 text-center">
-                            <h5>Redes Sociais</h5>
-                            <div className="d-flex justify-content-center gap-2">
-                                <div className="bg-secondary rounded-circle" style={{ width: '40px', height: '40px' }} />
-                                <div className="bg-secondary rounded-circle" style={{ width: '40px', height: '40px' }} />
-                                <div className="bg-secondary rounded-circle" style={{ width: '40px', height: '40px' }} />
-                            </div>
-                            <p className="mt-2">Siga-nos nas redes sociais!</p>
-                        </div>
-
-                        {/* Coluna Opinião */}
-                        <div className="col-md-3 text-center">
-                            <h5>Dê sua Opinião</h5>
-                            <p>
-                                Envie sua opinião para nós preenchendo o formulário!<br />
-                                <button className="btn btn-link text-light text-decoration-underline">Clique aqui</button>
-                            </p>
-                        </div>
-
-                        {/* Coluna Menu Rápido */}
-                        <div className="col-md-3 text-center">
-                            <h5>Menu Rápido</h5>
-                            <ul className="list-unstyled">
-                                <li><button className="btn btn-link text-light text-decoration-underline">Página Principal</button></li>
-                                <li><button className="btn btn-link text-light text-decoration-underline">Cursos</button></li>
-                                <li><button className="btn btn-link text-light text-decoration-underline">Software</button></li>
-                                <li><button className="btn btn-link text-light text-decoration-underline">Categorias</button></li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <div className="text-center mt-3">
-                        <p>&copy; 2025 - Desenvolvido por Brasilierenses</p>
-                    </div>
-                </div>
-            </footer>
+            <Footer />
         </div>
     );
 };

@@ -399,3 +399,66 @@ exports.buscarCursosPorCategoria = (req, res) => {
         });
     });
 };
+
+// Buscar curso por ID com softwares associados
+exports.buscarCursoPorIdComSoftwares = (req, res) => {
+    const cursoID = Number(req.params.id);
+
+    if (isNaN(cursoID)) {
+        return res.status(400).json({ error: 'ID inválido' });
+    }
+
+    // Primeiro busca os dados básicos do curso
+    db.get(
+        `SELECT 
+            cursos.id_cursos,
+            cursos.nome_curso,
+            cursos.descricao,
+            cursos.duracao,
+            cursos.url,
+            cursos.formato,
+            cursos.nivel_dificuldade,
+            categorias.nome AS nome_categoria,
+            sites.nome AS nome_site
+        FROM cursos
+        LEFT JOIN categorias ON cursos.id_categoria = categorias.id_categorias
+        LEFT JOIN sites ON cursos.id_site = sites.id_site
+        WHERE cursos.id_cursos = ?`,
+        [cursoID],
+        (err, curso) => {
+            if (err) {
+                console.error('Erro ao buscar curso:', err);
+                return res.status(500).json({ error: 'Erro no servidor' });
+            }
+            
+            if (!curso) {
+                return res.status(404).json({ error: 'Curso não encontrado' });
+            }
+
+            // Depois busca os softwares associados
+            db.all(
+                `SELECT 
+                    softwares.id_softwares,
+                    softwares.nome,
+                    softwares.url,
+                    softwares.desenvolvedor
+                FROM softwares
+                JOIN cursos_softwares ON softwares.id_softwares = cursos_softwares.id_software
+                WHERE cursos_softwares.id_curso = ?`,
+                [cursoID],
+                (err, softwares) => {
+                    if (err) {
+                        console.error('Erro ao buscar softwares:', err);
+                        return res.status(500).json({ error: 'Erro ao buscar softwares associados' });
+                    }
+
+                    // Combina os resultados
+                    res.json({
+                        ...curso,
+                        softwares: softwares || []
+                    });
+                }
+            );
+        }
+    );
+};
