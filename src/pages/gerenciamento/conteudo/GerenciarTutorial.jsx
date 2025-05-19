@@ -335,14 +335,7 @@ const GerenciarTutorial = () => {
                             >
                                 <PlusCircle size={14} className="me-1" /> Lista
                             </Button>
-                            <Button 
-                                variant="primary" 
-                                size="sm" 
-                                onClick={() => adicionarSecao('passo')}
-                                disabled={loading}
-                            >
-                                <PlusCircle size={14} className="me-1" /> Passo
-                            </Button>
+                            
                         </div>
                     </Card.Header>
                     <Card.Body>

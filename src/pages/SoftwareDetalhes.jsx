@@ -8,6 +8,8 @@ const SoftwareDetalhes = () => {
     const { id } = useParams();
     const [software, setSoftware] = useState(null);
     const [sections, setSections] = useState([]);
+    const [tutorial, setTutorial] = useState(null);
+    const [site, setSite] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
@@ -17,9 +19,11 @@ const SoftwareDetalhes = () => {
                 setLoading(true);
                 setError(null);
 
-                // Busca dados do software e seções de conteúdo
-                const [softwareRes, sectionsRes] = await Promise.all([
+                // Busca dados do software, tutorial, site e seções de conteúdo em paralelo
+                const [softwareRes, tutorialRes, siteRes, sectionsRes] = await Promise.all([
                     fetch(`http://localhost:3000/softwares/${id}`),
+                    fetch(`http://localhost:3000/tutoriais/software/${id}`),
+                    fetch(`http://localhost:3000/softwares/${id}/site`),
                     fetch(`http://localhost:3000/softwares/${id}/content`)
                 ]);
 
@@ -32,6 +36,20 @@ const SoftwareDetalhes = () => {
 
                 const softwareData = await softwareRes.json();
                 setSoftware(softwareData);
+
+                // Verifica se há tutorial vinculado
+                if (tutorialRes.ok) {
+                    setTutorial(await tutorialRes.json());
+                } else {
+                    setTutorial(null);
+                }
+
+                // Verifica se há site vinculado
+                if (siteRes.ok) {
+                    setSite(await siteRes.json());
+                } else {
+                    setSite(null);
+                }
 
                 // Verifica se há conteúdo
                 if (!sectionsRes.ok) {
@@ -48,6 +66,8 @@ const SoftwareDetalhes = () => {
                 setError(err.message);
                 setSoftware(null);
                 setSections([]);
+                setTutorial(null);
+                setSite(null);
             } finally {
                 setLoading(false);
             }
@@ -163,13 +183,13 @@ const SoftwareDetalhes = () => {
 
             <div className="row mt-4">
                 <div className="col-md-3">
-                    <div className="bg-secondary text-white p-3 rounded">
+                    <div className="bg-custom text-white p-3 rounded">
                         <h5>{software.nome || 'Software não encontrado'}</h5>
                         <p>Desenvolvedor: {software.desenvolvedor || 'N/A'}</p>
                         <p>Categoria: {software.nome_categoria || 'N/A'}</p>
-                        <div className="bg-dark" style={{ height: '150px', marginTop: '15px' }} />
+                        
                         <button
-                            className="btn btn-primary w-100 mt-3"
+                            className="btn btn-contrast w-100 mt-3"
                             onClick={() => window.open(software.url, '_blank')}
                             disabled={!software.url}
                         >
@@ -181,21 +201,29 @@ const SoftwareDetalhes = () => {
                 <div className="col-md-9">
                     <Link to="/softwares" className="btn btn-light me-3">
                         <i className="bi bi-arrow-left"></i> Voltar para lista de Softwares
-
                     </Link>
+
                     {/* Conteúdo dinâmico do banco de dados */}
                     {renderContent()}
 
                     <hr className="border-secondary" />
 
                     <div className="d-flex gap-2 mt-4">
-                        <Link to="/softwares" className="btn btn-secondary">
-                            Voltar para lista
-                        </Link>
+                        {/* Botão para acessar tutorial associado ao software */}
+                        {tutorial && (
+                            <Link
+                                to={`/tutorial/${tutorial.id_tutorial}`}
+                                className="btn btn-secondary"
+                            >
+                                Acessar Tutorial do Software ({tutorial.titulo})
+                            </Link>
+                        )}
+
+                        {/* Botão modificado para usar o site.url */}
                         <button
                             className="btn btn-primary"
-                            onClick={() => window.open(software.url, '_blank')}
-                            disabled={!software.url}
+                            onClick={() => window.open(site?.url, '_blank')}
+                            disabled={!site?.url}
                         >
                             Visitar site oficial
                         </button>

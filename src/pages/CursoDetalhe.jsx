@@ -5,39 +5,58 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import Header from './components/ui/Header';
 import Footer from './components/ui/Footer';
 import ComentariosCurso from '../pages/components/ui/ComentariosCurso';
+import '../styles.css';
 
 const CursoDetalhes = () => {
     const { id } = useParams();
     const [curso, setCurso] = useState(null);
     const [conteudos, setConteudos] = useState([]);
     const [softwares, setSoftwares] = useState([]);
+    const [site, setSite] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                // Busca dados do curso
-                const cursoResponse = await fetch(`http://localhost:3000/cursos/${id}`);
+                setLoading(true);
+                setError(null);
+
+                // Busca todos os dados em paralelo
+                const [cursoResponse, softwaresResponse, conteudosResponse, siteResponse] = await Promise.all([
+                    fetch(`http://localhost:3000/cursos/${id}`),
+                    fetch(`http://localhost:3000/cursos/${id}/softwares`),
+                    fetch(`http://localhost:3000/cursos/${id}/content`),
+                    fetch(`http://localhost:3000/cursos/${id}/site`)
+                ]);
+
                 if (!cursoResponse.ok) throw new Error(`Erro ao buscar curso ID ${id}`);
                 const cursoData = await cursoResponse.json();
 
-                // Busca softwares associados
-                const softwaresResponse = await fetch(`http://localhost:3000/cursos/${id}/softwares`);
-                if (!softwaresResponse.ok) throw new Error(`Erro ao buscar softwares do curso`);
+                if (!softwaresResponse.ok) throw new Error(`Erro ao buscar softwares`);
                 const softwaresData = await softwaresResponse.json();
 
-                // Busca conteúdos do curso
-                const conteudosResponse = await fetch(`http://localhost:3000/cursos/${id}/content`);
                 if (!conteudosResponse.ok) throw new Error(`Erro ao buscar conteúdos`);
+                const conteudosData = await conteudosResponse.json();
+
+                // Verifica se há site vinculado
+                let siteData = null;
+                if (siteResponse.ok) {
+                    siteData = await siteResponse.json();
+                }
 
                 setCurso(cursoData);
-                setSoftwares(softwaresData);
-                setConteudos(await conteudosResponse.json());
-                setLoading(false);
+                setSoftwares(Array.isArray(softwaresData) ? softwaresData : []);
+                setConteudos(conteudosData);
+                setSite(siteData);
             } catch (error) {
                 console.error('Erro ao carregar dados:', error);
                 setError(error.message);
+                setCurso(null);
+                setConteudos([]);
+                setSoftwares([]);
+                setSite(null);
+            } finally {
                 setLoading(false);
             }
         };
@@ -145,21 +164,21 @@ const CursoDetalhes = () => {
             {/* Cabeçalho */}
             <Header />
 
-
             <div className="row mt-4">
                 <div className="col-md-3">
-                    <div className="bg-secondary text-white p-3 rounded">
+                    <div className="bg-custom text-white p-3 rounded">
                         <h5>{curso.nome_curso || 'Curso não encontrado'}</h5>
-                        <p>Duração: {curso.duracao || 'N/A'}</p>
+                        
+                        <p><i className="bi bi-clock me-2"></i> Duração: {curso.duracao || 'N/A'}</p>
                         <p>Nível: {curso.nivel_dificuldade || 'N/A'}</p>
                         <p>Formato: {curso.formato || 'N/A'}</p>
-                        <div className="bg-dark" style={{ height: '150px', marginTop: '15px' }} />
+                       
                         <button
-                            className="btn btn-primary w-100 mt-3"
-                            onClick={() => window.open(software.url, '_blank')}
-                            disabled={!curso.url}
+                            className="btn btn-contrast w-100 mt-3"
+                            onClick={() => window.open(site?.url, '_blank')}
+                            disabled={!site?.url}
                         >
-                            {curso.url ? 'Acessar site oficial' : 'Link não disponível'}
+                            {site?.url ? 'Acessar site do Curso' : 'Link não disponível'}
                         </button>
                     </div>
                 </div>
@@ -167,8 +186,8 @@ const CursoDetalhes = () => {
                 <div className="col-md-9">
                     <Link to="/cursos" className="btn btn-light me-3">
                         <i className="bi bi-arrow-left"></i> Voltar para lista de Cursos
-
                     </Link>
+
                     {/* Visão Geral - Primeira seção */}
                     <section>
                         <h4>Visão Geral</h4>
@@ -184,41 +203,35 @@ const CursoDetalhes = () => {
                         </section>
                     ))}
 
-                    {/* Botão de tutorial (se houver URL) */}
                     {/* Botão de software associado */}
                     <div className="d-flex gap-2 mt-4">
-                        {/* Verifica se existem softwares associados */}
                         {softwares.length > 0 ? (
-                            // Se houver softwares, pega o primeiro (ou você pode mapear todos)
                             <Link
-                                to={`/softwares/${softwares[0].id_softwares}`}
+                                to={`/softwares/${softwares[0]?.id_softwares}`}
                                 className="btn btn-secondary"
                             >
-                                Acessar Software Associado ({softwares[0].nome})
+                                Acessar Software Associado ({softwares[0]?.nome})
                             </Link>
                         ) : (
-                            // Se não houver softwares associados
                             <button className="btn btn-secondary" disabled>
                                 Nenhum software associado
                             </button>
                         )}
 
-                        {curso.url && (
-                            <a
-                                href={curso.url}
-                                target="_blank"
-                                rel="noopener noreferrer"
+                        {site?.url && (
+                            <button
                                 className="btn btn-primary"
+                                onClick={() => window.open(curso.url, '_blank')}
                             >
                                 Acessar site oficial
-                            </a>
+                            </button>
                         )}
                     </div>
                 </div>
+
                 <div>
                     <ComentariosCurso />
                 </div>
-
             </div>
 
             {/* Footer */}

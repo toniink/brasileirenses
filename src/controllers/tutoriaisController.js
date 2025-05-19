@@ -498,3 +498,25 @@ exports.adicionarLista = async (req, res) => {
         });
     }
 };
+
+exports.buscarTutorialPorSoftware = (req, res) => {
+    const softwareID = req.params.id;
+
+    db.get(
+        `SELECT id_tutorial, titulo, descricao, imagem_url 
+         FROM tutoriais 
+         WHERE id_software = ?`,
+        [softwareID],
+        (err, tutorial) => {
+            if (err) {
+                console.error("Erro ao buscar tutorial:", err);
+                res.status(500).json({ erro: "Erro no servidor" });
+            } else if (!tutorial) {
+                res.status(404).json({ erro: "Nenhum tutorial encontrado para este software" });
+            } else {
+                res.json(tutorial);
+            }
+        }
+    );
+};
+

@@ -462,3 +462,47 @@ exports.buscarCursoPorIdComSoftwares = (req, res) => {
         }
     );
 };
+
+// Buscar site associado ao curso
+exports.getSiteByCurso = (req, res) => {
+    const cursoID = Number(req.params.id);
+
+    if (isNaN(cursoID)) {
+        return res.status(400).json({ error: "ID inválido" });
+    }
+
+    db.get(
+        `SELECT 
+            s.id_site, 
+            s.nome, 
+            s.url,
+            s.descricao
+        FROM cursos c
+        LEFT JOIN sites s ON c.id_site = s.id_site
+        WHERE c.id_cursos = ?`,
+        [cursoID],
+        (err, site) => {
+            if (err) {
+                console.error("Erro ao buscar site do curso:", err);
+                return res.status(500).json({ 
+                    error: "Erro interno no servidor",
+                    details: process.env.NODE_ENV === 'development' ? err.message : undefined
+                });
+            }
+
+            if (!site || !site.id_site) {
+                return res.status(404).json({ 
+                    error: "Nenhum site associado a este curso",
+                    code: "SITE_NOT_FOUND"
+                });
+            }
+
+            res.json({
+                id_site: site.id_site,
+                nome: site.nome,
+                url: site.url,
+                descricao: site.descricao
+            });
+        }
+    );
+};

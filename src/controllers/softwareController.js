@@ -548,6 +548,40 @@ async getContentBySoftware(req, res) {
         res.status(500).json({ error: "Erro interno no servidor" });
     }
 }
+
+async getSiteBySoftware(req, res) {
+    const softwareID = Number(req.params.id);
+
+    if (isNaN(softwareID)) {
+        return res.status(400).json({ error: "ID inválido" });
+    }
+
+    try {
+        const site = await new Promise((resolve, reject) => {
+            db.get(
+                `SELECT st.id_site, st.nome, st.url 
+                 FROM softwares s
+                 LEFT JOIN sites st ON s.id_site = st.id_site
+                 WHERE s.id_softwares = ?`,
+                [softwareID],
+                (err, row) => {
+                    if (err) reject(err);
+                    else resolve(row);
+                }
+            );
+        });
+
+        if (!site) {
+            return res.status(404).json({ error: "Nenhum site associado a este software" });
+        }
+
+        res.json(site);
+    } catch (err) {
+        console.error("Erro ao buscar site:", err);
+        res.status(500).json({ error: "Erro interno no servidor" });
+    }
+}
+
 }
 
 module.exports = new SoftwareController();

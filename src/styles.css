@@ -1,0 +1,17 @@
+.bg-custom {
+  background: linear-gradient(to right, #3A8DFF, #6FB8FF);
+}
+
+.btn-contrast {
+    background-color: #FFC107; /* Amarelo dourado */
+    color: #212529; /* Texto escuro para legibilidade */
+    border: none;
+    padding: 10px 20px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.btn-contrast:hover {
+    background-color: #FFA000; /* Versão mais escura no hover */
+}

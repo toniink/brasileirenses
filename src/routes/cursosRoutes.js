@@ -42,6 +42,7 @@ router.post('/:id/sections', cursosController.createSection);
 router.get('/:id/sections', cursosController.getSections);
 router.delete('/content/:tipo/:id', cursosController.deleteContent);
 
+router.get('/:id/site', cursosController.getSiteByCurso);
 // ==============================================
 // NOVAS ROTAS PARA ASSOCIAÇÃO COM SOFTWARES
 // ==============================================
