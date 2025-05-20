@@ -20,7 +20,7 @@ const HomePage = () => (
             Aqui, transformamos conhecimento em algo acessível e intuitivo, ajudando você a trilhar seu caminho com confiança.
             Descubra como simplificar o complexo e abraçar as tecnologias de forma descomplicada e prática.
           </p>
-          <Link to="/cursos" className="btn btn-primary mb-3">IR AOS CURSOS</Link>
+          <Link to="/cursos" className="btn btn-primary mb-3 shadow">IR AOS CURSOS</Link>
           <br />
           <Link to="/faq" className="btn btn-link text-primary ps-0">Tem dúvidas? Veja nosso suporte</Link>
 
@@ -65,7 +65,7 @@ const HomePage = () => (
         <h2 className="text-center mb-4">Conheça Alguns Cursos</h2>
         <div className="row">
           {/* Curso Python */}
-          <Link to="/cursos" className="col-md-4 text-center mb-4 text-decoration-none">
+          <Link to="/cursos" className="col-md-4 text-center mb-4 text-decoration-none shadow-sm">
             <div className="h-100 p-3 hover-effect" style={{ cursor: 'pointer' }}>
               <div style={{ width: '150px', height: '150px', margin: '0 auto' }}>
                 <img
@@ -82,7 +82,7 @@ const HomePage = () => (
           </Link>
 
           {/* Curso Finanças */}
-          <Link to="/cursos" className="col-md-4 text-center mb-4 text-decoration-none">
+          <Link to="/cursos" className="col-md-4 text-center mb-4 text-decoration-none shadow-sm">
             <div className="h-100 p-3 hover-effect" style={{ cursor: 'pointer' }}>
               <div style={{ width: '150px', height: '150px', margin: '0 auto' }}>
                 <img
@@ -99,7 +99,7 @@ const HomePage = () => (
           </Link>
 
           {/* Curso JavaScript */}
-          <Link to="/cursos" className="col-md-4 text-center mb-4 text-decoration-none">
+          <Link to="/cursos" className="col-md-4 text-center mb-4 text-decoration-none shadow-sm ">
             <div className="h-100 p-3 hover-effect" style={{ cursor: 'pointer' }}>
               <div style={{ width: '150px', height: '150px', margin: '0 auto' }}>
                 <img
@@ -126,7 +126,7 @@ const HomePage = () => (
             <p>
               Registre-se gratuitamente para avaliar cursos e deixar comentários. Ajudando outras pessoas a descobrirem se o curso é o que buscam com opniões reais.
             </p>
-            <Link to="/cadastro" className="btn btn-primary my-4">Clique aqui para se cadastrar</Link>
+            <Link to="/cadastro" className="btn btn-primary my-4 shadow">Clique aqui para se cadastrar</Link>
           </div>
           <div className="col-md-6 d-flex justify-content-center">
 
@@ -147,7 +147,7 @@ const HomePage = () => (
           Descubra algo novo para aprender em um acervo com várias áreas, de informática básica até programação.
         </p>
 
-        <Link to="/cursos" className="btn btn-primary my-4">Veja mais cursos</Link>
+        <Link to="/cursos" className="btn btn-primary my-4 shadow">Veja mais cursos</Link>
       </section>
     </main>
 

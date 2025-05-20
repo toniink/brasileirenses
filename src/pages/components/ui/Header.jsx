@@ -8,7 +8,7 @@ const Header = () => {
   const user = getCurrentUser();
 
   return (
-    <header className="bg-light py-3">
+    <header className=" bg-light py-3 shadow-sm">
       <div className="container">
         <div className="d-flex justify-content-between align-items-center">
           {/* Navegação no Header */}
@@ -21,12 +21,12 @@ const Header = () => {
           
           {/* Botão condicional Login/Logout */}
           {user ? (
-            <div className="d-flex align-items-center">
-              <span className="me-2">Olá, {user.nome}</span>
+            <div className="d-flex align-items-center mx-2 ">
+              <span className="me-2 ">Olá, {user.nome}</span>
               <LogoutButton />
             </div>
           ) : (
-            <Link to="/login" className="btn btn-primary text-white text-decoration-none">
+            <Link to="/login" className="btn btn-primary text-white text-decoration-none shadow">
               Fazer Login
             </Link>
           )}

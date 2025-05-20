@@ -15,7 +15,7 @@ const LogoutButton = () => {
     <Button 
       variant="outline-danger" 
       onClick={handleLogout}
-      className="ms-2"
+      className="ms-2 shadow-sm"
     >
       Sair
     </Button>

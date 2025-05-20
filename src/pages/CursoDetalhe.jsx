@@ -69,7 +69,7 @@ const CursoDetalhes = () => {
         switch (secao.tipo) {
             case 'titulo':
                 return (
-                    <h4 className="mt-4">
+                    <h4 className="pt-4">
                         {secao.conteudos[0]?.texto || 'Título da Seção'}
                     </h4>
                 );
@@ -81,7 +81,7 @@ const CursoDetalhes = () => {
                 );
             case 'lista':
                 return (
-                    <ul className="mt-3">
+                    <ul className="mb-2">
                         {secao.conteudos.map((item, index) => (
                             <li key={index}>{item.texto || `Item ${index + 1}`}</li>
                         ))}
@@ -135,7 +135,7 @@ const CursoDetalhes = () => {
 
     if (error) {
         return (
-            <div className="container text-center mt-5">
+            <div className="container text-center mt-5 ">
                 <div className="alert alert-danger">
                     <h1>Erro ao carregar o curso</h1>
                     <p>{error}</p>
@@ -164,16 +164,20 @@ const CursoDetalhes = () => {
             {/* Cabeçalho */}
             <Header />
             <div className="container mx-auto px-4">
+                 
+                    <Link to="/cursos" className="btn btn-light me-3 mt-5 shadow-sm">
+                            <i className="bi bi-arrow-left"></i> Voltar para lista de Cursos
+                        </Link>
 
                 <div className="row mt-4">
-                    <div className="col-lg-3 col-md-4">
+                    <div className="col-lg-3 col-md-4 my-4">
                         <div className="bg-custom text-white p-3 rounded">
                             <h5>{curso.nome_curso || 'Curso não encontrado'}</h5>
                             <p><i className="bi bi-clock me-2"></i> Duração: {curso.duracao || 'N/A'}</p>
                             <p><i className="bi bi-book me-2"></i>Nível: {curso.nivel_dificuldade || 'N/A'}</p>
                             <p> <i className="bi bi-display me-2"></i>Formato: {curso.formato || 'N/A'}</p>
                             <button
-                                className="btn btn-contrast w-100 mt-3"
+                                className="btn btn-contrast w-100 mt-3 shadow"
                                 onClick={() => window.open(site?.url, '_blank')}
                                 disabled={!site?.url}
                             >
@@ -183,10 +187,8 @@ const CursoDetalhes = () => {
                     </div>
 
 
-                    <div className="col-lg-8 col-md-7 mx-auto">
-                        <Link to="/cursos" className="btn btn-light me-3">
-                            <i className="bi bi-arrow-left"></i> Voltar para lista de Cursos
-                        </Link>
+                    <div className="col-lg-8 col-md-7 mx-auto my-4">
+                        
                         {/* Visão Geral - Primeira seção */}
                         <section>
                             <h4>Visão Geral</h4>
@@ -194,19 +196,28 @@ const CursoDetalhes = () => {
                             <hr className="border-secondary" />
                         </section>
                         {/* Conteúdo dinâmico das seções */}
-                        {conteudos.map((secao, index) => (
-                            <section key={index}>
-                                {renderContent(secao)}
-                                {index < conteudos.length - 1 && <hr className="border-secondary" />}
-                            </section>
-                        ))}
+                        <div className="course-sections">
+                            {conteudos.map((secao, index) => (
+                                <React.Fragment key={index}>
+                                    <div className="section-block">
+                                        {renderContent(secao)}
+                                    </div>
+
+                                    {/* Mostra o hr apenas após seções principais */}
+                                    {['titulo', 'area_atuacao', 'passo_a_passo'].includes(secao.tipo) &&
+                                        index < conteudos.length - 1 && (
+                                            <hr className="section-divider my-4" />
+                                        )}
+                                </React.Fragment>
+                            ))}
+                        </div>
 
                         {/* Botão de software associado */}
                         <div className="d-flex gap-2 mt-4">
                             {softwares.length > 0 ? (
                                 <Link
                                     to={`/softwares/${softwares[0]?.id_softwares}`}
-                                    className="btn btn-secondary"
+                                    className="btn btn-secondary shadow"
                                 >
                                     Acessar Software Associado ({softwares[0]?.nome})
                                 </Link>
@@ -217,7 +228,7 @@ const CursoDetalhes = () => {
                             )}
                             {site?.url && (
                                 <button
-                                    className="btn btn-primary"
+                                    className="btn btn-primary shadow"
                                     onClick={() => window.open(curso.url, '_blank')}
                                 >
                                     Acessar site oficial
@@ -229,10 +240,10 @@ const CursoDetalhes = () => {
                         <ComentariosCurso />
                     </div>
                 </div>
-                
+
             </div>
             {/* Footer */}
-                <Footer />
+            <Footer />
         </div>
     );
 };
