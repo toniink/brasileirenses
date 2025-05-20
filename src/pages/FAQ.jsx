@@ -59,7 +59,7 @@ const FAQ = () => {
 
         </Link>
         
-        <h1 className="mb-4 text-primary fw-bold border-bottom pb-2">
+        <h1 className="mb-4 text-primary fw-bold border-bottom pb-2 mt-4">
           Perguntas Frequentes
         </h1>
 

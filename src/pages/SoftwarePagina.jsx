@@ -96,7 +96,7 @@ const SoftwarePagina = () => {
                 <div className="row mt-4">
                     {/* Coluna Lateral: Filtro */}
                     <div className="col-md-3">
-                        <div className="card p-3 shadow-sm">
+                        <div className="card p-3 shadow-sm my-4">
                             <h5 className="mb-3">Filtrar por Categoria</h5>
                             {loading.categorias ? (
                                 <div className="text-center py-3">
@@ -128,7 +128,7 @@ const SoftwarePagina = () => {
                     </div>
                     {/* Conteúdo Principal: Softwares */}
                     <div className="col-md-9">
-                        <div className="d-flex justify-content-between align-items-center mb-4">
+                        <div className="d-flex justify-content-between align-items-center mb-4 my-4">
                             <h2 className="mb-0">
                                 {categoriaSelecionada
                                     ? categorias.find(c => (c.id_categorias || c.id) === categoriaSelecionada)?.nome

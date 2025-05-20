@@ -98,7 +98,7 @@ const ComentariosCurso = () => {
   };
 
   return (
-    <div className="mt-4 p-3 border rounded">
+    <div className="mt-4 p-3 border rounded my-5">
       <h4>Avaliações</h4>
       
       {loading ? (

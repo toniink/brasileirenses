@@ -1,3 +1,18 @@
+
+html, body {
+    height: 100%;
+}
+
+#root {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+main {
+    flex: 1;
+}
+
 .bg-custom {
   background: linear-gradient(to right, #3A8DFF, #6FB8FF);
 }
@@ -71,4 +86,7 @@
     border: none;
 }
 
+.header-shadow {
+    box-shadow: 15px 15px 20px #4b0505;
+}
 

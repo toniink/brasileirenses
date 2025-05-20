@@ -1,6 +1,8 @@
 import React, { lazy, Suspense } from 'react';
 import { HashRouter as Router, Route, Routes } from 'react-router-dom';
 import LoadingSpinner from './pages/components/ui/Loading';
+import "bootstrap/dist/css/bootstrap.min.css";
+import "bootstrap/dist/js/bootstrap.bundle.min.js";
 
 
 // Rotas públicas (carregamento imediato)

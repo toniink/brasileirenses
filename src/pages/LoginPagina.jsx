@@ -44,7 +44,7 @@ const LoginPagina = () => {
       <Header/>
 
       {/* Formulário de Login */}
-      <main className="container mt-5">
+      <main className="container mt-5 my-5">
         <div className="row justify-content-center">
           <div className="col-md-6 col-sm-12">
             <div className="card shadow-sm">

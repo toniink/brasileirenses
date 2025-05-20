@@ -2,13 +2,10 @@ import React, { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import Header from './components/ui/Header';
 import Footer from './components/ui/Footer';
-
-
 import { 
   Container, 
   Spinner, 
   Alert, 
-  Card, 
   ListGroup, 
   Image,
   Badge,
@@ -35,18 +32,15 @@ const TutorialGenerico = () => {
                 setLoading(true);
                 setError(null);
                 
-                // 1. Busca dados básicos do tutorial
                 const tutorialRes = await fetch(`http://localhost:3000/tutoriais/${id}`);
                 if (!tutorialRes.ok) throw new Error("Tutorial não encontrado");
                 const tutorialData = await tutorialRes.json();
                 setTutorial(tutorialData);
 
-                // 2. Busca conteúdo completo
                 const conteudoRes = await fetch(`http://localhost:3000/tutoriais/${id}/conteudo`);
                 if (!conteudoRes.ok) throw new Error("Conteúdo não encontrado");
                 let conteudoData = await conteudoRes.json();
                 
-                // Ordena seções e seus conteúdos
                 conteudoData = conteudoData
                     .sort((a, b) => a.ordem - b.ordem)
                     .map(secao => ({
@@ -58,7 +52,6 @@ const TutorialGenerico = () => {
                 
                 setSecoes(conteudoData);
 
-                // 3. Busca software associado se existir
                 if (tutorialData.id_software) {
                     const softwareRes = await fetch(`http://localhost:3000/softwares/${tutorialData.id_software}`);
                     if (softwareRes.ok) {
@@ -77,94 +70,94 @@ const TutorialGenerico = () => {
         if (id) fetchTutorialData();
     }, [id]);
 
-    const renderConteudo = (secao) => {
+    const renderConteudo = (secao, index) => {
         if (!secao.conteudos || secao.conteudos.length === 0) {
             return <Alert variant="warning">Seção vazia</Alert>;
         }
 
-        switch(secao.tipo) {
-            case 'titulo':
-                return <h3 className="mb-4 border-bottom pb-2">{secao.conteudos[0].texto}</h3>;
+        const conteudo = (() => {
+            switch(secao.tipo) {
+                case 'titulo':
+                    return <h4 className="mt-4 pt-3">{secao.conteudos[0].texto}</h4>;
 
-            case 'paragrafo':
-                return secao.conteudos.map((c, i) => (
-                    <p key={`p-${i}`} className="mb-3">{c.texto}</p>
-                ));
+                case 'paragrafo':
+                    return secao.conteudos.map((c, i) => (
+                        <p key={`p-${i}`} className="mb-3">{c.texto}</p>
+                    ));
 
-            case 'lista':
-                return (
-                    <ListGroup variant="flush" className="mb-3">
-                        {secao.conteudos.map((item, i) => (
-                            <ListGroup.Item key={`item-${i}`}>{item.item || item.texto}</ListGroup.Item>
-                        ))}
-                    </ListGroup>
-                );
-
-            case 'imagem':
-                return (
-                    <div className="text-center my-4">
-                        <Image 
-                            src={secao.conteudos[0].url} 
-                            alt={secao.conteudos[0].descricao || "Imagem do tutorial"} 
-                            fluid 
-                            rounded 
-                            className="shadow"
-                            style={{ maxHeight: '400px' }}
-                        />
-                        {secao.conteudos[0].descricao && (
-                            <p className="text-muted mt-2">{secao.conteudos[0].descricao}</p>
-                        )}
-                    </div>
-                );
-
-            case 'passo':
-                return (
-                    <div className="mt-4">
-                        <h5 className="mb-3">
-                            <Badge bg="primary" className="me-2">Passo a Passo</Badge>
-                        </h5>
-                        <ListGroup as="ol" numbered className="mb-4">
-                            {secao.conteudos.map((passo, i) => (
-                                <ListGroup.Item 
-                                    as="li" 
-                                    key={`passo-${i}`}
-                                    className="d-flex justify-content-between align-items-start"
-                                >
-                                    <div className="ms-2 me-auto">
-                                        <div className="fw-bold">Passo {passo.numero}</div>
-                                        {passo.instrucao}
-                                    </div>
-                                    {passo.imagem && (
-                                        <Image 
-                                            src={passo.imagem} 
-                                            alt={`Passo ${passo.numero}`}
-                                            thumbnail
-                                            style={{ maxWidth: '150px' }}
-                                        />
-                                    )}
-                                </ListGroup.Item>
+                case 'lista':
+                    return (
+                        <ul className="mb-3 ps-3">
+                            {secao.conteudos.map((item, i) => (
+                                <li key={`item-${i}`} className="mb-2">{item.item || item.texto}</li>
                             ))}
-                        </ListGroup>
-                    </div>
-                );
+                        </ul>
+                    );
 
-            case 'codigo':
-                return (
-                    <Card className="mb-3 bg-dark text-white">
-                        <Card.Header>
-                            {secao.conteudos[0].linguagem || 'Código'}
-                        </Card.Header>
-                        <Card.Body>
+                case 'imagem':
+                    return (
+                        <div className="text-center my-3">
+                            <Image 
+                                src={secao.conteudos[0].url} 
+                                alt={secao.conteudos[0].descricao || "Imagem do tutorial"} 
+                                fluid 
+                                className="rounded"
+                                style={{ maxHeight: '400px' }}
+                            />
+                            {secao.conteudos[0].descricao && (
+                                <p className="text-muted mt-2">{secao.conteudos[0].descricao}</p>
+                            )}
+                        </div>
+                    );
+
+                case 'passo':
+                    return (
+                        <div className="mt-3">
+                            <h5 className="mb-3">Passo a Passo</h5>
+                            <ol className="mb-3 ps-3">
+                                {secao.conteudos.map((passo, i) => (
+                                    <li key={`passo-${i}`} className="mb-3">
+                                        <div className="fw-semibold">Passo {passo.numero}</div>
+                                        <p>{passo.instrucao}</p>
+                                        {passo.imagem && (
+                                            <Image 
+                                                src={passo.imagem} 
+                                                alt={`Passo ${passo.numero}`}
+                                                fluid
+                                                className="mt-2 rounded"
+                                            />
+                                        )}
+                                    </li>
+                                ))}
+                            </ol>
+                        </div>
+                    );
+
+                case 'codigo':
+                    return (
+                        <div className="mb-3 p-3 bg-dark text-white rounded">
+                            <div className="mb-2 small">
+                                {secao.conteudos[0].linguagem || 'Código'}
+                            </div>
                             <pre className="mb-0">
                                 <code>{secao.conteudos[0].conteudo}</code>
                             </pre>
-                        </Card.Body>
-                    </Card>
-                );
+                        </div>
+                    );
 
-            default:
-                return <Alert variant="warning">Tipo de conteúdo desconhecido</Alert>;
-        }
+                default:
+                    return <Alert variant="warning">Tipo de conteúdo desconhecido</Alert>;
+            }
+        })();
+
+        return (
+            <div key={secao.id_secao}>
+                {conteudo}
+                {secao.tipo === 'titulo' && index < secoes.length - 1 && (
+                    <hr className="my-3" />
+                )}
+            </div>
+        );
     };
 
     if (loading) {
@@ -182,7 +175,7 @@ const TutorialGenerico = () => {
                 <Alert variant="danger">
                     <Alert.Heading>Erro ao carregar tutorial</Alert.Heading>
                     <p>{error}</p>
-                    <Button variant="outline-danger" onClick={() => navigate(-1)}>
+                    <Button variant="outline-secondary shadow" onClick={() => navigate(-1)}>
                         <ArrowLeft className="me-2" />
                         Voltar
                     </Button>
@@ -197,7 +190,7 @@ const TutorialGenerico = () => {
                 <Alert variant="warning">
                     <Alert.Heading>Tutorial não encontrado</Alert.Heading>
                     <p>O tutorial solicitado não existe ou foi removido.</p>
-                    <Button variant="outline-warning" onClick={() => navigate(-1)}>
+                    <Button variant="outline-secondary" onClick={() => navigate(-1)}>
                         <ArrowLeft className="me-2" />
                         Voltar
                     </Button>
@@ -207,94 +200,77 @@ const TutorialGenerico = () => {
     }
 
     return (
-        <Container fluid className="px-0">
+        <div className="container-fluid">
             <Header />
-            {/* Cabeçalho */}
-            <div className="bg-primary text-white py-4 shadow">
-                <Container>
-                    <div className="d-flex justify-content-between align-items-center">
-                        <div>
-                            <Button 
-                                variant="outline-light" 
-                                onClick={() => navigate(-1)}
-                                className="me-3"
-                            >
-                                <ArrowLeft />
-                            </Button>
-                            <h1 className="d-inline-block mb-0">{tutorial.titulo}</h1>
+            
+            <div className="container mx-auto px-4 mt-4">
+                <Button 
+                    variant="outline-secondary" 
+                    onClick={() => navigate(-1)}
+                    className="mb-4 shadow"
+                >
+                    <ArrowLeft className="me-2" />
+                    Voltar
+                </Button>
+
+                <div className="row">
+                    <div className="col-lg-8 mx-auto">
+                        <div className="mb-4">
+                            <h1>{tutorial.titulo}</h1>
+                            {tutorial.descricao && (
+                                <p className="lead text-muted">{tutorial.descricao}</p>
+                            )}
+                            {software && (
+                                <Badge bg="secondary" className="mt-2">
+                                    {software.nome}
+                                </Badge>
+                            )}
+                            <hr className="border border-primary border-2 opacity-100"/>
                         </div>
-                        {software && (
-                            <Badge bg="light" text="dark" className="fs-6">
-                                {software.nome}
-                            </Badge>
+
+                        {secoes.length > 0 ? (
+                            secoes.map((secao, index) => renderConteudo(secao, index))
+                        ) : (
+                            <Alert variant="info" className="text-center">
+                                Este tutorial ainda não possui conteúdo
+                            </Alert>
                         )}
-                    </div>
-                </Container>
-            </div>
 
-            {/* Conteúdo Principal */}
-            <Container className="py-4">
-                {tutorial.descricao && (
-                    <Card className="mb-4 border-0 shadow-sm">
-                        <Card.Body>
-                            <p className="lead mb-0">{tutorial.descricao}</p>
-                        </Card.Body>
-                    </Card>
-                )}
-
-                {/* Seções de Conteúdo */}
-                {secoes.length > 0 ? (
-                    secoes.map((secao) => (
-                        <Card key={secao.id_secao} className="mb-4 border-0 shadow-sm">
-                            <Card.Body>
-                                {renderConteudo(secao)}
-                            </Card.Body>
-                        </Card>
-                    ))
-                ) : (
-                    <Alert variant="info" className="text-center">
-                        Este tutorial ainda não possui conteúdo
-                    </Alert>
-                )}
-
-                {/* Rodapé */}
-                <div className="d-flex justify-content-between mt-4 pt-3 border-top">
-                    <Button variant="outline-secondary" onClick={() => navigate(-1)}>
-                        <ArrowLeft className="me-2" />
-                        Voltar
-                    </Button>
-                    
-                    <div>
-                        {software && (
-                            <Button 
-                                variant="primary" 
-                                className="me-2"
-                                onClick={() => navigate(`/softwares/${software.id_softwares}`)}
-                            >
-                                <Download className="me-2" />
-                                Ver Software
+                        <div className="d-flex justify-content-between mt-5 pt-3 border-top my-4">
+                            <Button variant="outline-secondary shadow" onClick={() => navigate(-1)}>
+                                <ArrowLeft className="me-2" />
+                                Voltar
                             </Button>
-                        )}
-                        {tutorial.url && (
-                            <Button 
-                                variant="outline-primary" 
-                                href={tutorial.url} 
-                                target="_blank"
-                            >
-                                <Link45deg className="me-2" />
-                                Site Oficial
-                            </Button>
-                        )}
+                            
+                            <div>
+                                {software && (
+                                    <Button 
+                                        variant="primary" 
+                                        className="me-2"
+                                        onClick={() => navigate(`/softwares/${software.id_softwares}`)}
+                                    >
+                                        <Download className="me-2" />
+                                        Ver Software
+                                    </Button>
+                                )}
+                                {tutorial.url && (
+                                    <Button 
+                                        variant="outline-primary" 
+                                        href={tutorial.url} 
+                                        target="_blank"
+                                    >
+                                        <Link45deg className="me-2" />
+                                        Site Oficial
+                                    </Button>
+                                )}
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </Container>
+            </div>
 
             <Footer />
-
-
-        </Container>
-
-
+        </div>
     );
 };
 

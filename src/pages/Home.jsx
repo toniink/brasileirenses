@@ -140,7 +140,7 @@ const HomePage = () => (
           </div>
         </div>
       </section>
-<hr className="divisor"/>
+      <hr className="divisor" />
       {/* Seção Descubra Algo Novo */}
       <section className="container mt-5 text-center">
         <p>

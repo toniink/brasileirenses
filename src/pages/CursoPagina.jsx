@@ -107,7 +107,7 @@ const CursoPagina = () => {
 
                 <div className="row mt-4">
                     {/* Coluna Lateral: Filtro */}
-                    <div className="col-md-3">
+                    <div className="col-md-3 my-4">
                         <div className="card p-3 shadow-sm">
                             <h5 className="mb-3">Filtrar por Categoria</h5>
                             {loading.categorias ? (
@@ -140,7 +140,7 @@ const CursoPagina = () => {
                     </div>
 
                     {/* Conteúdo Principal: Cursos */}
-                    <div className="col-md-9">
+                    <div className="col-md-9 my-4">
                         <div className="d-flex justify-content-between align-items-center mb-4">
                             <h2 className="mb-0">
                                 {categoriaSelecionada
