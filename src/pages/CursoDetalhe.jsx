@@ -66,59 +66,67 @@ const CursoDetalhes = () => {
 
     // Função para renderizar o conteúdo dinamicamente
     const renderContent = (secao) => {
-        switch (secao.tipo) {
-            case 'titulo':
-                return (
-                    <h4 className="mt-4">
-                        {secao.conteudos[0]?.texto || 'Título da Seção'}
-                    </h4>
-                );
-            case 'paragrafo':
-                return (
-                    <p className="mt-3">
-                        {secao.conteudos[0]?.texto || 'Texto do parágrafo...'}
-                    </p>
-                );
-            case 'lista':
-                return (
-                    <ul className="mt-3">
-                        {secao.conteudos.map((item, index) => (
-                            <li key={index}>{item.texto || `Item ${index + 1}`}</li>
-                        ))}
-                    </ul>
-                );
-            case 'area_atuacao':
-                return (
-                    <div className="row mt-3">
-                        {secao.conteudos.map((area, index) => (
-                            <div key={index} className="col-md-6 mb-3">
-                                <h5>{area.titulo || `Área ${index + 1}`}</h5>
-                                <p>{area.descricao || 'Descrição da área de atuação...'}</p>
-                            </div>
-                        ))}
-                    </div>
-                );
-            case 'passo_a_passo':
-                return (
-                    <div className="mt-3">
-                        {secao.conteudos.map((passo, index) => (
-                            <div key={index} className="mb-3">
-                                <h6>Passo {passo.numero || index + 1}</h6>
-                                <p>{passo.instrucao || 'Instrução do passo...'}</p>
-                                {passo.imagem && (
-                                    <img
-                                        src={passo.imagem}
-                                        alt={`Passo ${passo.numero}`}
-                                        className="img-fluid mb-2"
-                                    />
-                                )}
-                            </div>
-                        ))}
-                    </div>
-                );
-            default:
-                return null;
-        }
+        const content = (() => {
+            switch (secao.tipo) {
+                case 'titulo':
+                    return (
+                        <h4 className="mt-4">
+                            {secao.conteudos[0]?.texto || 'Título da Seção'}
+                        </h4>
+                    );
+                case 'paragrafo':
+                    return (
+                        <p className="mt-3">
+                            {secao.conteudos[0]?.texto || 'Texto do parágrafo...'}
+                        </p>
+                    );
+                case 'lista':
+                    return (
+                        <ul className="mt-3">
+                            {secao.conteudos.map((item, index) => (
+                                <li key={index}>{item.texto || `Item ${index + 1}`}</li>
+                            ))}
+                        </ul>
+                    );
+                case 'area_atuacao':
+                    return (
+                        <div className="row mt-3">
+                            {secao.conteudos.map((area, index) => (
+                                <div key={index} className="col-md-6 mb-3">
+                                    <h5>{area.titulo || `Área ${index + 1}`}</h5>
+                                    <p>{area.descricao || 'Descrição da área de atuação...'}</p>
+                                </div>
+                            ))}
+                        </div>
+                    );
+                case 'passo_a_passo':
+                    return (
+                        <div className="mt-3">
+                            {secao.conteudos.map((passo, index) => (
+                                <div key={index} className="mb-3">
+                                    <h6>Passo {passo.numero || index + 1}</h6>
+                                    <p>{passo.instrucao || 'Instrução do passo...'}</p>
+                                    {passo.imagem && (
+                                        <img
+                                            src={passo.imagem}
+                                            alt={`Passo ${passo.numero}`}
+                                            className="img-fluid mb-2"
+                                        />
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    );
+                default:
+                    return null;
+            }
+        })();
+
+        return (
+            <div className="content-block">
+                {content}
+            </div>
+        );
     };
 
     if (loading) {
@@ -166,7 +174,7 @@ const CursoDetalhes = () => {
             <div className="container mx-auto px-4">
 
                 <div className="row mt-4">
-                    <div className="col-lg-3 col-md-4">
+                    <div className="col-lg-3 col-md-4 m-4">
                         <div className="bg-custom text-white p-3 rounded">
                             <h5>{curso.nome_curso || 'Curso não encontrado'}</h5>
                             <p><i className="bi bi-clock me-2"></i> Duração: {curso.duracao || 'N/A'}</p>
@@ -194,12 +202,18 @@ const CursoDetalhes = () => {
                             <hr className="border-secondary" />
                         </section>
                         {/* Conteúdo dinâmico das seções */}
-                        {conteudos.map((secao, index) => (
-                            <section key={index}>
-                                {renderContent(secao)}
-                                {index < conteudos.length - 1 && <hr className="border-secondary" />}
-                            </section>
-                        ))}
+                        <div className="content-sections ">
+                            {conteudos.map((secao, index) => (
+                                <React.Fragment key={index}>
+                                    {renderContent(secao)}
+                                    {/* Mostra o hr apenas após blocos de conteúdo importantes */}
+                                    {['titulo', 'area_atuacao', 'passo_a_passo'].includes(secao.tipo) &&
+                                        index < conteudos.length - 1 && (
+                                            <hr className="section-divider" />
+                                        )}
+                                </React.Fragment>
+                            ))}
+                        </div>
 
                         {/* Botão de software associado */}
                         <div className="d-flex gap-2 mt-4">
@@ -229,10 +243,10 @@ const CursoDetalhes = () => {
                         <ComentariosCurso />
                     </div>
                 </div>
-                
+
             </div>
             {/* Footer */}
-                <Footer />
+            <Footer />
         </div>
     );
 };
