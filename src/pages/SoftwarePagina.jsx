@@ -92,105 +92,105 @@ const SoftwarePagina = () => {
                 </div>
             )}
 
-            <div className="row mt-4">
-                {/* Coluna Lateral: Filtro */}
-                <div className="col-md-3">
-                    <div className="card p-3 shadow-sm">
-                        <h5 className="mb-3">Filtrar por Categoria</h5>
-                        {loading.categorias ? (
-                            <div className="text-center py-3">
-                                <div className="spinner-border spinner-border-sm" role="status">
+            <div className="container mx-auto px-4">
+                <div className="row mt-4">
+                    {/* Coluna Lateral: Filtro */}
+                    <div className="col-md-3">
+                        <div className="card p-3 shadow-sm">
+                            <h5 className="mb-3">Filtrar por Categoria</h5>
+                            {loading.categorias ? (
+                                <div className="text-center py-3">
+                                    <div className="spinner-border spinner-border-sm" role="status">
+                                        <span className="visually-hidden">Carregando...</span>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="list-group">
+                                    <button
+                                        className={`list-group-item list-group-item-action ${!categoriaSelecionada ? 'active' : ''}`}
+                                        onClick={() => handleFiltroCategoria(null)}
+                                    >
+                                        <i className="bi bi-grid-fill me-2"></i>
+                                        Todas as Categorias
+                                    </button>
+                                    {categorias.map(categoria => (
+                                        <button
+                                            key={categoria.id_categorias || categoria.id}
+                                            className={`list-group-item list-group-item-action ${categoriaSelecionada === (categoria.id_categorias || categoria.id) ? 'active' : ''}`}
+                                            onClick={() => handleFiltroCategoria(categoria.id_categorias || categoria.id)}
+                                        >
+                                            {categoria.nome || categoria.name}
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                    {/* Conteúdo Principal: Softwares */}
+                    <div className="col-md-9">
+                        <div className="d-flex justify-content-between align-items-center mb-4">
+                            <h2 className="mb-0">
+                                {categoriaSelecionada
+                                    ? categorias.find(c => (c.id_categorias || c.id) === categoriaSelecionada)?.nome
+                                    : 'Todos os Softwares'}
+                            </h2>
+                            {!loading.softwares && (
+                                <span className="badge bg-primary">
+                                    {softwares.length} {softwares.length === 1 ? 'software' : 'softwares'}
+                                </span>
+                            )}
+                        </div>
+                        {loading.softwares ? (
+                            <div className="text-center py-5">
+                                <div className="spinner-border text-primary" role="status">
                                     <span className="visually-hidden">Carregando...</span>
                                 </div>
                             </div>
                         ) : (
-                            <div className="list-group">
-                                <button
-                                    className={`list-group-item list-group-item-action ${!categoriaSelecionada ? 'active' : ''}`}
-                                    onClick={() => handleFiltroCategoria(null)}
-                                >
-                                    <i className="bi bi-grid-fill me-2"></i>
-                                    Todas as Categorias
-                                </button>
-                                {categorias.map(categoria => (
-                                    <button
-                                        key={categoria.id_categorias || categoria.id}
-                                        className={`list-group-item list-group-item-action ${categoriaSelecionada === (categoria.id_categorias || categoria.id) ? 'active' : ''}`}
-                                        onClick={() => handleFiltroCategoria(categoria.id_categorias || categoria.id)}
-                                    >
-                                        {categoria.nome || categoria.name}
-                                    </button>
-                                ))}
-                            </div>
-                        )}
-                    </div>
-                </div>
-
-                {/* Conteúdo Principal: Softwares */}
-                <div className="col-md-9">
-                    <div className="d-flex justify-content-between align-items-center mb-4">
-                        <h2 className="mb-0">
-                            {categoriaSelecionada
-                                ? categorias.find(c => (c.id_categorias || c.id) === categoriaSelecionada)?.nome
-                                : 'Todos os Softwares'}
-                        </h2>
-                        {!loading.softwares && (
-                            <span className="badge bg-primary">
-                                {softwares.length} {softwares.length === 1 ? 'software' : 'softwares'}
-                            </span>
-                        )}
-                    </div>
-
-                    {loading.softwares ? (
-                        <div className="text-center py-5">
-                            <div className="spinner-border text-primary" role="status">
-                                <span className="visually-hidden">Carregando...</span>
-                            </div>
-                        </div>
-                    ) : (
-                        <div className="row">
-                            {softwares.length > 0 ? (
-                                softwares.map(software => (
-                                    <div 
-                                        className="col-md-4 mb-4" 
-                                        key={software.id_softwares || software.id}
-                                        style={{ cursor: 'pointer' }}
-                                        onClick={() => handleSoftwareClick(software.id_softwares || software.id)}
-                                    >
-                                        <div className="card h-100 shadow-sm hover-shadow transition-all">
-                                            <div className="card-img-top bg-secondary" style={{ height: '150px' }} />
-                                            <div className="card-body d-flex flex-column">
-                                                <div className="d-flex justify-content-between align-items-start">
-                                                    <h5 className="card-title me-2">{software.nome || software.name}</h5>
-                                                    <span className="badge bg-info text-dark text-nowrap flex-shrink-0 align-self-start">
-                                                        {software.nome_categoria || software.categoria}
-                                                    </span>
-                                                </div>
-                                                <p className="card-text text-muted small flex-grow-1">
-                                                    {software.desenvolvedor || 'Desenvolvedor não informado'}
-                                                </p>
-                                                <div className="mt-2">
-                                                    {software.url && (
-                                                        <a href={software.url} target="_blank" rel="noopener noreferrer" className="btn btn-sm btn-outline-primary">
-                                                            Visitar Site
-                                                        </a>
-                                                    )}
+                            <div className="row">
+                                {softwares.length > 0 ? (
+                                    softwares.map(software => (
+                                        <div
+                                            className="col-md-4 mb-4 col-lg-4 col-md-6 col-sm-12"
+                                            key={software.id_softwares || software.id}
+                                            style={{ cursor: 'pointer' }}
+                                            onClick={() => handleSoftwareClick(software.id_softwares || software.id)}
+                                        >
+                                            <div className="card h-100 shadow-sm hover-shadow transition-all ">
+                                                <div className="card-img-top bg-light" style={{ height: '150px' }} />
+                                                <div className="card-body d-flex flex-column">
+                                                    <div className="d-flex justify-content-between align-items-start">
+                                                        <h5 className="card-title me-2">{software.nome || software.name}</h5>
+                                                        <span className="badge bg-info text-dark text-nowrap flex-shrink-0 align-self-start ">
+                                                            {software.nome_categoria || software.categoria}
+                                                        </span>
+                                                    </div>
+                                                    <p className="card-text text-muted small flex-grow-1">
+                                                        {software.desenvolvedor || 'Desenvolvedor não informado'}
+                                                    </p>
+                                                    <div className="mt-2">
+                                                        {software.url && (
+                                                            <a href={software.url} target="_blank" rel="noopener noreferrer" className="btn btn-sm btn-outline-primary">
+                                                                Visitar Site
+                                                            </a>
+                                                        )}
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
+                                    ))
+                                ) : (
+                                    <div className="col-12">
+                                        <div className="alert alert-info">
+                                            {categoriaSelecionada
+                                                ? 'Nenhum software encontrado nesta categoria.'
+                                                : 'Nenhum software disponível no momento.'}
+                                        </div>
                                     </div>
-                                ))
-                            ) : (
-                                <div className="col-12">
-                                    <div className="alert alert-info">
-                                        {categoriaSelecionada
-                                            ? 'Nenhum software encontrado nesta categoria.'
-                                            : 'Nenhum software disponível no momento.'}
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-                    )}
+                                )}
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
 

@@ -3,6 +3,8 @@ import { useParams, Link } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Header from './components/ui/Header';
 import Footer from './components/ui/Footer';
+import '../styles.css';
+
 
 const SoftwareDetalhes = () => {
     const { id } = useParams();
@@ -185,9 +187,9 @@ const SoftwareDetalhes = () => {
                 <div className="col-md-3">
                     <div className="bg-custom text-white p-3 rounded">
                         <h5>{software.nome || 'Software não encontrado'}</h5>
-                        <p>Desenvolvedor: {software.desenvolvedor || 'N/A'}</p>
-                        <p>Categoria: {software.nome_categoria || 'N/A'}</p>
-                        
+                        <p><i className="bi bi-person-gear me-2"></i>Desenvolvedor: {software.desenvolvedor || 'N/A'}</p>
+                        <p><i className="bi bi-grid-3x3-gap-fill me-2"></i>Categoria: {software.nome_categoria || 'N/A'}</p>
+
                         <button
                             className="btn btn-contrast w-100 mt-3"
                             onClick={() => window.open(software.url, '_blank')}

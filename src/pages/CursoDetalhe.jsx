@@ -163,79 +163,76 @@ const CursoDetalhes = () => {
         <div className="container-fluid">
             {/* Cabeçalho */}
             <Header />
+            <div className="container mx-auto px-4">
 
-            <div className="row mt-4">
-                <div className="col-md-3">
-                    <div className="bg-custom text-white p-3 rounded">
-                        <h5>{curso.nome_curso || 'Curso não encontrado'}</h5>
-                        
-                        <p><i className="bi bi-clock me-2"></i> Duração: {curso.duracao || 'N/A'}</p>
-                        <p>Nível: {curso.nivel_dificuldade || 'N/A'}</p>
-                        <p>Formato: {curso.formato || 'N/A'}</p>
-                       
-                        <button
-                            className="btn btn-contrast w-100 mt-3"
-                            onClick={() => window.open(site?.url, '_blank')}
-                            disabled={!site?.url}
-                        >
-                            {site?.url ? 'Acessar site do Curso' : 'Link não disponível'}
-                        </button>
-                    </div>
-                </div>
-
-                <div className="col-md-9">
-                    <Link to="/cursos" className="btn btn-light me-3">
-                        <i className="bi bi-arrow-left"></i> Voltar para lista de Cursos
-                    </Link>
-
-                    {/* Visão Geral - Primeira seção */}
-                    <section>
-                        <h4>Visão Geral</h4>
-                        <p>{curso.descricao || 'Texto de visão geral sobre o curso.'}</p>
-                        <hr className="border-secondary" />
-                    </section>
-
-                    {/* Conteúdo dinâmico das seções */}
-                    {conteudos.map((secao, index) => (
-                        <section key={index}>
-                            {renderContent(secao)}
-                            {index < conteudos.length - 1 && <hr className="border-secondary" />}
-                        </section>
-                    ))}
-
-                    {/* Botão de software associado */}
-                    <div className="d-flex gap-2 mt-4">
-                        {softwares.length > 0 ? (
-                            <Link
-                                to={`/softwares/${softwares[0]?.id_softwares}`}
-                                className="btn btn-secondary"
-                            >
-                                Acessar Software Associado ({softwares[0]?.nome})
-                            </Link>
-                        ) : (
-                            <button className="btn btn-secondary" disabled>
-                                Nenhum software associado
-                            </button>
-                        )}
-
-                        {site?.url && (
+                <div className="row mt-4">
+                    <div className="col-lg-3 col-md-4">
+                        <div className="bg-custom text-white p-3 rounded">
+                            <h5>{curso.nome_curso || 'Curso não encontrado'}</h5>
+                            <p><i className="bi bi-clock me-2"></i> Duração: {curso.duracao || 'N/A'}</p>
+                            <p><i className="bi bi-book me-2"></i>Nível: {curso.nivel_dificuldade || 'N/A'}</p>
+                            <p> <i className="bi bi-display me-2"></i>Formato: {curso.formato || 'N/A'}</p>
                             <button
-                                className="btn btn-primary"
-                                onClick={() => window.open(curso.url, '_blank')}
+                                className="btn btn-contrast w-100 mt-3"
+                                onClick={() => window.open(site?.url, '_blank')}
+                                disabled={!site?.url}
                             >
-                                Acessar site oficial
+                                {site?.url ? 'Acessar site do Curso' : 'Link não disponível'}
                             </button>
-                        )}
+                        </div>
+                    </div>
+
+
+                    <div className="col-lg-8 col-md-7 mx-auto">
+                        <Link to="/cursos" className="btn btn-light me-3">
+                            <i className="bi bi-arrow-left"></i> Voltar para lista de Cursos
+                        </Link>
+                        {/* Visão Geral - Primeira seção */}
+                        <section>
+                            <h4>Visão Geral</h4>
+                            <p>{curso.descricao || 'Texto de visão geral sobre o curso.'}</p>
+                            <hr className="border-secondary" />
+                        </section>
+                        {/* Conteúdo dinâmico das seções */}
+                        {conteudos.map((secao, index) => (
+                            <section key={index}>
+                                {renderContent(secao)}
+                                {index < conteudos.length - 1 && <hr className="border-secondary" />}
+                            </section>
+                        ))}
+
+                        {/* Botão de software associado */}
+                        <div className="d-flex gap-2 mt-4">
+                            {softwares.length > 0 ? (
+                                <Link
+                                    to={`/softwares/${softwares[0]?.id_softwares}`}
+                                    className="btn btn-secondary"
+                                >
+                                    Acessar Software Associado ({softwares[0]?.nome})
+                                </Link>
+                            ) : (
+                                <button className="btn btn-secondary" disabled>
+                                    Nenhum software associado
+                                </button>
+                            )}
+                            {site?.url && (
+                                <button
+                                    className="btn btn-primary"
+                                    onClick={() => window.open(curso.url, '_blank')}
+                                >
+                                    Acessar site oficial
+                                </button>
+                            )}
+                        </div>
+                    </div>
+                    <div>
+                        <ComentariosCurso />
                     </div>
                 </div>
-
-                <div>
-                    <ComentariosCurso />
-                </div>
+                
             </div>
-
             {/* Footer */}
-            <Footer />
+                <Footer />
         </div>
     );
 };

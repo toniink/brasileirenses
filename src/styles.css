@@ -2,6 +2,36 @@
   background: linear-gradient(to right, #3A8DFF, #6FB8FF);
 }
 
+
+
+
+.nav-link-custom {
+    font-weight: bold; /* Deixa as letras mais grossas */
+    text-transform: uppercase; /* Mantém o estilo do menu */
+    color:#3a87fa;
+    transition: color 0.3s ease-in-out; /* Efeito suave no hover */
+}
+
+/* Efeito hover para destacar ao passar o mouse */
+.nav-link-custom:hover {
+    color: #1b4a91; /* Azul que harmoniza com o site */
+    text-decoration: underline; /* Opcional para dar destaque */
+}
+
+.footer-link {
+    color: white; /* Mantém o texto branco */
+    text-decoration: underline;
+    transition: color 0.3s ease-in-out; /* Efeito suave no hover */
+}
+
+/* Efeito hover */
+.footer-link:hover {
+    color: #FFC107; /* Amarelo vibrante no hover */
+    text-decoration: none; /* Remove o sublinhado ao passar o mouse */
+}
+
+
+
 .btn-contrast {
     background-color: #FFC107; /* Amarelo dourado */
     color: #212529; /* Texto escuro para legibilidade */
@@ -14,4 +44,29 @@
 
 .btn-contrast:hover {
     background-color: #FFA000; /* Versão mais escura no hover */
+}
+
+.img-HomeCrieConta {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.img-HomeCrieContaresponsive {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.divisor {
+    width: 50%;
+    height: 2px;
+    background-color: #d1d1d1; /* Cinza suave */
+    margin-top: 0;
+    margin: 30px auto;
+    border: none;
 }

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'; // Importa o Link do React Router
 import 'bootstrap/dist/css/bootstrap.min.css'; // Importa os estilos do Bootstrap
 import Header from './components/ui/Header';
 import Footer from './components/ui/Footer';
+import '../styles.css';
 
 const HomePage = () => (
   <div className="container-fluid">
@@ -21,7 +22,7 @@ const HomePage = () => (
           </p>
           <Link to="/cursos" className="btn btn-primary mb-3">IR AOS CURSOS</Link>
           <br />
-          <Link to="/faq" className="btn btn-link text-primary">Tem dúvidas? Veja nosso suporte</Link>
+          <Link to="/faq" className="btn btn-link text-primary ps-0">Tem dúvidas? Veja nosso suporte</Link>
 
         </div>
         <div className="col-md-6 col-sm-12 text-end">
@@ -33,6 +34,8 @@ const HomePage = () => (
         </div>
       </section>
 
+      <hr className="divisor" />
+
 
       {/* Seção Acessível e Seguro */}
       <section className="row align-items-center bg-light p-4 rounded">
@@ -43,7 +46,7 @@ const HomePage = () => (
             Nossa missão é oferecer acesso fácil e seguro ao conhecimento digital, mesmo para iniciantes.
           </p>
         </div>
-        <div className="col-md-6 text-end">
+        <div className="col-md-6 text-end d-flex justify-content-center">
           <div style={{ width: '100px', height: '100px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
             <img
               src="https://static.vecteezy.com/system/resources/previews/010/145/488/large_2x/download-icon-sign-symbol-design-free-png.png"
@@ -53,6 +56,8 @@ const HomePage = () => (
           </div>
         </div>
       </section>
+
+      <hr className="divisor" />
 
       {/* Seção Conheça Alguns Cursos */}
       {/* Seção Conheça Alguns Cursos */}
@@ -112,39 +117,30 @@ const HomePage = () => (
         </div>
       </section>
 
+      <hr className="divisor" />
       {/* Seção Crie Sua Conta */}
       <section className="container mt-5 bg-light p-4 rounded">
         <div className="row align-items-center">
           <div className="col-md-6 text-start">
             <h2>Crie Sua Conta</h2>
             <p>
-              Registre-se gratuitamente para avaliar cursos e deixar comentários. AJudando outras pessoas a descobrirem se o curso é o que buscam com opniões reais.
+              Registre-se gratuitamente para avaliar cursos e deixar comentários. Ajudando outras pessoas a descobrirem se o curso é o que buscam com opniões reais.
             </p>
             <Link to="/cadastro" className="btn btn-primary my-4">Clique aqui para se cadastrar</Link>
           </div>
-          <div className="col-md-6 text-end">
-            {/* Placeholder circular para a imagem */}
-            <div
-              style={{
-                width: '150px',
-                height: '150px',
-                borderRadius: '50%',
-                overflow: 'hidden',
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center'
-              }}
-            >
+          <div className="col-md-6 d-flex justify-content-center">
+
+            <div className="img-HomeCrieConta">
               <img
                 src="https://static.vecteezy.com/system/resources/previews/005/163/906/non_2x/create-new-account-concept-illustration-flat-design-eps10-modern-graphic-element-for-landing-page-empty-state-ui-infographic-icon-vector.jpg"
                 alt="Imagem circular"
-                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                className="img-HomeCrieContaresponsive"
               />
             </div>
           </div>
         </div>
       </section>
-
+<hr className="divisor"/>
       {/* Seção Descubra Algo Novo */}
       <section className="container mt-5 text-center">
         <p>

@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { getCurrentUser } from '../../../api/auth';
 import LogoutButton from './LogoutButton';
+import '../../../styles.css';
 
 const Header = () => {
   const user = getCurrentUser();
@@ -12,10 +13,10 @@ const Header = () => {
         <div className="d-flex justify-content-between align-items-center">
           {/* Navegação no Header */}
           <nav className="d-flex gap-3">
-            <Link to="/" className="btn btn-link">HOME</Link>
-            <Link to="/cursos" className="btn btn-link">CURSOS</Link>
-            <Link to="/softwares" className="btn btn-link">PROGRAMAS</Link>
-            <Link to="/faq" className="btn btn-link">AJUDA</Link>
+            <Link to="/" className="btn nav-link-custom">Página Inicial</Link>
+            <Link to="/cursos" className="btn nav-link-custom">CURSOS</Link>
+            <Link to="/softwares" className="btn nav-link-custom">PROGRAMAS</Link>
+            <Link to="/faq" className="btn nav-link-custom">AJUDA</Link>
           </nav>
           
           {/* Botão condicional Login/Logout */}

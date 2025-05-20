@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import '../../../styles.css';
 
 const Footer = () => {
     return (
@@ -12,7 +13,7 @@ const Footer = () => {
                         <p>
                             Precisa falar com a gente?<br />
                             Entre em contato usando nosso formulário!<br />
-                            <Link to="/feedback" className="btn btn-link text-light text-decoration-underline">Clique aqui</Link>
+                            <Link to="/feedback" className="btn footer-link  text-decoration-underline">Clique aqui</Link>
 
                         </p>
                     </div>
@@ -49,7 +50,7 @@ const Footer = () => {
                         <p>
                             Queremos ouvir você!<br />
                             Compartilhe sua opinião preenchendo nosso formulário.<br />
-                            <Link to="/feedback" className="btn btn-link text-light text-decoration-underline">Envie aqui</Link>
+                            <Link to="/feedback" className="btn footer-link  text-decoration-underline">Envie aqui</Link>
 
                         </p>
                     </div>
@@ -60,17 +61,17 @@ const Footer = () => {
                         <ul className="list-unstyled">
 
                             <li>
-                                <Link to="/" className="btn btn-link text-light text-decoration-underline">Página Inicial</Link>
+                                <Link to="/" className="btn footer-link text-decoration-underline">Página Inicial</Link>
                             </li>
 
                             <li>
-                                <Link to="/cursos" className="btn btn-link text-light text-decoration-underline">Cursos</Link>
+                                <Link to="/cursos" className="btn footer-link  text-decoration-underline">Cursos</Link>
                             </li>
                             <li>
-                                <Link to="/softwares" className="btn btn-link text-light text-decoration-underline">Softwares</Link>
+                                <Link to="/softwares" className="btn footer-link  text-decoration-underline">Softwares</Link>
                             </li>
                             <li>
-                                <Link to="/faq" className="btn btn-link text-light text-decoration-underline">Ajuda</Link>
+                                <Link to="/faq" className="btn t text-decoration-underline footer-link">Ajuda</Link>
                             </li>
                         </ul>
                     </div>
