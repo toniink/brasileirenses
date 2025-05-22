@@ -1,12 +1,112 @@
-# React + Vite
+# Portal de Recursos Educacionais
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Um CMS educacional desenvolvido para democratizar o acesso ao conhecimento tecnológico, organizando cursos, softwares e tutoriais em uma interface intuitiva para iniciantes.
 
-Currently, two official plugins are available:
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
-## Expanding the ESLint configuration
+## 🛠 Tecnologias Utilizadas
+### Frontend
+- **React 19** (com hooks e react-router-dom v7)
+- **Vite 6** (como build tool)
+- **Bootstrap 5** + React-Bootstrap (estilização)
+- **Bootstrap Icons** + React Icons (pacote de ícones)
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### Backend
+- **Node.js** (ambiente de execução)
+- **Express 5** (framework para API)
+- **SQLite3** (banco de dados embutido)
+- **CORS** (middleware para requisições cruzadas)
+
+### Ferramentas de Desenvolvimento
+- **ESLint** (padronização de código)
+- **React Refresh** (hot reloading)
+- **TypeScript Definitions** (tipagem para React)
+
+### Bibliotecas Adicionais
+- **jsonwebtoken** (para autenticação)
+- **react-router-dom** (gerenciamento de rotas SPA)
+
+---
+
+## 📂 Estrutura do Projeto
+```
+brasileirenses/
+├── server.js # Ponto de entrada do backend
+├── vite.config.js # Configuração do Vite
+├── database.db # Banco de dados SQLite
+├── src/
+│ ├── api/ # Autenticação
+│ ├── config/ # Configurações do DB
+│ ├── controllers/ # Lógica da API
+│ ├── pages/ # Componentes React
+│ │ ├── admin/ # Área de gerenciamento
+│ │ └── public/ # Páginas acessíveis
+│ ├── routes/ # Endpoints da API
+│ └── services/ # Consultas complexas
+```
+
+---
+
+## 🚀 Como Executar o Projeto
+
+1. **Pré-requisitos**:
+   - Node.js (v18+)
+   - npm (v9+)
+
+2. **Instalação**:
+   
+   ```
+   git clone https://github.com/toniink/brasileirenses/
+   ```
+   ```
+   cd brasileirenses
+   ```
+   ```
+   npm install
+   ```
+
+3. **Execução**
+```
+# Iniciar frontend (Vite)
+npm run dev
+```
+```
+# Em outro terminal, iniciar backend
+node server.js
+   ```
+   ---
+
+## 🔄 Fluxos Principais
+### 👨‍💻 Usuário Comum
+1. Acessa a lista de cursos na página inicial
+2. Seleciona um curso específico
+3. Visualiza o software relacionado
+4. Acessa o tutorial "Como instalar"
+
+
+### 👨‍🔧 Administrador
+**Acesso**: `/#/gerenciamento` (acesso direto pelo endpoint)
+***Ordem de Cadastro***:
+
+1. Categorias
+2. Sites de referência
+3. Softwares
+4. Cursos
+5. Conteúdos (textos) para Cursos/Softares/Tutoriais
+
+---
+
+## ⚙️ Funcionalidades Implementadas
+- CRUD completo para gestão de conteúdos
+- Sistema de feedback dos usuários
+- Interface responsiva e acessível
+- Organização hierárquica dos materiais educacionais
+
+---
+
+## 🔜 Próximas Atualizações
+- Sistema de playlists
+- Upload de imagens
+- Moderação de comentários
+---
+- Temas claro/escuro
