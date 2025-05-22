@@ -108,5 +108,5 @@ node server.js
 - Sistema de playlists
 - Upload de imagens
 - Moderação de comentários
----
 - Temas claro/escuro
+ ---
