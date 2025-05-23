@@ -1,25 +1,36 @@
-Portal de Recursos Educacionais
+# Portal de Recursos Educacionais
+
 Um CMS educacional desenvolvido para democratizar o acesso ao conhecimento tecnológico, organizando cursos, softwares e tutoriais em uma interface intuitiva para iniciantes.
 
-🛠 Tecnologias Utilizadas
-Front-end
-React 19 (com hooks e react-router-dom v7)
-Vite 6 (ferramenta de construção como)
-Bootstrap 5 + React-Bootstrap (estilização)
-Ícones Bootstrap + Ícones React (pacote de ícones)
-Backend
-Node.js (ambiente de execução)
-Express 5 (estrutura para API)
-SQLite3 (banco de dados embutido)
-CORS (middleware para requisições cruzadas)
-Ferramentas de Desenvolvimento
-ESLint (padronização de código)
-React Refresh (recarga dinâmica)
-Definições de TypeScript (tipagem para React)
-Bibliotecas Adicionais
-jsonwebtoken (para autenticação)
-react-router-dom (gerenciamento de rotas SPA)
-📂 Estrutura do Projeto
+---
+
+## 🛠 Tecnologias Utilizadas
+
+### Front-end
+- React 19 (com hooks e `react-router-dom` v7)
+- Vite 6
+- Bootstrap 5 + React-Bootstrap
+- Bootstrap Icons + React Icons
+
+### Backend
+- Node.js
+- Express 5
+- SQLite3
+- CORS
+
+### Ferramentas de Desenvolvimento
+- ESLint
+- React Refresh
+- Definições de TypeScript
+
+### Bibliotecas Adicionais
+- `jsonwebtoken`
+- `react-router-dom`
+
+---
+
+## 📂 Estrutura do Projeto
+
 brasileirenses/
 ├── server.js # Ponto de entrada do backend
 ├── vite.config.js # Configuração do Vite
@@ -33,43 +44,73 @@ brasileirenses/
 │ │ └── public/ # Páginas acessíveis
 │ ├── routes/ # Endpoints da API
 │ └── services/ # Consultas complexas
-🚀 Como Executar o Projeto
-Pré-requisitos :
 
-Node.js (v18+)
-npm (v9+)
-Instalação :
+yaml
+Copiar
+Editar
 
+---
+
+## 🚀 Como Executar o Projeto
+
+### Pré-requisitos
+- Node.js (v18+)
+- npm (v9+)
+
+### Instalação
+
+```bash
 git clone https://github.com/toniink/brasileirenses/
 cd brasileirenses
 npm install
 Execução
-
-# Iniciar frontend (Vite)
+bash
+Copiar
+Editar
+# Em um terminal, inicie o frontend (Vite)
 npm run dev
-# Em outro terminal, iniciar backend
+
+# Em outro terminal, inicie o backend
 node server.js
 🔄 Fluxos Principais
 👨‍💻 Usuário Comum
 Acesse a lista de cursos na página inicial
+
 Selecione um curso específico
-Visualização do software relacionado
+
+Visualize o software relacionado
+
 Acesse o tutorial "Como instalar"
+
 👨‍🔧 Administrador
-Acesso : /#/gerenciamento(acesso direto pelo endpoint) Ordem de Cadastro :
+Acesso direto via: /#/gerenciamento
+
+Ordem recomendada de cadastro:
 
 Categorias
+
 Sites de referência
+
 Softwares
+
 Cursos
-Conteúdos (textos) para Cursos/Softwares/Tutoriais
+
+Conteúdo (para cursos/softwares/tutoriais)
+
 ⚙️ Funcionalidades Implementadas
-CRUD completo para gestão de conteúdo
-Sistema de feedback dos usuários
-Interface responsiva e acessível
-Organização hierárquica dos materiais educacionais
+✅ CRUD completo para cursos, softwares, tutoriais e categorias
+
+✅ Sistema de feedback de usuários
+
+✅ Interface responsiva e acessível
+
+✅ Organização hierárquica dos conteúdos
+
 🔜 Próximas Atualizações
 Sistema de playlists
-Carregar imagens
+
+Upload de imagens
+
 Moderação de comentários
-Temas claros/escuros
+
+Suporte a temas claro/escuro
