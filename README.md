@@ -1,12 +1,75 @@
-# React + Vite
+Portal de Recursos Educacionais
+Um CMS educacional desenvolvido para democratizar o acesso ao conhecimento tecnológico, organizando cursos, softwares e tutoriais em uma interface intuitiva para iniciantes.
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+🛠 Tecnologias Utilizadas
+Front-end
+React 19 (com hooks e react-router-dom v7)
+Vite 6 (ferramenta de construção como)
+Bootstrap 5 + React-Bootstrap (estilização)
+Ícones Bootstrap + Ícones React (pacote de ícones)
+Backend
+Node.js (ambiente de execução)
+Express 5 (estrutura para API)
+SQLite3 (banco de dados embutido)
+CORS (middleware para requisições cruzadas)
+Ferramentas de Desenvolvimento
+ESLint (padronização de código)
+React Refresh (recarga dinâmica)
+Definições de TypeScript (tipagem para React)
+Bibliotecas Adicionais
+jsonwebtoken (para autenticação)
+react-router-dom (gerenciamento de rotas SPA)
+📂 Estrutura do Projeto
+brasileirenses/
+├── server.js # Ponto de entrada do backend
+├── vite.config.js # Configuração do Vite
+├── database.db # Banco de dados SQLite
+├── src/
+│ ├── api/ # Autenticação
+│ ├── config/ # Configurações do DB
+│ ├── controllers/ # Lógica da API
+│ ├── pages/ # Componentes React
+│ │ ├── admin/ # Área de gerenciamento
+│ │ └── public/ # Páginas acessíveis
+│ ├── routes/ # Endpoints da API
+│ └── services/ # Consultas complexas
+🚀 Como Executar o Projeto
+Pré-requisitos :
 
-Currently, two official plugins are available:
+Node.js (v18+)
+npm (v9+)
+Instalação :
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+git clone https://github.com/toniink/brasileirenses/
+cd brasileirenses
+npm install
+Execução
 
-## Expanding the ESLint configuration
+# Iniciar frontend (Vite)
+npm run dev
+# Em outro terminal, iniciar backend
+node server.js
+🔄 Fluxos Principais
+👨‍💻 Usuário Comum
+Acesse a lista de cursos na página inicial
+Selecione um curso específico
+Visualização do software relacionado
+Acesse o tutorial "Como instalar"
+👨‍🔧 Administrador
+Acesso : /#/gerenciamento(acesso direto pelo endpoint) Ordem de Cadastro :
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+Categorias
+Sites de referência
+Softwares
+Cursos
+Conteúdos (textos) para Cursos/Softwares/Tutoriais
+⚙️ Funcionalidades Implementadas
+CRUD completo para gestão de conteúdo
+Sistema de feedback dos usuários
+Interface responsiva e acessível
+Organização hierárquica dos materiais educacionais
+🔜 Próximas Atualizações
+Sistema de playlists
+Carregar imagens
+Moderação de comentários
+Temas claros/escuros
