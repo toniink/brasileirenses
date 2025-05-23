@@ -1,37 +1,90 @@
-# brasileirenses
+# 📚 Portal de Recursos Educacionais
+Um sistema completo de gerenciamento de conteúdos educacionais voltado para iniciantes em tecnologia. A plataforma permite cadastrar, editar e consultar cursos, categorias, sites e usuários, além de associar múltiplas categorias a um curso, tudo com interface web intuitiva e API RESTful.
 
-Estamos desenvolvendo um site que guia pessoas com pouco ou nenhum conhecimento em tecnologia à cursos online gratuitos e seguros.
+## 🚀 Funcionalidades
+- CRUD de usuários, cursos, categorias e sites
+- Associação de categorias secundárias a cursos
+- Interface responsiva com HTML, CSS e JavaScript
+- Backend com Node.js, Express e SQLite
+- Autenticação de usuários com senhas criptografadas
+- Separação clara entre camadas (controllers, rotas, serviços, views)
 
-## Demonstração
+## 🛠 Tecnologias Utilizadas
+- Backend
+- Node.js
+- Express
+- SQLite3
+- Bcrypt (criptografia de senhas)
+- CORS
 
-(https://design.penpot.app/#/workspace?team-id=9f31952d-2d54-8169-8006-12f0bbadf696&file-id=749aaa04-8836-81c6-8006-12f178be9bd7&page-id=749aaa04-8836-81c6-8006-103bcbeed364)
+## Frontend
+- HTML5
+- CSS3 (layout responsivo com estilização moderna)
+- JavaScript (consumo de API via fetch)
 
-## Funcionalidades
+## Organização de Código
+- controllers/ – lógica das rotas (CRUD para categorias, cursos, sites, usuários)
+- public/ – arquivos estáticos: CSS e scripts JS
+- pages/ – HTML da interface do sistema
+- scripts/ – interações JS para formulários e manipulação de dados
 
-[x] Curadoria de links para cursos e softwares gratuitos.
+## 📂 Estrutura de Diretórios
 
-[x] Tutoriais e vídeo-aulas para uso de softwares.
+portal-recursos/
+├── config/              # Conexão com banco de dados SQLite
+├── controllers/         # Lógica dos recursos (usuários, cursos, etc.)
+├── public/              # Estilos (CSS) e scripts (JS)
+├── pages/               # Interfaces HTML
+├── routes/              # Definição das rotas da API
+├── server.js            # Ponto de entrada do backend
+└── database.db          # Banco de dados SQLite
 
-[x] Sistema de login para criação de playlists, avaliação de cursos e comentários.
+## 📄 Funcionalidades por Módulo
+### 🧑‍🏫 Cursos
+- Cadastro e listagem com descrição, duração, formato e dificuldade
+- Associação a categorias e sites
+- Edição e exclusão de cursos
+- Gerenciamento de categorias secundárias
 
-[x] Barra de busca personalizada para facilitar a navegação.
+### 🧩 Categorias
+- Criar, editar, deletar categorias
+- Atribuir categorias secundárias aos cursos
+- Visualizar categorias associadas
 
-[x] Design intuitivo com acessibilidade e layout responsivo.
+### 🌐 Sites
+- Vincular cursos a plataformas como Alura, Udemy, etc.
+- Campos: nome, URL e descrição
 
-## Tecnologias Utilizadas
+## 👤 Usuários
+- CRUD completo com hash de senhas
+- Campos: nome, email, senha (criptografada)
 
--HTML5
+## 🔧 Como Executar o Projeto
+### Pré-requisitos
+- Node.js (v18+)
+- npm (v9+)
 
--CSS3
+### Instalação
 
--JavaScript
+- git clone https://github.com/toniink/brasileirenses
+- cd portal-recurso
+- npm install
 
--Banco de dados: MySQL ou MongoDB (dependendo da abordagem escolhida).
+### Execução
+### Iniciar o servidor
+- npm run dev
+- Acesse no navegador: http://localhost:3000
 
--Frameworks e Bibliotecas: Bootstrap, React (opcional).
+## 🔜 Melhorias Futuras
+- Upload de imagens
+- Moderação de comentários
+- Filtros por nível/formato
+- Paginação e busca avançada
+- Login de usuários com autenticação JWT
 
-## Como Rodar Localmente
+## 📸 Layouts e Interfaces
+- O sistema inclui páginas para:
+- Cadastro e edição de cursos, usuários, categorias e sites
+- Tabelas responsivas com ações de editar/excluir
+- Associações dinâmicas via JavaScript
 
-1. Clone o repositório:
-```bash
-git clone https://github.com/toniink/brasileirenses.git
