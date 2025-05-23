@@ -384,7 +384,7 @@ const CursosEntidade = () => {
 
                                         {/* NOVO CAMPO - Lista suspensa de softwares (seleção única) */}
                                         <div className="col-md-6 mb-3">
-                                            <label className="form-label">Software Associado</label>
+                                            <label className="form-label">Software Associado *</label>
                                             <select
                                                 className="form-select"
                                                 name="id_software"
@@ -392,7 +392,7 @@ const CursosEntidade = () => {
                                                 onChange={handleChange}
                                                 disabled={loading}
                                             >
-                                                <option value="">Selecione um software (opcional)</option>
+                                                <option value="">Selecione um software</option>
                                                 {softwares.map(software => (
                                                     <option key={software.id_softwares} value={software.id_softwares}>
                                                         {software.nome}
